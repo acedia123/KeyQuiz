@@ -1,0 +1,78 @@
+@import '../../../styles/variable.scss';
+.header-title {
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.link {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.carousel-wrapper {
+    position: relative;
+    span {
+        position: absolute;
+        left: 332px;
+        max-width: 600px;
+        font-style: normal;
+        font-size: 30px;
+        line-height: 47px;
+        transition: 1s;
+    }
+    .carousel-name {
+        top: 100px;
+        font-weight: 700;
+        color: $white-color;
+        text-shadow: 2px 0 $black-color, -2px 0 $black-color, 0 2px $black-color, 0 -2px $black-color, 1px 1px $black-color, -1px -1px $black-color, 1px -1px $black-color, -1px 1px $black-color;
+    }
+    .carousel-description {
+        top: 300px;
+        font-weight: 400;
+        color: $black-color;
+        text-shadow: 2px 0 $white-color, -2px 0 $white-color, 0 2px $white-color, 0 -2px $white-color, 1px 1px $white-color, -1px -1px $white-color, 1px -1px $white-color, -1px 1px $white-color;
+    }
+}
+
+.adornment {
+    position: absolute;
+    top: 50px;
+    right: 24px;
+}
+
+@media only screen and (min-width: 481px) and (max-width: 1130px) {
+    .carousel-wrapper {
+        span {
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 26px;
+        }
+        .carousel-name {
+            top: 36px;
+        }
+        .carousel-description {
+            top: 275px;
+        }
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .carousel-wrapper {
+        span {
+            left: 10px;
+            max-width: 480px;
+            font-size: 14px;
+            line-height: 20px;
+        }
+        .carousel-name {
+            top: 62px;
+        }
+        .carousel-description {
+            top: 150px;
+        }
+    }
+}

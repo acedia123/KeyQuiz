@@ -1,0 +1,22 @@
+{
+    "language": {
+        "english": "Tiếng Anh",
+        "vietnam": "Tiếng Việt"
+    },
+    "general": {
+        "notification": "Thông báo",
+        "shrink": "Co",
+        "button": {
+            "save": "Lưu",
+            "cancel": "Hủy"
+        }
+    },
+    "auth": {
+        "account": "Tài khoản",
+        "password": "Mật khẩu"
+    },
+    "navigation": {
+        "userProfile": "Thông tin người dùng",
+        "listUser": "Danh sách người dùng"
+    }
+}

@@ -1,0 +1,38 @@
+// Pagination
+.table-pagination {
+    .table-pagination__action {
+        background-color: #fff;
+        color: #333;
+        border: 1px solid $border-color;
+        outline: 0;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        cursor: pointer;
+        border-radius: 2px;
+        font-size: 14px;
+    }
+    .table-pagination__action--disabled {
+        opacity: 0.7;
+        cursor: default;
+    }
+    .table-pagination__list {
+        button {
+            border: none;
+            margin: 0 8px;
+            color: #000;
+            &:hover {
+                color: $primary-color;
+            }
+            font-size: 14px;
+        }
+        .table-pagination__text--active {
+            background-color: $primary-color;
+            color: #fff;
+            font-weight: 600;
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
+}

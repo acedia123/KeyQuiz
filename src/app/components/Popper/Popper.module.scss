@@ -1,0 +1,21 @@
+@import '../../../styles/variable.scss';
+.add-button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid $primary-color !important;
+}
+
+.user-avatar-popper {
+    width: 180px;
+    .separate {
+        margin: 5px 10px;
+    }
+}
+
+.header-popper {
+    width: 300px;
+}
+
+.more-icon {
+    font-size: 30px !important;
+}

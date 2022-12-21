@@ -1,0 +1,42 @@
+//bg-color
+$bg-header: rgb(0, 152, 121);
+$bg-layout: #f5f5f5;
+//recycle-color
+$bg-primary: linear-gradient(92.39deg, #fdc133 9.48%, #ffb400 24.1%, #f19100 78.81%);
+$primary-color: #ffb400;
+$hover-color: #e6e6e6;
+$success-color: #00925d;
+$danger-color: #dc3545;
+$disabled-color: #d5d5d5;
+$border-color: #dbdbdb;
+$text-muted: rgba(0, 0, 0, 0.54);
+$text-hint: rgba(0, 0, 0, 0.38);
+$border-color: #dbdbdb;
+$border-primary: hsla(0, 0%, 100%, 0.1);
+$box-shadow: 0 1px 3.125rem 0 rgb(0 0 0 / 20%);
+// customization color
+$separate-color: rgba(102, 102, 102, 0.25);
+// Default color
+$white-color: #fff;
+$black-color: #000;
+$text-color: #333;
+$gray-color: #767676;
+// indicator
+$header-height: 56px;
+// Root
+:root {
+    --sidebar-width: 280px;
+    --sidebar-width-md: 80px;
+}
+
+@media only screen and (min-width: 481px) and (max-width: 970px) {
+     :root {
+        --sidebar-width: 80px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+     :root {
+        --sidebar-width: 0;
+    }
+}

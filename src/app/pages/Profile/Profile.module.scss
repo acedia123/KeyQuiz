@@ -1,0 +1,66 @@
+@import '../../../styles/variable.scss';
+.header-title {
+    font-size: 22px;
+    white-space: nowrap;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.form-profile {
+    width: 500px;
+    // margin: 0 auto;
+}
+
+.avatar-name {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.hover-image {
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    align-items: center;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    button {
+        color: #fff;
+        font-size: 14px;
+    }
+}
+
+.avatar-dialog__img-wrapper {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    .image-avatar {
+        border: 1px solid #000;
+        &:hover {
+            border-color: #ddd;
+        }
+    }
+}
+
+.image-wrapper {
+    position: relative;
+    &:hover {
+        .hover-image {
+            display: flex;
+        }
+    }
+}
+
+.kq-btn {
+    border: 1px solid $primary-color !important;
+}
+
+.separate {
+    width: 1px;
+    height: 200px;
+    background-color: #ccc;
+}

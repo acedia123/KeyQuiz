@@ -1,0 +1,109 @@
+.ttr-wrapper {
+    -webkit-transition: margin 200ms cubic-bezier(0.215, 0.61, 0.355, 1);
+    -moz-transition: margin 200ms cubic-bezier(0.215, 0.61, 0.355, 1);
+    -o-transition: margin 200ms cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition: margin 200ms cubic-bezier(0.215, 0.61, 0.355, 1);
+    /* easeOutCubic */
+    width: 100%;
+}
+
+.widget-card {
+    border-radius: 4px;
+    background: #ec681d;
+    padding: 20px 20px 15px 20px;
+    color: #fff;
+    position: relative;
+    margin-bottom: 30px;
+    width: 100%;
+    .wc-title {
+        font-size: 16px;
+        line-height: 16px;
+        margin: 0;
+        color: #fff;
+        font-weight: 500;
+    }
+}
+
+.wc-progress {
+    margin: 15px 0 5px 0;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    .progress-bar {
+        background-color: #fff;
+        border-radius: 3px;
+    }
+}
+
+.wc-stats {
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 500;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.wc-des {
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+.wc-progress-bx {
+    display: flex;
+    width: 100%;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.widget-bg1 {
+    background: #fd8515;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #fd8515 0%, #db4b24 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #fd8515 0%, #db4b24 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #fd8515 0%, #db4b24 100%);
+}
+
+.widget-bg2 {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#8699fb+0,8340f6+100 */
+    background: #8699fb;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #8699fb 0%, #8340f6 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #8699fb 0%, #8340f6 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #8699fb 0%, #8340f6 100%);
+}
+
+.widget-bg3 {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#fc7588+0,e71c54+100 */
+    background: #fc7588;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #fc7588 0%, #e71c54 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #fc7588 0%, #e71c54 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #fc7588 0%, #e71c54 100%);
+}
+
+.widget-bg4 {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#668bff+0,104dfd+100 */
+    background: #668bff;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #668bff 0%, #104dfd 100%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #668bff 0%, #104dfd 100%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #668bff 0%, #104dfd 100%);
+}
+
+@media only screen and (max-width: 767px) {
+    .ttr-wrapper {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}

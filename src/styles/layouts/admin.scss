@@ -1,0 +1,88 @@
+$admin-header: 56px;
+:root {
+    --sidebar-width: 280px;
+}
+
+.AdminLayout {
+    width: 100%;
+    font-size: 14px;
+    background-color: #fafafa;
+    .app__container {
+        margin-left: var(--sidebar-width);
+        transition: all 0.3s ease-in-out;
+        vertical-align: top;
+        flex: 1 1 auto;
+        display: flex;
+        overflow: hidden;
+        position: relative;
+        flex-direction: column;
+        .header {
+            box-shadow: 0px 5px 5px -3px #0000000f, 0px 8px 10px 1px #0000000b, 0px 3px 14px 2px #00000009;
+            height: $admin-header;
+            background-color: $white-color;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width);
+            z-index: 96;
+            transition: all 0.3s ease-in-out;
+            .wrapper {
+                justify-content: space-between;
+                height: 100%;
+                padding: 0 20px;
+                .user-popper {
+                    width: 185px;
+                    li:hover {
+                        background-color: #f5f5f5;
+                    }
+                }
+            }
+        }
+        .scrollable__content {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            flex: 1 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            .main {
+                height: 1000px;
+                .wrapper {
+                    margin: 30px;
+                }
+            }
+            .footer {}
+        }
+    }
+}
+
+// Responsive
+.shrink {
+    .app__container {
+        margin-left: 0;
+        .header {
+            left: 0;
+        }
+    }
+    .hide {
+        opacity: 0;
+    }
+}
+
+.hide {
+    transition: opacity 0.3s;
+}
+
+// Base
+.avatar__wrapper {
+    width: 40px;
+    height: 40px;
+}
+
+.Popper {
+    width: 100%;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: rgb(0 0 0 /12%) 0 2px 12px;
+    max-height: min((100vh - 96px) - 60px, 734px);
+}

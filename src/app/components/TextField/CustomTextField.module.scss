@@ -1,0 +1,138 @@
+@import '../../../styles/variable.scss';
+$height-input: 34px;
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.label {
+    font-size: 16px;
+    color: rgba(102, 102, 102, 1);
+    margin-bottom: 0;
+    font-family: 'Poppins';
+    cursor: text;
+}
+
+.input {
+    border: 1px solid $separate-color;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 16px !important;
+    min-width: 250px;
+    &:focus {
+        border-color: rgba(102, 102, 102, 1);
+    }
+    &:disabled {
+        background-color: $hover-color;
+    }
+}
+
+.course-form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    position: relative;
+    .form-title {
+        font-size: 14px;
+        color: #333;
+        font-weight: 600;
+        white-space: nowrap;
+        font-family: 'Poppins';
+        min-width: 150px;
+        margin-top: 15px;
+    }
+    .input-inner {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .form-input {
+        width: 488px;
+        min-height: $height-input;
+        background: #ffffff;
+        border: 1px solid #333333;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+}
+
+.dialog-form-group {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    position: relative;
+    .form-title {
+        font-size: 14px;
+        color: #333;
+        font-weight: 600;
+        white-space: nowrap;
+        font-family: 'Poppins';
+        margin-bottom: 0;
+        margin-right: 10px;
+        // min-width: 150px;
+    }
+    .form-input {
+        width: 488px;
+        min-height: $height-input;
+        background: #ffffff;
+        border: 1px solid #333333;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .course-form-group {
+        align-items: flex-start;
+        flex-direction: column;
+        .form-input {
+            width: 100%;
+            margin-left: 0;
+        }
+        .form-title {
+            margin-top: 0;
+        }
+    }
+}
+
+@media only screen and (max-width: 770px) {
+    .input {
+        min-width: 280px;
+    }
+}
+
+.text-danger {
+    color: $danger-color;
+    font-size: 16px;
+    padding: 0 14px;
+}
+
+.danger-form {
+    border-color: $danger-color;
+}
+
+.input-adornment {
+    padding-right: 48px !important;
+}
+
+.error-message {
+    color: $danger-color;
+    font-size: 14px;
+    padding: 5px 20px;
+}
+
+.custom-input-adornment {
+    position: absolute;
+    top: 50px;
+    right: 24px;
+}

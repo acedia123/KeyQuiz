@@ -1,0 +1,211 @@
+ul {
+    padding-left: 0;
+    margin: 0;
+    list-style: none;
+}
+
+a {
+    text-decoration: none !important;
+    color: #333;
+    cursor: pointer;
+}
+
+a:hover {
+    color: #333;
+}
+
+button {
+    border: none;
+    background-color: transparent;
+    outline: none !important;
+    cursor: pointer;
+}
+
+input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 14px !important;
+}
+
+p {
+    margin: 0;
+}
+
+.d-flex-center {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+.d-flex-align-center {
+    display: flex !important;
+    align-items: center;
+}
+
+.d-flex-center-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.color-primary {
+    color: $primary-color !important;
+}
+
+.color-gray {
+    color: $gray-color;
+}
+
+.small-font {
+    font-size: 11px !important;
+}
+
+.font-12 {
+    font-size: 12px !important;
+}
+
+.normal-font {
+    font-size: 14px !important;
+}
+
+.fs-16 {
+    font-size: 16px !important;
+}
+
+.fs-18 {
+    font-size: 18px !important;
+}
+
+.fs-22 {
+    font-size: 22px !important;
+}
+
+.lg-font {
+    font-size: 18px !important;
+}
+
+.text-muted {
+    color: $text-muted !important;
+}
+
+.text-hint {
+    color: $text-hint !important;
+}
+
+.ml-8 {
+    margin-left: 8px !important;
+}
+
+.ml-10 {
+    margin-right: 10px !important;
+}
+
+.pt-20 {
+    padding-top: 20px;
+}
+
+.pb-20 {
+    padding-bottom: 20px;
+}
+
+.kq-btn-tooltip {
+    padding: 5px;
+    margin: 0 7px;
+}
+
+.link--hover {
+    &:hover {
+        color: $primary-color;
+    }
+}
+
+.row-center {
+    width: 100% !important;
+    text-align: center !important;
+}
+
+.kq-btn-tooltip:hover {
+    background-color: $hover-color;
+    border-radius: 50%;
+}
+
+.kq-hover-link {
+    text-decoration: none;
+    font-size: 14px !important;
+    &:hover {
+        text-decoration: underline !important;
+        color: $primary-color;
+    }
+}
+
+.kq-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+}
+
+.close-icon {
+    position: absolute !important;
+    top: 8px;
+    right: 8px;
+}
+
+.rounded-15 {
+    border-radius: 15px !important;
+}
+
+.dialog-button {
+    border-radius: 15px !important;
+    min-width: 100px !important;
+}
+
+// Data table
+.MuiDataGrid-columnHeaderTitle {
+    font-size: 14px;
+    font-weight: 600 !important;
+    text-transform: capitalize;
+    color: #333;
+}
+
+.progress-warning {
+    background-color: #f1dd9e !important;
+    .MuiLinearProgress-bar {
+        background-color: $primary-color !important;
+    }
+}
+
+.progress-danger {
+    background-color: #eaadb3 !important;
+    .MuiLinearProgress-bar {
+        background-color: $danger-color !important;
+    }
+}
+
+.quesTable {
+    font-size: 14px !important;
+    .MuiDataGrid-columnHeader {
+        background-color: #e7f2ff !important;
+    }
+    .MuiInputBase-root {
+        font-size: 14px !important;
+    }
+    .MuiTablePagination-selectLabel {
+        font-size: 14px !important;
+    }
+    .MuiTablePagination-displayedRows {
+        font-size: 14px !important;
+    }
+    .even-row {
+        background-color: rgb(238, 238, 238) !important;
+    }
+    .odd-row {
+        background-color: transparent !important;
+    }
+    .icon {
+        font-size: 20px;
+    }
+}

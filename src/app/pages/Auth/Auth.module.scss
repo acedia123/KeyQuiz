@@ -1,0 +1,120 @@
+@import '../../../styles/variable.scss';
+.title {
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 54px;
+}
+
+.text-input {
+    font-size: 22px;
+    label {
+        font-size: 22px !important;
+    }
+}
+
+.label-row {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.link {
+    font-size: 14px;
+    // margin-top: 8px;
+    &:hover {
+        text-decoration: underline !important;
+    }
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 24px;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background: $primary-color;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 40px;
+    font-size: 18px;
+}
+
+.btn-google {
+    background: #ffffff;
+    border: 1px solid $text-color;
+    border-radius: 40px;
+    color: $text-color;
+}
+
+.button-spacing {
+    margin-top: 20px;
+}
+
+.grid-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: -16px;
+}
+
+@media only screen and (min-width: 770px) and (max-width: 1200px) {
+    .grid-row {
+        align-items: unset;
+        flex-direction: column;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .grid-row {
+        align-items: unset;
+        flex-direction: column;
+    }
+}
+
+.separate-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin: 16px 0;
+}
+
+.separate {
+    height: 2px;
+    width: 100%;
+    background-color: $separate-color;
+}
+
+.brand-img {
+    width: 30px;
+    margin-right: 16px;
+}
+
+.text {
+    cursor: pointer;
+    color: $primary-color;
+    margin-left: 5px;
+    &:hover {
+        color: $primary-color;
+    }
+}
+
+.footer {
+    font-size: 16px;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.adornment {
+    position: absolute;
+    top: 50px;
+    right: 24px;
+}

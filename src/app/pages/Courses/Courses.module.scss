@@ -1,0 +1,33 @@
+@import '../../../styles/variable.scss';
+$height-input: 40px;
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-title {
+    font-size: 22px;
+    white-space: nowrap;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.header-action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.filter {
+    height: $height-input;
+    width: 100%;
+    font-size: 14px;
+    padding: 0 20px;
+    outline: none;
+    border: none;
+    font-weight: 600;
+    option {
+        font-weight: 600;
+    }
+}

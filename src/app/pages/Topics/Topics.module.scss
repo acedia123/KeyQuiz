@@ -1,0 +1,60 @@
+@import '../../../styles/variable.scss';
+$height-input: 40px;
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-title {
+    font-size: 22px;
+    white-space: nowrap;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.header-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    position: relative;
+    .form-title {
+        font-size: 14px;
+        color: #333;
+        font-weight: 600;
+        white-space: nowrap;
+        font-family: 'Poppins';
+        margin-bottom: 0;
+    }
+    .filter {
+        border-radius: 10px;
+        font-weight: 400 !important;
+        option {
+            font-weight: inherit;
+        }
+    }
+}
+
+.filter {
+    margin-left: 10px;
+    height: $height-input;
+    font-size: 14px;
+    padding: 0 20px;
+    outline: none;
+    font-weight: 600;
+    option {
+        font-weight: inherit;
+    }
+}
+
+.topic-search-popper {
+    width: 278px;
+}

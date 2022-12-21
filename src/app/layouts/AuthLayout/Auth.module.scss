@@ -1,0 +1,46 @@
+@import '../../../styles/variable.scss';
+.wrapper {
+    -webkit-tap-highlight-color: rgb(255 255 255/0);
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1100;
+}
+
+.inner {
+    display: flex;
+    height: 100%;
+}
+
+.background {
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    flex: 50%;
+}
+
+.form {
+    flex: 50%;
+    overflow: scroll;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.form-card {
+    width: 580px;
+    margin: auto;
+    padding: 0 32px;
+}
+
+@media only screen and (max-width: 770px) {
+    .background {
+        display: none;
+    }
+    .form-card {
+        padding: 0;
+    }
+}
