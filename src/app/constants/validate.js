@@ -80,12 +80,15 @@ export const checkConfirmPass = (data) => {
     return dataText;
 };
 
-export const checkTermName = (data) => {
+export const checkTermName = (data, termData) => {
     let dataText = {};
+    let checkData = termData.filter((item) => item.term_name === data.term_name);
     if (data.term_name === '') {
         dataText = { status: true, error: "Chapter name can't empty." };
     } else if (data.term_name.length > 50) {
         dataText = { status: true, error: 'Chapter name no more than 50 character.' };
+    } else if (checkData.length > 1 && data.term_name != '') {
+        dataText = { status: true, error: 'Chapter name already exists.' };
     } else {
         dataText = { status: false, error: '' };
     }

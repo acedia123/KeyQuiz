@@ -53,7 +53,7 @@ export default function HomePage() {
                 setLearningCourse(data);
                 getAllCourses().then((course) => {
                     let newData = course.data.filter(
-                        (item) => item.category[0].category_id === data[0].category[0].category_id,
+                        (item) => data.length > 0 && item.category[0].category_id === data[0].category[0].category_id,
                     );
                     if (newData.length === 0) {
                         newData = course.data.sort(() => Math.random() - Math.random()).slice(0, 6);

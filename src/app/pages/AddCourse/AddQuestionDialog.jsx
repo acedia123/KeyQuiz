@@ -14,12 +14,13 @@ import styles from './AddCourse.module.scss';
 
 const cx = classNames.bind(styles);
 
-export default function AddQuestionDialog({ open, handleSubmit, handleClose, dataAddQuestion }) {
+export default function AddQuestionDialog({ open, handleSubmit, handleClose, dataAddQuestion, data }) {
     const context = useContext(ToastContext);
     const [dataSelected, setDataSelected] = useState([]);
     const [openConfirmDeleteAnswer, setOpenConfirmDeleteAnswer] = useState(false);
     const [openConfirmDeleteAnswers, setOpenConfirmDeleteAnswers] = useState(false);
     const [answerIndex, setAnswerIndex] = useState(0);
+    const [foundSameContent, setFoundSameContent] = useState(0);
     const [dataForm, setDataForm] = useState({
         content: '',
         answers: [{ id: 1, content: '', isCorrect: false }],
@@ -119,9 +120,7 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
 
     const handleFormSubmit = () => {
         handleCheckAnswer();
-
         let newData = dataForm.answers.map((item) => (item.content === '' ? null : item));
-
         const { notification, content } = JSON.parse(localStorage.getItem('addQuestionForm'));
         if (!notification.status && !content.status) {
             dataForm.answers = newData.filter((n) => n);
@@ -153,6 +152,7 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
             notification: { status: false, error: '' },
             content: { status: false, error: '' },
         });
+        setFoundSameContent(0);
     };
 
     const handleCheckAnswer = () => {
@@ -174,6 +174,15 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
     };
 
     const handleBlurContent = () => {
+        let count = data.reduce(
+            (preValue, item) =>
+                preValue +
+                item.questions.filter(
+                    (ques) => ques.content.trim().toLowerCase() === dataForm.content.trim().toLowerCase(),
+                ).length,
+            0,
+        );
+        setFoundSameContent(count);
         setDataError((preState) => {
             return { ...preState, content: checkContent(dataForm) };
         });
@@ -266,7 +275,14 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
                         onChange={handleChangeText}
                         onBlur={handleBlurContent}
                     />
-                    {dataError.content.status && <span className={cx('error-message')}>{dataError.content.error}</span>}
+
+                    {dataError.content.status ? (
+                        <span className={cx('error-message')}>{dataError.content.error}</span>
+                    ) : (
+                        <span className={cx('content-message')}>
+                            Found {foundSameContent} questions has same content
+                        </span>
+                    )}
                 </div>
             </div>
             <div className={cx('form-table')}>

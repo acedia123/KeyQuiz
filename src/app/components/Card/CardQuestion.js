@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@mui/material';
+import { Card, CardContent, Chip } from '@mui/material';
 import { DeleteRounded, Edit, StarOutline, StarRounded } from '@mui/icons-material';
 import { getUserFromLocalStorage } from '../../constants/functions';
 
@@ -42,7 +42,18 @@ export default function CardQuestion({
         <Card className={cx('flash-card-item')}>
             <div className={cx('card-header')} style={{ backgroundColor: '#E7F2FF' }}>
                 <div className={cx('header-title')}>
-                    {index}. <span className={cx('text-content')}>{data.content}</span>
+                    {index}.{' '}
+                    <span className={cx('text-content')}>
+                        {data.content}
+                        {data.isExist && (
+                            <Chip
+                                className="ml-4"
+                                label={<span className="normal-font">Existed</span>}
+                                variant="outlined"
+                                color="warning"
+                            />
+                        )}
+                    </span>
                 </div>
 
                 {isForm ? (
@@ -96,7 +107,7 @@ export default function CardQuestion({
                     <div className={cx('separate') + ' my-2'}></div>
                 </div>
                 <div className={cx('content')}>
-                    <span className="normal-font">{data.term_name}</span>
+                    <span className="normal-font">{data.term_name ? data.term_name : term.term_name}</span>
                 </div>
             </CardContent>
         </Card>

@@ -31,6 +31,7 @@ import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
 import CourseTextField from '../../components/TextField/CourseTextField';
 import { checkCourseName, checkPassword, checkTermName } from '../../constants/validate';
+import ImportCourseDialog from './ImportCourseDialog';
 
 const cx = classNames.bind(styles);
 
@@ -61,6 +62,7 @@ export default function EditCourse() {
     // Confirm Dialog
     const [openDialog, setOpenDialog] = useState(false);
     const [openConfirmQuestionDialog, setOpenConfirmQuestionDialog] = useState(false);
+    const [openImportExcel, setOpenImportExcel] = useState(false);
 
     const [dataError, setDataError] = useState({
         course_name: { status: false, error: '' },
@@ -158,7 +160,7 @@ export default function EditCourse() {
 
     const handleBlurTermText = (termIndex) => {
         let dataErrors = dataError.terms.slice();
-        dataErrors[termIndex] = checkTermName(data.data[termIndex]);
+        dataErrors[termIndex] = checkTermName(data.data[termIndex], data.data);
         setDataError((preState) => {
             return { ...preState, terms: dataErrors };
         });
@@ -167,7 +169,7 @@ export default function EditCourse() {
     const handleCheckValidate = () => {
         let dataErrors = [];
         data.data.forEach((item) => {
-            dataErrors.push(checkTermName(item));
+            dataErrors.push(checkTermName(item, data.data));
         });
         let newState = {
             terms: dataErrors,
@@ -305,31 +307,55 @@ export default function EditCourse() {
         });
     };
 
-    const handleOpenImport = () => {};
+    const handleOpenImport = () => {
+        setOpenImportExcel(true);
+    };
 
     const handleImportExcel = (newData) => {
-        // console.log(newData);
-        // let newDataConvert = [];
-        // let newDataError = dataError.terms.slice();
-        // let newExpand = expand.slice();
-        // // console.log(data.data);
-        // newData.forEach((item) => {
-        //     newDataError.push({ status: false, error: '' });
-        //     newExpand.push(false);
-        // });
-        // // handleData(newData);
-        // if (data.data.length === 0) {
-        //     setData((preState) => {
-        //         return { ...preState, data: newData };
-        //     });
-        // } else {
-        //     setData((preState) => {
-        //         return { ...preState, data: [...preState.data, ...newData] };
-        //     });
-        // }
-        // setDataError({ ...dataError, terms: newDataError });
-        // setExpand(newExpand);
-        // setOpenImportExcel(false);
+        let newDataError = dataError.terms.slice();
+        let newExpand = expand.slice();
+
+        let handleData = newData.map((item) => {
+            newDataError.push({ status: false, error: '' });
+            newExpand.push(false);
+            let newArr = [];
+            let newQues = item.questions.map((b) => {
+                let check = newArr.filter((a) => a.content === b.content).length > 0;
+                if (check) {
+                    return { ...b, isExist: check };
+                } else {
+                    newArr.push(b);
+                    return { ...b, isExist: false };
+                }
+            });
+            return { ...item, questions: newQues };
+        });
+
+        if (data.data.length === 0) {
+            setData((preState) => {
+                return { ...preState, data: handleData };
+            });
+        } else {
+            let ob = data.data.map((item) => {
+                let h = handleData.find((h) => item.term_name === h.term_name);
+                if (h) {
+                    let idss = new Set(item.questions.map((d) => d.content));
+                    let quess = [...item.questions, ...h.questions.filter((d) => !idss.has(d.content))];
+                    return { ...item, questions: quess };
+                } else {
+                    return { ...item };
+                }
+            });
+            let ids = new Set(ob.map((d) => d.term_name));
+            let merged = [...ob, ...handleData.filter((d) => !ids.has(d.term_name))];
+            setData((preState) => {
+                return { ...preState, data: merged };
+            });
+        }
+
+        setDataError({ ...dataError, terms: newDataError });
+        setExpand(newExpand);
+        setOpenImportExcel(false);
     };
 
     const filters = [
@@ -403,7 +429,6 @@ export default function EditCourse() {
                                     </option>
                                 ))}
                         </select>
-                        {/* {error && <span  className={cx('error-text')}>{helperText}</span>} */}
                     </div>
                 </div>
                 <div className={cx('form-group')}>
@@ -562,6 +587,12 @@ export default function EditCourse() {
                     </div>
                 ))}
             </div>
+
+            <ImportCourseDialog
+                open={openImportExcel}
+                handleClose={() => setOpenImportExcel(false)}
+                handleSubmit={handleImportExcel}
+            />
 
             <AddQuestionDialog
                 open={openAddQuestionDialog}

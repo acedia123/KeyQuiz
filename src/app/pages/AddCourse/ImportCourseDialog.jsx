@@ -62,15 +62,15 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
         let terms = [];
         for (let i = 0; i < newArr.length; i++) {
             let newObj = newArr[i].split('--next-line--');
-            let check = terms.find((item) => item === newObj[0].substring(11));
+            let check = terms.find((item) => item === newObj[0].substring(14));
             if (!check) {
-                terms.push(newObj[0].substring(11));
+                terms.push(newObj[0].substring(14));
             }
             questions.push({
-                term_name: newObj[0].substring(11),
+                term_name: newObj[0].substring(14),
                 content: newObj[1].substring(9),
                 answers: newObj[2].substring(9).split('\\n'),
-                correct_answers: newObj[3].substring(16).split('\\n'),
+                correct_answers: newObj[3].substring(17).split('\\n'),
                 hint: newObj[4].substring(6),
                 explain: newObj[5].substring(9),
             });

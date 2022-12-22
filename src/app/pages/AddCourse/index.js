@@ -154,7 +154,7 @@ export default function AddCourse() {
 
     const handleBlurTermText = (termIndex) => {
         let dataErrors = dataError.terms.slice();
-        dataErrors[termIndex] = checkTermName(data.data[termIndex]);
+        dataErrors[termIndex] = checkTermName(data.data[termIndex], data.data);
         setDataError((preState) => {
             return { ...preState, terms: dataErrors };
         });
@@ -163,7 +163,7 @@ export default function AddCourse() {
     const handleCheckValidate = () => {
         let dataErrors = [];
         data.data.forEach((item) => {
-            dataErrors.push(checkTermName(item));
+            dataErrors.push(checkTermName(item, data.data));
         });
         let newState = {
             terms: dataErrors,
@@ -222,6 +222,8 @@ export default function AddCourse() {
                 correctAns.push(item.content);
             }
         });
+
+        let checkData = newData.some((item) => item.questions.filter((ques) => ques.content === dataForm.content));
         if (isEdit) {
             newData[termIndex].questions[questionIndex] = {
                 content: dataForm.content,
@@ -229,6 +231,7 @@ export default function AddCourse() {
                 correctAnswers: correctAns,
                 hint: dataForm.hint,
                 explain: dataForm.explain,
+                isExist: checkData,
             };
         } else {
             newData[termIndex].questions.push({
@@ -237,6 +240,7 @@ export default function AddCourse() {
                 correctAnswers: correctAns,
                 hint: dataForm.hint,
                 explain: dataForm.explain,
+                isExist: checkData,
             });
         }
 
@@ -310,50 +314,50 @@ export default function AddCourse() {
     };
 
     const handleImportExcel = (newData) => {
-        console.log(newData);
-
-        let newDataConvert = [];
         let newDataError = dataError.terms.slice();
         let newExpand = expand.slice();
 
-        // console.log(data.data);
-
-        newData.forEach((item) => {
+        let handleData = newData.map((item) => {
             newDataError.push({ status: false, error: '' });
             newExpand.push(false);
+            let newArr = [];
+            let newQues = item.questions.map((b) => {
+                let check = newArr.filter((a) => a.content === b.content).length > 0;
+                if (check) {
+                    return { ...b, isExist: check };
+                } else {
+                    newArr.push(b);
+                    return { ...b, isExist: false };
+                }
+            });
+            return { ...item, questions: newQues };
         });
-
-        // handleData(newData);
 
         if (data.data.length === 0) {
             setData((preState) => {
-                return { ...preState, data: newData };
+                return { ...preState, data: handleData };
             });
         } else {
+            let ob = data.data.map((item) => {
+                let h = handleData.find((h) => item.term_name === h.term_name);
+                if (h) {
+                    let idss = new Set(item.questions.map((d) => d.content));
+                    let quess = [...item.questions, ...h.questions.filter((d) => !idss.has(d.content))];
+                    return { ...item, questions: quess };
+                } else {
+                    return { ...item };
+                }
+            });
+            let ids = new Set(ob.map((d) => d.term_name));
+            let merged = [...ob, ...handleData.filter((d) => !ids.has(d.term_name))];
             setData((preState) => {
-                return { ...preState, data: [...preState.data, ...newData] };
+                return { ...preState, data: merged };
             });
         }
 
         setDataError({ ...dataError, terms: newDataError });
         setExpand(newExpand);
         setOpenImportExcel(false);
-    };
-
-    const handleData = (newData) => {
-        var startTime = performance.now();
-
-        for (let i = 0; i < newData.length; i++) {
-            // if (data.data.length > 0) {
-            newData[i].questions = newData[i].questions.filter(
-                (value, index, self) => index === self.findIndex((t) => t.content === value.content),
-            );
-            console.log(newData[i].questions);
-            // }
-        }
-        var endTime = performance.now();
-
-        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
     };
 
     const filters = [
@@ -596,6 +600,7 @@ export default function AddCourse() {
             />
 
             <AddQuestionDialog
+                data={data.data}
                 open={openAddQuestionDialog}
                 dataAddQuestion={dataAddQuestion}
                 handleSubmit={handleSubmitDialog}
