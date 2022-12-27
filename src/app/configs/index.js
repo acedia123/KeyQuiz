@@ -9,6 +9,7 @@ export const routes = {
     topics: '/topics',
     learn: '/learn',
     test: '/test',
+    testDetail: '/test-detail',
     userProfile: '/user-profile',
     courseDetail: '/course-detail',
     addCourse: '/add-course',

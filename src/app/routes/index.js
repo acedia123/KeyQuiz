@@ -23,6 +23,7 @@ const Learn = React.lazy(() => import('../pages/Learn'));
 
 //Test
 const Test = React.lazy(() => import('../pages/Test'));
+const TestDetail = React.lazy(() => import('../pages/Test/TestDetail'));
 
 // Topic
 const Topics = React.lazy(() => import('../pages/Topics'));
@@ -50,6 +51,7 @@ export const publicRoutes = [
     { path: routes.topics, component: Topics, layout: DefaultLayout },
 
     { path: routes.test + '/:id', component: Test, layout: null },
+    { path: routes.testDetail + '/:id', component: TestDetail, layout: null },
 
     { path: routes.login, component: Login, layout: Auth },
     { path: routes.activePage + '/:id', component: LoginFake, layout: Auth },

@@ -29,6 +29,7 @@ import ReportDialog from '../../components/Dialog/ReportDialog';
 import classNames from 'classnames/bind';
 import styles from './CourseDetail.module.scss';
 import { getTerm } from '../../redux/test/actions';
+import TabTestResult from './TabTestResult';
 
 const cx = classNames.bind(styles);
 
@@ -349,6 +350,7 @@ export default function CourseDetail() {
                         <Tabs value={value} onChange={handleChange}>
                             <Tab label="Questions" {...a11yProps(0)} className="normal-font font-weight-bold" />
                             <Tab label="Course Reviews" {...a11yProps(1)} className="normal-font font-weight-bold" />
+                            <Tab label="Test Result" {...a11yProps(2)} className="normal-font font-weight-bold" />
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
@@ -356,6 +358,9 @@ export default function CourseDetail() {
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <TabComments courseId={id} courseDetail={courseDetail} />
+                    </TabPanel>
+                    <TabPanel value={value} index={2}>
+                        <TabTestResult courseId={id} courseDetail={courseDetail} />
                     </TabPanel>
                 </div>
             )}

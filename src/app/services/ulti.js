@@ -13,3 +13,5 @@ export const searchingGoogle = (data) => {
     var url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=017576662512468239146:omuauf_lfve&q=${data}`;
     return axios.get(url);
 };
+
+export const downloadTemplate = () => API_PATH + '/download-template';

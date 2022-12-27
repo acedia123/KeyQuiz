@@ -36,7 +36,7 @@ export default function LearnResult({ data, refs }) {
     const handleCheckStar = () => {};
 
     return (
-        <Card refs={refs} className={cx('card', isNewQuestion ? '--animation-slide' : '')}>
+        <Card ref={refs} className={cx('card', isNewQuestion ? '--animation-slide' : '')}>
             <CardContent className={cx('card-content')}>
                 <Grid className={cx('card__header')}>
                     <Typography className="normal-font font-weight-bold">

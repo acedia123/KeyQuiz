@@ -80,3 +80,8 @@ export const getCourseAdmin = (data) => {
     var url = API_PATH + '/get-all-course';
     return axios.post(url, data);
 };
+
+export const getListTestByUser = (data) => {
+    var url = API_PATH + '/get-list-test';
+    return axios.post(url, data);
+};

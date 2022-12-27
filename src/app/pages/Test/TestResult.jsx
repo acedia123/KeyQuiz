@@ -1,6 +1,6 @@
-import { React, useEffect, useState } from 'react';
+import { React, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Box, Card, CardContent, Grid, Typography, CircularProgress } from '@mui/material';
+import { Card, CardContent, Grid } from '@mui/material';
 import LearnResult from '../Learn/LearnResult';
 import CustomButton from '../../components/Share/CustomButton';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,51 +8,9 @@ import { routes } from '../../configs';
 
 import classNames from 'classnames/bind';
 import styles from '../Learn/Learn.module.scss';
+import CustomCircularProgress from '../../components/Share/CustomCircularProgress';
 
 const cx = classNames.bind(styles);
-
-function CircularProgressWithLabel(props) {
-    return (
-        <Box
-            sx={{
-                position: 'relative',
-                display: 'inline-flex',
-                border: '1px solid #ccc',
-                borderRadius: '50%',
-                width: 80,
-                height: 80,
-            }}
-        >
-            <CircularProgress
-                style={{ width: 80, height: 80 }}
-                variant="determinate"
-                sx={{ color: props.color }}
-                value={props.value}
-            />
-            <Box
-                sx={{
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Typography
-                    className="normal-font font-weight-bold"
-                    variant="caption"
-                    component="div"
-                    color="text.secondary"
-                >
-                    {`${Math.round(props.value)}%`}
-                </Typography>
-            </Box>
-        </Box>
-    );
-}
 
 export default function TestResult({ refs }) {
     const { id } = useParams();
@@ -74,16 +32,20 @@ export default function TestResult({ refs }) {
             <Card className={cx('overview-round-header')}>
                 <CardContent className={cx('card-content', 'text-danger')}>
                     Wrong number of times: {testResult.wrongTime}/{testProcessing.length}
-                    <CircularProgressWithLabel
-                        value={(testResult.wrongTime * 100) / testProcessing.length}
+                    <CustomCircularProgress
+                        value={testResult.wrongTime}
+                        total={testProcessing.length}
                         color="#dc3545"
+                        isPer={true}
                     />
                 </CardContent>
                 <CardContent className={cx('card-content', 'text-success')}>
                     Correct number of times: {testResult.successTime}/{testProcessing.length}
-                    <CircularProgressWithLabel
-                        value={(testResult.successTime * 100) / testProcessing.length}
+                    <CustomCircularProgress
+                        value={testResult.successTime}
+                        total={testProcessing.length}
                         color="#00925d"
+                        isPer={true}
                     />
                 </CardContent>
                 <CardContent className={cx('card-content', 'justify-content-around')}>
@@ -103,11 +65,17 @@ export default function TestResult({ refs }) {
             </Card>
             <div className={cx('header-label')}>Your result</div>
             <Grid container spacing={2}>
-                {testProcessing.map((item) => (
-                    <Grid item md={12}>
-                        <LearnResult data={item} refs={refs[item.id]} />
-                    </Grid>
-                ))}
+                {testProcessing.map((item) => {
+                    let refsData = refs[item.id];
+                    if (item.question_practice_id) {
+                        refsData = refs[item.question_practice_id];
+                    }
+                    return (
+                        <Grid item md={12}>
+                            <LearnResult data={item} refs={refsData} />
+                        </Grid>
+                    );
+                })}
             </Grid>
         </div>
     );

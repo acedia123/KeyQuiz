@@ -233,6 +233,32 @@ $height-input: 40px;
     }
 }
 
+.test-wrapper {
+    .banner {
+        background-color: #fff;
+        min-height: 50px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 2px;
+        box-sizing: border-box;
+        padding: 30px;
+    }
+    .banner-inner {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .banner-inner {
+        font-size: 14px;
+    }
+    .banner-text-title {
+        font-size: 16px;
+        font-weight: 600;
+    }
+}
+
 //phone
 @media only screen and (max-width: 550px) {
     .action-wrapper {

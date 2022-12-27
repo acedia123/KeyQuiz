@@ -3,17 +3,21 @@ import TermFeed from './TermFeed';
 import { IMAGE_PATH } from '../../appConfig';
 import Carousel from 'react-material-ui-carousel';
 import { Grid, Paper } from '@mui/material';
-import { userTerm } from '../../constants/fakeData';
-import CustomTab from '../../components/Tab';
 import { routes } from '../../configs';
-import { getCourseLearning, getTopCourseByUser, getTopPopularCourse } from '../../services/home';
+import {
+    getCourseLearned,
+    getCourseLearning,
+    getTopCourseByUser,
+    getTopPopularCourse,
+    getTopSuggest,
+} from '../../services/home';
+import CustomTab from '../../components/Tab';
 import CardCourse from '../../components/Card/CardCourse';
+import CarouselFewData from '../../components/Carousel/CarouselFewData';
+import CardCarouselNoData from '../../components/Card/CardCarouselNoData';
 
 import classNames from 'classnames/bind';
 import styles from './Home.module.scss';
-import CarouselFewData from '../../components/Carousel/CarouselFewData';
-import CardCarouselNoData from '../../components/Card/CardCarouselNoData';
-import { getAllCourses } from '../../services/courses';
 
 const cx = classNames.bind(styles);
 
@@ -28,9 +32,9 @@ function Item({ data }) {
 }
 
 export default function HomePage() {
-    const [recentlyCourseData, setRecentlyCourse] = useState(null);
     const [popularCourse, setPopularCourse] = useState([]);
     const [learningCourse, setLearningCourse] = useState([]);
+    const [learnedCourse, setLearnedCourse] = useState([]);
     const [myCourse, setMyCourse] = useState(null);
     const [suggestCourse, setSuggestCourse] = useState([]);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
@@ -38,29 +42,18 @@ export default function HomePage() {
 
     useEffect(() => {
         document.title = 'Home | Key Quiz';
-        userTerm(10, 0, 8, 0).then((data) => {
-            setRecentlyCourse(data.courses);
-        });
         if (user) {
             getTopCourseByUser({ top: 6, user_id: user.user_id }).then(({ data }) => {
-                let newArr = [];
-                for (let item in data) {
-                    newArr.push(data[item]);
-                }
-                setMyCourse(newArr);
+                setMyCourse(data);
             });
             getCourseLearning({ user_id: user.user_id, limit: 6 }).then(({ data }) => {
                 setLearningCourse(data);
-                getAllCourses().then((course) => {
-                    let newData = course.data.filter(
-                        (item) => data.length > 0 && item.category[0].category_id === data[0].category[0].category_id,
-                    );
-                    if (newData.length === 0) {
-                        newData = course.data.sort(() => Math.random() - Math.random()).slice(0, 6);
-                    }
-                    setSuggestCourse(newData);
-                    console.log(newData);
-                });
+            });
+            getCourseLearned({ user_id: user.user_id, top: 6 }).then(({ data }) => {
+                setLearnedCourse(data);
+            });
+            getTopSuggest({ user_id: user.user_id }).then(({ data }) => {
+                setSuggestCourse([...data.byAuthor, ...data.byCategory]);
             });
         } else {
             getTopPopularCourse().then(({ data }) => {
@@ -106,7 +99,7 @@ export default function HomePage() {
                                 },
                                 {
                                     title: 'Learned Courses',
-                                    data: recentlyCourseData ? recentlyCourseData : [],
+                                    data: learnedCourse ? learnedCourse : [],
                                     loadLink: routes.userProfile + '/?tab=1',
                                     describe: "You haven't learned courses yet",
                                 },

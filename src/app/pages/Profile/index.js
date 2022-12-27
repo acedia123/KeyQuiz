@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Alert, Avatar, Box, Card, CardContent, Grid, Tab, Tabs } from '@mui/material';
-import { userTerm } from '../../constants/fakeData';
-import CardCourse from '../../components/Card/CardCourse';
+import { Alert, Avatar, Box, Card, CardContent, Tab, Tabs } from '@mui/material';
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import { BackspaceOutlined, LockOutlined, ModeEditRounded, SaveOutlined } from '@mui/icons-material';
 import AuthTextField from '../../components/TextField/AuthTextField';
-import TabPanel from '../../components/Tab/TabPanel';
 import CustomDialog from '../../components/Share/CustomDialog';
 import { IMAGE_PATH } from '../../appConfig';
 import { avatars } from '../../constants/avatar';
@@ -14,12 +11,13 @@ import { changeAvatar, changePassword, editName, getAccountById } from '../../se
 import { ToastContext } from '../../context/ToastContextProvider';
 import { checkConfirmPassword, checkNewPassword, checkPassword } from '../../constants/validate';
 import CustomInputAdornment from '../../components/TextField/CustomInputAdornment';
-import { getCourseLearning, getTopCourseByUser } from '../../services/home';
+import { getCourseLearned, getCourseLearning, getTopCourseByUser } from '../../services/home';
 import TabMyCourse from './TabMyCourse';
 import { checkPasswordService } from '../../services/auth';
 
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
+import { useParams } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -32,12 +30,12 @@ function a11yProps(index) {
 
 export default function UserProfile() {
     const context = useContext(ToastContext);
-    const [data, setData] = useState([]);
     const [myCourse, setMyCourse] = useState([]);
     const [value, setValue] = useState(0);
     const [avatarDialog, setAvatarDialog] = useState(false);
     const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
     const [learningCourse, setLearningCourse] = useState([]);
+    const [learnedCourse, setLearnedCourse] = useState([]);
     const [dataLoading, setDataLoading] = useState({ avatar: '', user_name: '' });
 
     const [showPassword, setShowPassword] = useState(false);
@@ -80,10 +78,12 @@ export default function UserProfile() {
 
     useEffect(() => {
         document.title = 'User Profile | Key Quiz';
-        fetchData();
         fetchAccount();
-        fetchMyCourse();
+        fetchData();
         localStorage.setItem('changePassword', JSON.stringify(dataError));
+        return () => {
+            localStorage.removeItem('changePassword');
+        };
     }, []);
 
     useEffect(() => {
@@ -93,13 +93,16 @@ export default function UserProfile() {
         }
     }, [window.location.search]);
 
-    const fetchMyCourse = () => {
+    const fetchData = () => {
         const user = JSON.parse(localStorage.getItem('user'));
         getTopCourseByUser({ user_id: user.user_id }).then(({ data }) => {
             setMyCourse(data);
         });
         getCourseLearning({ user_id: user.user_id }).then(({ data }) => {
             setLearningCourse(data);
+        });
+        getCourseLearned({ user_id: user.user_id }).then(({ data }) => {
+            setLearnedCourse(data);
         });
     };
 
@@ -115,19 +118,12 @@ export default function UserProfile() {
         });
     };
 
-    const fetchData = () => {
-        userTerm(50, 0, 18, 0).then((data) => {
-            setData(data.courses);
-        });
-    };
-
     const handleChange = (event) => {
         setDataForm({ ...dataForm, [event.target.name]: event.target.value });
     };
 
     const handleChangeTab = (event, newValue) => {
         setValue(newValue);
-        fetchData();
     };
 
     const handleChangeImage = (avatar) => {
@@ -274,7 +270,6 @@ export default function UserProfile() {
 
     return (
         <div className="inner">
-            {/* <CustomBreadcrumbs routeSegments={[{ name: 'abc', path: 'abc' }, { name: 'List courses' }]} /> */}
             <Card>
                 <CardContent>
                     <div className="d-flex-center-between">
@@ -392,13 +387,7 @@ export default function UserProfile() {
                         </Tabs>
                     </Box>
                     <TabMyCourse value={value} index={0} data={learningCourse} />
-                    <TabPanel value={value} index={1}>
-                        <Grid container spacing={2}>
-                            {data.map((item) => (
-                                <CardCourse key={item.id} data={item} />
-                            ))}
-                        </Grid>
-                    </TabPanel>
+                    <TabMyCourse value={value} index={1} data={learnedCourse} />
                     <TabMyCourse value={value} index={2} data={myCourse} />
                 </CardContent>
             </Card>

@@ -17,3 +17,13 @@ export const getTopPopularCourse = (data) => {
     var url = API_PATH + '/get-top-9-popular-course';
     return axios.post(url, data);
 };
+
+export const getCourseLearned = (data) => {
+    var url = API_PATH + '/get-top-learned-course';
+    return axios.post(url, data);
+};
+
+export const getTopSuggest = (data) => {
+    var url = API_PATH + '/get-course-suggest';
+    return axios.post(url, data);
+};

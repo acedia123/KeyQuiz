@@ -79,7 +79,7 @@ export default function Learn() {
 
     useEffect(() => {
         document.title = 'Learn - PRJ321 | Key Quiz';
-        const SIZE_OF_ROUND = dataSetting.numberRound;
+        const SIZE_OF_ROUND = +dataSetting.numberRound;
         getQuestionToLearn({ course_id: courseId, type: 0, user_id: getUserFromLocalStorage().user_id }).then(
             ({ data }) => {
                 let newData = parseJSON(data);

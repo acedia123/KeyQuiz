@@ -10,16 +10,17 @@ import { routes } from '../../configs';
 import CustomButton from '../../components/Share/CustomButton';
 import { useDispatch, useSelector } from 'react-redux';
 import TestResult from './TestResult';
-import { getSelected, getTerm, getTestResult, getQuestionByTest, getTotalQues } from '../../redux/test/actions';
+import { getSelected, getTerm, getTestResult, getQuestionByTest } from '../../redux/test/actions';
 import { getCourseDetail } from '../../redux/course/actions';
 import { getUserFromLocalStorage } from '../../constants/functions';
 import ConfirmSubmitTest from '../../components/Dialog/ConfirmSubmitTest';
 import CustomDialog from '../../components/Share/CustomDialog';
 import { useTimer } from 'react-timer-hook';
+import { Box } from '@mui/system';
+import { createTest } from '../../services/test';
 
 import classNames from 'classnames/bind';
 import styles from './Test.module.scss';
-import { Box } from '@mui/system';
 
 const cx = classNames.bind(styles);
 
@@ -27,7 +28,6 @@ const ProgressLabel = ({ value }) => {
     const [initialValue, setInitialValue] = useState(100);
 
     useEffect(() => {
-        console.log(value);
         setInitialValue(value);
     }, []);
 
@@ -61,6 +61,8 @@ export default function TestDetail() {
     const { questions } = useSelector((state) => state.test);
     const { terms } = useSelector((state) => state.test);
     const { totalQues } = useSelector((state) => state.test);
+
+    const [testId, setTestId] = useState('');
 
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
     const [refs, setRefs] = useState([]);
@@ -103,14 +105,16 @@ export default function TestDetail() {
             }),
         );
         dispatch(getTerm.getTermRequest({ course_id: id }));
+        createTestApi();
     }, []);
 
     useEffect(() => {
         if (courseDetail) {
             const refsResult = questions.reduce((acc, value) => {
-                acc[value.id] = React.createRef();
+                acc[value.question_practice_id] = React.createRef();
                 return acc;
             }, {});
+            console.log(questions);
             setRefs2(refsResult);
             const refs1 = questions.reduce((acc, value) => {
                 acc[value.question_practice_id] = React.createRef();
@@ -136,11 +140,10 @@ export default function TestDetail() {
     };
 
     const handleClickResult = (id) => {
-        console.log(refs2[id]);
-        // refs2[id].current.scrollIntoView({
-        //     behavior: 'smooth',
-        //     block: 'start',
-        // });
+        refs2[id].current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
     };
 
     const handleConfirmTest = () => {
@@ -150,6 +153,21 @@ export default function TestDetail() {
         } else {
             handleSubmitTest();
         }
+    };
+
+    const createTestApi = () => {
+        let { h, s, m } = dataSetting.timer;
+        createTest({
+            user_id: getUserFromLocalStorage().user_id,
+            course_id: id,
+            time: `${h}:${m}:${s}`,
+            total_question: dataSetting.numberRound,
+            wrong_count: 0,
+            correct_count: 0,
+            status: 1,
+        }).then(({ data }) => {
+            setTestId(data.data);
+        });
     };
 
     const handleSubmitTest = () => {
@@ -172,6 +190,21 @@ export default function TestDetail() {
             getTestResult.getTestResultSuccess({ successTime: correctTimes, wrongTime: wrongTimes, openResult: true }),
         );
         setOpenConfirmDialog(false);
+        let questionsData = testProcessing.map((item) => {
+            return {
+                question_id: item.question_id,
+                user_answers: item.userChoose.length > 0 ? item.userChoose.map((choose) => choose.answer) : [],
+            };
+        });
+
+        createTest({
+            test_id: testId,
+            questions: questionsData,
+            correct_count: correctTimes,
+            wrong_count: wrongTimes,
+        }).then(({ data }) => {
+            console.log(data);
+        });
     };
 
     const handleReview = () => {
@@ -197,6 +230,7 @@ export default function TestDetail() {
                 type: dataSetting.type,
             }),
         );
+        handleCloseSettingDialog();
     };
 
     const handleChange = (e) => setDataSetting({ ...dataSetting, chapter: e.target.value });
@@ -345,12 +379,12 @@ export default function TestDetail() {
 
                                                 return (
                                                     <li>
-                                                        <Link
-                                                            onClick={() => handleClickResult(test.id)}
+                                                        <button
+                                                            onClick={() => handleClickResult(test.question_practice_id)}
                                                             className={cx('btn-question', checkStatus)}
                                                         >
                                                             {index + 1}
-                                                        </Link>
+                                                        </button>
                                                     </li>
                                                 );
                                             })}

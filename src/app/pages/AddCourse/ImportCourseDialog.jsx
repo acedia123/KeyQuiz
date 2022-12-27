@@ -3,10 +3,11 @@ import CustomDialog from '../../components/Share/CustomDialog';
 import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
 import { importCourseExcel } from '../../services/excel';
+import { IMAGE_PATH } from '../../appConfig';
+import { downloadTemplate } from '../../services/ulti';
 
 import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
-import { IMAGE_PATH } from '../../appConfig';
 
 const cx = classNames.bind(styles);
 
@@ -86,7 +87,6 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
                 .map((mapItem) => {
                     return { ...mapItem, correctAnswers: mapItem.correct_answers };
                 });
-            // .filter((value, index, self) => index === self.findIndex((t) => t.content === value.content));
             return { term_name: item, questions: newArr };
         });
     };
@@ -111,11 +111,15 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
             <div className={cx('import-file-dialog')}>
                 <div className={cx('center')}>
                     <div className={cx('title')}>
-                        <h1>Drop file to upload</h1>
+                        <h1>
+                            You can{' '}
+                            <a href={downloadTemplate()} className="text-primary">
+                                click here
+                            </a>{' '}
+                            to download template or drop file to upload
+                        </h1>
                     </div>
-                    {/* <div className="normal-font">
-                        You can <Link onClick={handleDownloadFile}>click here</Link> to download template
-                    </div> */}
+                    <div className="normal-font"></div>
                     <input
                         ref={inputRef}
                         type="file"
