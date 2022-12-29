@@ -124,6 +124,7 @@ export default function UserProfile() {
 
     const handleChangeTab = (event, newValue) => {
         setValue(newValue);
+        fetchData();
     };
 
     const handleChangeImage = (avatar) => {
@@ -268,6 +269,23 @@ export default function UserProfile() {
             });
     };
 
+    const handleSearch = (value, index) => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (index === 0) {
+            getCourseLearning({ user_id: user.user_id, searchText: value }).then(({ data }) => {
+                setLearningCourse(data);
+            });
+        } else if (index === 1) {
+            getCourseLearned({ user_id: user.user_id, searchText: value }).then(({ data }) => {
+                setLearnedCourse(data);
+            });
+        } else {
+            getTopCourseByUser({ user_id: user.user_id, searchText: value }).then(({ data }) => {
+                setMyCourse(data);
+            });
+        }
+    };
+
     return (
         <div className="inner">
             <Card>
@@ -386,9 +404,9 @@ export default function UserProfile() {
                             <Tab label="Created Courses" {...a11yProps(2)} className="normal-font font-weight-bold" />
                         </Tabs>
                     </Box>
-                    <TabMyCourse value={value} index={0} data={learningCourse} />
-                    <TabMyCourse value={value} index={1} data={learnedCourse} />
-                    <TabMyCourse value={value} index={2} data={myCourse} />
+                    <TabMyCourse value={value} index={0} data={learningCourse} handleSearch={handleSearch} />
+                    <TabMyCourse value={value} index={1} data={learnedCourse} handleSearch={handleSearch} />
+                    <TabMyCourse value={value} index={2} data={myCourse} handleSearch={handleSearch} />
                 </CardContent>
             </Card>
 

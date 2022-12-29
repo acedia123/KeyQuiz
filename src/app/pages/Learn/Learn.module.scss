@@ -176,6 +176,77 @@ $header-height: 56px;
     }
 }
 
+.mini-screen {
+    .input-search {
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+    .search-wrapper {
+        display: flex;
+    }
+    .results {
+        margin: 10px 0;
+        .result-item {
+            padding: 10px 0;
+            border-bottom: 1px solid $hover-color;
+            cursor: pointer;
+            display: block;
+            &:hover {
+                .result-title {
+                    text-decoration: underline;
+                }
+            }
+            .result-sub-text {
+                color: $text-muted;
+                font-size: 14px;
+            }
+            .result-title {
+                font-size: 20px;
+                color: $primary-color;
+                font-weight: 600;
+            }
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+    }
+    .searchSelect {
+        position: absolute;
+        background-color: rgb(245, 245, 245);
+        box-sizing: content-box;
+        cursor: pointer;
+        height: 19px;
+        width: 19px;
+        z-index: 2147483647;
+        border-width: 1px;
+        border-style: solid;
+        border-color: rgb(220, 220, 220);
+        border-image: initial;
+        border-radius: 5px;
+        padding: 3px;
+        .icon {
+            font-size: 30px;
+            background-size: 19px;
+            height: 19px;
+            width: 19px;
+        }
+    }
+}
+
+.--animation-slide {
+    animation-name: slide;
+    animation-duration: 0.4s;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(100px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
 @media only screen and (max-width: 830px) {
     .main {
         width: 100%;

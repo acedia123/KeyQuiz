@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 // Router
 import { Link, useNavigate, useParams } from 'react-router-dom';
 // Redux
@@ -11,15 +11,19 @@ import {
     getNewQuestion,
     getNotification,
     getOpenOverview,
+    getSearchSelected,
+    getSearchText,
     getTotalLearn,
     userAnswer,
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
 // Service
 import { getQuestionToLearn } from '../../services/courses';
+import { searchingGoogle } from '../../services/ulti';
+import { reportQuestion } from '../../services/report';
 // Material UI
-import { Grid } from '@mui/material';
-import { SettingsOutlined, CloseOutlined } from '@mui/icons-material';
+import { debounce, Grid } from '@mui/material';
+import { SettingsOutlined, CloseOutlined, Search } from '@mui/icons-material';
 // Component
 import LearnOneAnswer from '../../components/Question/LearnOneAnswer';
 import LearnMultiAnswer from '../../components/Question/LearnMultiAnswer';
@@ -28,17 +32,16 @@ import CustomButton from '../../components/Share/CustomButton';
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import OverviewRound from './OverviewRound';
 import LearnEnding from './LearnEnding';
+import MiniScreen from './MiniScreen';
+import ReportDialog from '../../components/Dialog/ReportDialog';
 // Other
 import { routes } from '../../configs';
 import { IMAGE_PATH } from '../../appConfig';
 import { getUserFromLocalStorage } from '../../constants/functions';
+import { getTerm } from '../../redux/test/actions';
 
 import classNames from 'classnames/bind';
 import styles from './Learn.module.scss';
-import { getTerm } from '../../redux/test/actions';
-import { reportQuestion } from '../../services/report';
-import ReportDialog from '../../components/Dialog/ReportDialog';
-import { searchingGoogle } from '../../services/ulti';
 
 const cx = classNames.bind(styles);
 
@@ -53,6 +56,8 @@ export default function Learn() {
     const { totalLearn } = useSelector((state) => state.question);
     const { terms } = useSelector((state) => state.test);
 
+    const [dataSearch, setDataSearch] = useState();
+    const [isOpenSearch, setIsOpenSearch] = useState(false);
     const [rounds, setRounds] = useState(null);
     const [openDialogSetting, setOpenDialogSetting] = useState(false);
     const [openReport, setOpenReport] = useState(false);
@@ -87,10 +92,6 @@ export default function Learn() {
             },
         );
         dispatch(getTerm.getTermRequest({ course_id: courseId }));
-
-        searchingGoogle('abc').then((data) => {
-            console.log(data);
-        });
     }, []);
 
     const handleNextQuestion = () => {
@@ -178,7 +179,6 @@ export default function Learn() {
                 } else if (dataSetting.type === 2) {
                     newData = newData.filter((item) => item.term_id === dataSetting.chapter);
                 }
-                console.log(dataSetting);
                 setDataSetting({ ...dataSetting, numberRound: newData.length });
                 fetchData(newData, SIZE_OF_ROUND);
             },
@@ -201,7 +201,6 @@ export default function Learn() {
 
     const handleBlurNumRound = (event) => {
         const totalNum = rounds.reduce((preVal, current) => preVal + current.questions.length, 0);
-        console.log(totalNum);
         if (event.target.value > totalNum) {
             setDataSetting((preState) => {
                 return { ...preState, numberRound: totalNum };
@@ -228,7 +227,6 @@ export default function Learn() {
     ];
 
     const handleReport = (id) => {
-        console.log(id);
         setQuestionId(id);
         setOpenReport(true);
     };
@@ -239,9 +237,34 @@ export default function Learn() {
             question_id: questionId,
             type_of_report,
             other,
-        }).then(({ data }) => {
+        }).then(() => {
             setOpenReport(false);
         });
+    };
+    const { searchText } = useSelector((state) => state.question);
+
+    const handleChangeSearch = (event) => {
+        debounceDropDown(event);
+    };
+
+    const fetchDropdownOptions = (value) => {
+        searchingGoogle(value).then(({ data }) => {
+            setDataSearch(data);
+            dispatch(getSearchSelected.getSearchSelectedSuccess(false));
+            dispatch(getSearchText.getSearchTextSuccess(value));
+        });
+    };
+
+    const debounceDropDown = useCallback(
+        debounce((nextValue) => fetchDropdownOptions(nextValue), 500),
+        [],
+    );
+
+    const handleClickSearch = () => {
+        if (!isOpenSearch) {
+            setIsOpenSearch(true);
+        }
+        fetchDropdownOptions(searchText);
     };
 
     return (
@@ -256,6 +279,13 @@ export default function Learn() {
                 </div>
                 <div className={cx('header-title')}>Round {indexRound + 1}</div>
                 <div className={cx('header-actions')}>
+                    <CustomIconAction
+                        label={'Setting'}
+                        arrow={true}
+                        className={`mr-3 ${cx('kq-btn')}`}
+                        handleClick={() => setIsOpenSearch(!isOpenSearch)}
+                        icon={<Search className={cx('icon')} />}
+                    />
                     <CustomIconAction
                         label={'Setting'}
                         arrow={true}
@@ -282,13 +312,16 @@ export default function Learn() {
                         <LearnMultiAnswer
                             data={rounds[indexRound].questions[indexQuestion]}
                             handleReport={handleReport}
+                            handleClickSearch={handleClickSearch}
                         />
                     ) : (
                         <LearnOneAnswer
                             data={rounds[indexRound].questions[indexQuestion]}
                             handleReport={handleReport}
+                            handleClickSearch={handleClickSearch}
                         />
                     )}
+                    {isOpenSearch && <MiniScreen data={dataSearch} handleChangeSearch={handleChangeSearch} />}
                 </div>
             )}
 
@@ -375,11 +408,13 @@ export default function Learn() {
                     handleClick={handleSubmitForm}
                 />
             </CustomDialog>
+
             <ReportDialog
                 open={openReport}
                 handleSubmit={handleSubmitReport}
                 handleClose={() => setOpenReport(false)}
             />
+
             {notification && (
                 <div className={cx('dialog')}>
                     <div className={cx('dialog-content')}>

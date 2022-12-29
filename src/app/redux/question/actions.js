@@ -56,3 +56,11 @@ export const getOpenEndingView = createActions({
 export const getIndexRoundQuestion = createActions({
     getIndexRoundQuestionSuccess: (payload) => payload,
 });
+
+export const getSearchSelected = createActions({
+    getSearchSelectedSuccess: (payload) => payload,
+});
+
+export const getSearchText = createActions({
+    getSearchTextSuccess: (payload) => payload,
+});

@@ -1,23 +1,34 @@
 import { React, useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, Grid, Typography } from '@mui/material';
-import { QuestionMark, Lightbulb, FlagOutlined, SkipNext, Check, StarRounded, StarOutline } from '@mui/icons-material';
+import {
+    QuestionMark,
+    Lightbulb,
+    FlagOutlined,
+    SkipNext,
+    Check,
+    StarRounded,
+    StarOutline,
+    Search,
+} from '@mui/icons-material';
 import {
     addRoundProcess,
     getCheckQuestion,
     getIsAnswer,
     getNewQuestion,
     getNotification,
+    getSearchSelected,
+    getSearchText,
     userAnswer,
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
+import { changeTypeOfQuestion } from '../../services/courses';
 
 import classNames from 'classnames/bind';
 import styles from './Question.module.scss';
-import { changeTypeOfQuestion } from '../../services/courses';
 
 const cx = classNames.bind(styles);
 
-export default function LearnOneAnswer({ data, handleReport }) {
+export default function LearnOneAnswer({ data, handleReport, handleClickSearch }) {
     const dispatch = useDispatch();
     const [showHint, setShowHint] = useState(false);
     const { userAnswers } = useSelector((state) => state.question);
@@ -97,6 +108,23 @@ export default function LearnOneAnswer({ data, handleReport }) {
 
     const handleToggleStar = () => {};
 
+    const { searchSelected } = useSelector((state) => state.question);
+    const [pos, setPos] = useState({});
+
+    const handleMouseUp = (event) => {
+        let selection = window.getSelection().toString();
+        if (selection !== '' && !searchSelected) {
+            dispatch(getSearchSelected.getSearchSelectedSuccess(true));
+            dispatch(getSearchText.getSearchTextSuccess(selection));
+            setPos({ left: event.clientX - 200 + 'px', right: event.clientY + 'px' });
+        }
+    };
+
+    const handleSearch = (data) => {
+        dispatch(getSearchText.getSearchTextSuccess(data));
+        handleClickSearch();
+    };
+
     return (
         <Card className={cx('card', isNewQuestion ? cx('--animation-slide') : '')}>
             <CardContent className={cx('card-content')}>
@@ -120,6 +148,9 @@ export default function LearnOneAnswer({ data, handleReport }) {
                         <button onClick={handleReportQuestion} className={cx('btn') + ' ml-3'}>
                             <FlagOutlined className={cx('icon')} />
                         </button>
+                        <button onClick={() => handleSearch(data.content)} className={cx('btn') + ' ml-3'}>
+                            <Search className={cx('icon')} />
+                        </button>
                         {!isAnswer && (
                             <button onClick={handleSkipQuestion} className={cx('btn') + ' ml-3'}>
                                 <SkipNext className={cx('icon')} />
@@ -128,7 +159,14 @@ export default function LearnOneAnswer({ data, handleReport }) {
                     </div>
                 </Grid>
                 <Grid className={cx('content-wrapper')} container justifyContent="space-between" flexDirection="column">
-                    <div className={cx('content')}>{data.content}</div>
+                    <div className={cx('content', 'position-relative')} onMouseUp={handleMouseUp}>
+                        {data.content}
+                        {searchSelected && (
+                            <div className={cx('searchSelect')} onClick={handleClickSearch} style={{ ...pos }}>
+                                <Search className={cx('icon')} />
+                            </div>
+                        )}
+                    </div>
                     <div>
                         {checkQuestion != null && (
                             <div className={cx('message', checkQuestion ? 'text-success' : 'text-danger')}>

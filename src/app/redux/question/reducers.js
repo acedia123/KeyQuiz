@@ -10,6 +10,8 @@ import {
     getNotification,
     getOpenEndingView,
     getOpenOverview,
+    getSearchSelected,
+    getSearchText,
     getTotalLearn,
     getType,
     userAnswer,
@@ -27,6 +29,8 @@ const initialState = {
     totalLearn: 0,
     isCheck: false,
     openEndingView: false,
+    searchSelected: false,
+    searchText: null,
     // process
     roundProcess: {
         totalCorrect: 0,
@@ -75,6 +79,12 @@ const QuestionReducer = (state = initialState, action) => {
         }
         case getType(getIndexRoundQuestion.getIndexRoundQuestionSuccess): {
             return { ...state, indexRound: action.payload.indexRound, indexQuestion: action.payload.indexQuestion };
+        }
+        case getType(getSearchSelected.getSearchSelectedSuccess): {
+            return { ...state, searchSelected: action.payload };
+        }
+        case getType(getSearchText.getSearchTextSuccess): {
+            return { ...state, searchText: action.payload };
         }
         default:
             return { ...state };
