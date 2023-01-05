@@ -32,7 +32,7 @@ export default function MiniScreen({ data, handleChangeSearch }) {
                     {data &&
                         data.items.map((item) => (
                             <a href={item.link} target="_blank" className={cx('result-item')} key={item}>
-                                <span className={cx('result-sub-text')}>{item.link}</span>
+                                <span className={cx('result-sub-text', 'text-claim')}>{item.link}</span>
                                 <h3 className={cx('result-title')}>{item.title}</h3>
                                 <span className={cx('result-sub-text')}>{item.snippet}</span>
                             </a>

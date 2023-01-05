@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 // Hook
 import { useNavigate, useParams } from 'react-router-dom';
+import { ToastContext } from '../../context/ToastContextProvider';
 // Material UI
 import { Grid, IconButton } from '@mui/material';
 import {
@@ -19,19 +20,18 @@ import CardQuestion from '../../components/Card/CardQuestion';
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
 import CustomButton from './CustomButton';
+import CourseTextField from '../../components/TextField/CourseTextField';
+import ImportCourseDialog from './ImportCourseDialog';
 // Service
 import { editCourse, findCourseById } from '../../services/courses';
 import { getAllCategories } from '../../services/category';
-
+// Other
 import { routes } from '../../configs/index';
-import { IMAGE_PATH } from '../../appConfig';
-import { ToastContext } from '../../context/ToastContextProvider';
+import { checkCourseName, checkPassword, checkTermName } from '../../constants/validate';
+import { statusCourse } from '../../constants/constObject';
 
 import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
-import CourseTextField from '../../components/TextField/CourseTextField';
-import { checkCourseName, checkPassword, checkTermName } from '../../constants/validate';
-import ImportCourseDialog from './ImportCourseDialog';
 
 const cx = classNames.bind(styles);
 
@@ -219,32 +219,29 @@ export default function EditCourse() {
         }
     };
 
-    const handleSubmitDialog = (dataForm, isEdit) => {
+    const handleSubmitDialog = (dataForm, isEdit, count) => {
         const newData = data.data.slice();
-        let newAnswer = dataForm.answers.map((item) => item.content);
         let correctAns = [];
-        dataForm.answers.forEach((item) => {
-            if (item.isCorrect) {
-                correctAns.push(item.content);
-            }
-        });
+        let initialData = {
+            ...dataForm,
+            answers: dataForm.answers.map((item) => {
+                item.isCorrect && correctAns.push(item.content);
+                return item.content;
+            }),
+            correctAnswers: correctAns,
+            isExist: count > 0,
+        };
+
         if (isEdit) {
-            newData[termIndex].questions[questionIndex] = {
-                ...dataForm,
-                answers: newAnswer,
-                correctAnswers: correctAns,
-            };
+            newData[termIndex].questions[questionIndex] = initialData;
         } else {
-            newData[termIndex].questions.push({
-                ...dataForm,
-                answers: newAnswer,
-                correctAnswers: correctAns,
-            });
+            newData[termIndex].questions.push(initialData);
         }
 
         setData((preState) => {
-            return { ...preState, data: [...newData] };
+            return { ...preState, data: newData };
         });
+
         setOpenAddQuestionDialog(false);
     };
 
@@ -358,18 +355,6 @@ export default function EditCourse() {
         setOpenImportExcel(false);
     };
 
-    const filters = [
-        {
-            name: 'Public course',
-            value: '2',
-        },
-        {
-            name: 'Private course',
-            value: '1',
-        },
-        { name: 'Only me', value: '0' },
-    ];
-
     return (
         <div className="inner">
             <div className={cx('header')}>
@@ -435,7 +420,7 @@ export default function EditCourse() {
                     <span className={cx('form-title')}>Status course</span>
                     <div className="w-100 d-flex">
                         <select className={cx('filter')} name="filter" onChange={handleSelectStatus}>
-                            {filters.map((item) => (
+                            {statusCourse.map((item) => (
                                 <option
                                     key={item.name}
                                     value={item.value}

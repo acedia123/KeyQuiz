@@ -30,6 +30,8 @@ import { routes } from '../../configs/index';
 import { ToastContext } from '../../context/ToastContextProvider';
 import CourseTextField from '../../components/TextField/CourseTextField';
 import { checkCourseName, checkPassword, checkTermName } from '../../constants/validate';
+import { getUserFromLocalStorage } from '../../constants/functions';
+import { statusCourse } from '../../constants/constObject';
 
 import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
@@ -48,7 +50,7 @@ export default function AddCourse() {
         public_status: '2',
         password: null,
         category_id: 'cate1',
-        user_id: JSON.parse(localStorage.getItem('user')).user_id,
+        user_id: getUserFromLocalStorage() ? getUserFromLocalStorage().user_id : navigate(routes.home),
         data: [],
     });
 
@@ -213,40 +215,30 @@ export default function AddCourse() {
         }
     };
 
-    const handleSubmitDialog = (dataForm, isEdit) => {
+    const handleSubmitDialog = (dataForm, isEdit, count) => {
         const newData = data.data.slice();
-        let newAnswer = dataForm.answers.map((item) => item.content);
-        let correctAns = [];
-        dataForm.answers.forEach((item) => {
-            if (item.isCorrect) {
-                correctAns.push(item.content);
-            }
-        });
 
-        let checkData = newData.some((item) => item.questions.filter((ques) => ques.content === dataForm.content));
+        let correctAns = [];
+        let initialData = {
+            ...dataForm,
+            answers: dataForm.answers.map((item) => {
+                item.isCorrect && correctAns.push(item.content);
+                return item.content;
+            }),
+            correctAnswers: correctAns,
+            isExist: count > 0,
+        };
+
         if (isEdit) {
-            newData[termIndex].questions[questionIndex] = {
-                content: dataForm.content,
-                answers: newAnswer,
-                correctAnswers: correctAns,
-                hint: dataForm.hint,
-                explain: dataForm.explain,
-                isExist: checkData,
-            };
+            newData[termIndex].questions[questionIndex] = initialData;
         } else {
-            newData[termIndex].questions.push({
-                content: dataForm.content,
-                answers: newAnswer,
-                correctAnswers: correctAns,
-                hint: dataForm.hint,
-                explain: dataForm.explain,
-                isExist: checkData,
-            });
+            newData[termIndex].questions.push(initialData);
         }
 
         setData((preState) => {
-            return { ...preState, data: [...newData] };
+            return { ...preState, data: newData };
         });
+
         setOpenAddQuestionDialog(false);
     };
 
@@ -262,7 +254,6 @@ export default function AddCourse() {
         let newDataError = dataError.terms.slice();
         newDataError.push({ status: false, error: '' });
         setDataError({ ...dataError, terms: newDataError });
-
         setExpand((preState) => [...preState, false]);
     };
 
@@ -304,12 +295,7 @@ export default function AddCourse() {
             password: null,
             category_id: 'cate1',
             user_id: JSON.parse(localStorage.getItem('user')).user_id,
-            data: [
-                {
-                    term_name: '',
-                    questions: [],
-                },
-            ],
+            data: [],
         });
     };
 
@@ -359,18 +345,6 @@ export default function AddCourse() {
         setExpand(newExpand);
         setOpenImportExcel(false);
     };
-
-    const filters = [
-        {
-            name: 'Public course',
-            value: 2,
-        },
-        {
-            name: 'Private course',
-            value: 1,
-        },
-        { name: 'Only me', value: 0 },
-    ];
 
     return (
         <div className="inner">
@@ -439,7 +413,7 @@ export default function AddCourse() {
                         <span className={cx('form-title')}>Status course</span>
                         <div className="w-100 d-flex">
                             <select className={cx('filter')} name="filter" onChange={handleSelectStatus}>
-                                {filters.map((item, index) => (
+                                {statusCourse.map((item, index) => (
                                     <option
                                         key={item.name}
                                         value={item.value}

@@ -171,7 +171,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
                             </button>
                         )}
                         <button onClick={handleToggleStar} className={cx('btn') + ' ml-3'}>
-                            {isImportant ? (
+                            {data.is_important ? (
                                 <StarRounded className={cx('icon', 'icon-primary')} />
                             ) : (
                                 <StarOutline className={cx('icon')} />

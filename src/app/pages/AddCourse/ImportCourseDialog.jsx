@@ -71,9 +71,10 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
                 term_name: newObj[0].substring(14),
                 content: newObj[1].substring(9),
                 answers: newObj[2].substring(9).split('\\n'),
-                correct_answers: newObj[3].substring(17).split('\\n'),
-                hint: newObj[4].substring(6),
-                explain: newObj[5].substring(9),
+                correct_answers: newObj[3].substring(17).trim().split('\\n'),
+                level: newObj[4].substring(7).toLowerCase() === 'Easy'.toLowerCase() ? 0 : 1,
+                hint: newObj[5].substring(6),
+                explain: newObj[6].substring(9),
             });
         }
         handleSubmit(convertData({ terms, question: questions }));
@@ -85,7 +86,11 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
             const newArr = data.question
                 .filter((ques) => ques.term_name === item)
                 .map((mapItem) => {
-                    return { ...mapItem, correctAnswers: mapItem.correct_answers };
+                    return {
+                        ...mapItem,
+                        correctAnswers: mapItem.correct_answers,
+                        answers: mapItem.answers.filter((el) => el != ''),
+                    };
                 });
             return { term_name: item, questions: newArr };
         });

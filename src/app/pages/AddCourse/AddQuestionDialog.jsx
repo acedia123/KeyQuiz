@@ -8,6 +8,7 @@ import CourseTextField from '../../components/TextField/CourseTextField';
 import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
 import { ToastContext } from '../../context/ToastContextProvider';
 import { checkContent } from '../../constants/validate';
+import { levels } from '../../constants/constObject';
 
 import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
@@ -26,6 +27,7 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
         answers: [{ id: 1, content: '', isCorrect: false }],
         hint: '',
         explain: '',
+        level: 0,
     });
 
     const [dataError, setDataError] = useState({
@@ -43,8 +45,9 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
                 ...dataAddQuestion,
                 answers: newAnswers,
             };
-
             setDataForm(newData);
+        } else {
+            handleClear();
         }
         return () => {
             localStorage.removeItem('addQuestionForm');
@@ -114,18 +117,17 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
         setDataForm({ ...dataForm, answers: newState });
     };
 
-    const handleChangeSelection = (data) => {
-        setDataSelected(data);
+    const handleChangeSelection = (dataSelected) => {
+        setDataSelected(dataSelected);
     };
 
     const handleFormSubmit = () => {
         handleCheckAnswer();
-        let newData = dataForm.answers.map((item) => (item.content === '' ? null : item));
         const { notification, content } = JSON.parse(localStorage.getItem('addQuestionForm'));
         if (!notification.status && !content.status) {
-            dataForm.answers = newData.filter((n) => n);
+            dataForm.answers = dataForm.answers.map((item) => (item.content === '' ? null : item)).filter((n) => n);
             if (dataAddQuestion) {
-                handleSubmit(dataForm, true);
+                handleSubmit(dataForm, true, foundSameContent);
                 context.setDataAlert({
                     ...context.dataAlert,
                     isOpen: true,
@@ -133,7 +135,8 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
                     status: 'success',
                 });
             } else {
-                handleSubmit(dataForm, false);
+                console.log(foundSameContent);
+                handleSubmit(dataForm, false, foundSameContent);
                 context.setDataAlert({
                     ...context.dataAlert,
                     isOpen: true,
@@ -189,8 +192,13 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
     };
 
     const handleCloseForm = () => {
-        handleClear();
         handleClose();
+    };
+
+    const handleSelectLevel = (e) => {
+        setDataForm((preState) => {
+            return { ...preState, level: +e.target.value };
+        });
     };
 
     const columns = [
@@ -343,6 +351,22 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
                 handleSubmit={handleDeleteAnswers}
                 handleClose={() => setOpenConfirmDeleteAnswers(false)}
             />
+            <div className={cx('form-group')}>
+                <span className={cx('form-title')}>Level</span>
+                <div className={cx('input-inner')}>
+                    <select className={cx('filter', 'filter-topic')} name="filter" onChange={handleSelectLevel}>
+                        {levels.map((item, index) => (
+                            <option
+                                key={item.level}
+                                value={item.value}
+                                selected={item.value === dataForm.level ? 'selected' : ''}
+                            >
+                                {item.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
             <CourseTextField
                 label="Hint"

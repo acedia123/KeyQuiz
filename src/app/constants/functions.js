@@ -1,3 +1,5 @@
+import { levels } from './constObject';
+
 export const convertNumber = (num) => {
     if (num >= 1000000000) {
         return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'g';
@@ -34,6 +36,8 @@ export const convertRelativeTime = (time) => {
         return Math.round(elapsed / msPerYear) + ' years ago';
     }
 };
+
+export const convertLevel = (value) => levels.find((item) => item.value === value).name;
 
 export const getUserFromLocalStorage = () => {
     return JSON.parse(localStorage.getItem('user'));

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Chip } from '@mui/material';
 import { DeleteRounded, Edit, StarOutline, StarRounded } from '@mui/icons-material';
-import { getUserFromLocalStorage } from '../../constants/functions';
+import { convertLevel, getUserFromLocalStorage } from '../../constants/functions';
 
 import classNames from 'classnames/bind';
 import styles from '../../pages/AddCourse/AddCourse.module.scss';
@@ -100,6 +100,7 @@ export default function CardQuestion({
                             Answer: {answer?.map((item) => String.fromCharCode(97 + item).toUpperCase()).join(',')}
                         </span>
                     )}
+                    <span className="normal-font">Level: {data.level ? convertLevel(data.level) : 'Easy'}</span>
                     {data.explain && <span className="normal-font">Explain: {data.explain}</span>}
                     {data.hint && <span className="normal-font">Hint: {data.hint}</span>}
                 </div>
@@ -107,8 +108,22 @@ export default function CardQuestion({
                     <div className={cx('separate') + ' my-2'}></div>
                 </div>
                 <div className={cx('content')}>
-                    <span className="normal-font">{data.term_name ? data.term_name : term.term_name}</span>
+                    <span className="normal-font">Chapter: {data.term_name ? data.term_name : term.term_name}</span>
                 </div>
+
+                {!isForm && (
+                    <>
+                        <div className={cx('content')}>
+                            <div className={cx('separate') + ' my-2'}></div>
+                        </div>
+                        <div className={cx('content')}>
+                            <span className="normal-font text-success">Correct times: {data.correct_time}</span>
+                        </div>
+                        <div className={cx('content')}>
+                            <span className="normal-font text-danger">Wrong times: {data.wrong_times}</span>
+                        </div>
+                    </>
+                )}
             </CardContent>
         </Card>
     );
