@@ -57,7 +57,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
     };
 
     const generalFunction = (answer, index, check) => {
-        changeTypeOfQuestion({ question_practice_id: data.question_practice_id });
+        changeTypeOfQuestion({ question_practice_id: data.question_practice_id, isCorrect: check });
         dispatch(getNotification.getNotificationSuccess(true));
         if (data.hint) {
             setShowHint(true);

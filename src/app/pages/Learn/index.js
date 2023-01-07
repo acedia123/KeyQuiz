@@ -114,6 +114,7 @@ export default function Learn() {
                     }),
                 );
             } else {
+                setIsOpenSearch(false);
                 dispatch(getOpenOverview.getOpenOverviewSuccess(true));
                 dispatch(getNotification.getNotificationSuccess(true));
                 dispatch(getTotalLearn.getTotalLearnSuccess(totalLearn + rounds[indexRound].questions.length));
@@ -263,8 +264,10 @@ export default function Learn() {
     const handleClickSearch = () => {
         if (!isOpenSearch) {
             setIsOpenSearch(true);
+            fetchDropdownOptions(searchText);
+        } else {
+            setIsOpenSearch(false);
         }
-        fetchDropdownOptions(searchText);
     };
 
     return (
@@ -279,13 +282,13 @@ export default function Learn() {
                 </div>
                 <div className={cx('header-title')}>Round {indexRound + 1}</div>
                 <div className={cx('header-actions')}>
-                    <CustomIconAction
+                    {/* <CustomIconAction
                         label={'Setting'}
                         arrow={true}
                         className={`mr-3 ${cx('kq-btn')}`}
                         handleClick={() => setIsOpenSearch(!isOpenSearch)}
                         icon={<Search className={cx('icon')} />}
-                    />
+                    /> */}
                     <CustomIconAction
                         label={'Setting'}
                         arrow={true}

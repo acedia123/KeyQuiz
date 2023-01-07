@@ -81,7 +81,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
         dispatch(getCheckQuestion.getCheckQuestionSuccess(checkData));
         dispatch(getIsAnswer.getIsAnswerSuccess(true));
         dispatch(getNotification.getNotificationSuccess(true));
-        changeTypeOfQuestion({ question_practice_id: data.question_practice_id });
+        changeTypeOfQuestion({ question_practice_id: data.question_practice_id, isCorrect: checkData });
         // Process
         if (checkData) {
             roundProcess.totalCorrect = roundProcess.totalCorrect + 1;
@@ -113,7 +113,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
         dispatch(getCheckQuestion.getCheckQuestionSuccess(false));
         dispatch(getIsAnswer.getIsAnswerSuccess(true));
         dispatch(getNotification.getNotificationSuccess(true));
-        changeTypeOfQuestion({ question_practice_id: data.question_practice_id });
+        changeTypeOfQuestion({ question_practice_id: data.question_practice_id, isCorrect: false });
         // Process
 
         roundProcess.totalWrong = roundProcess.totalWrong + 1;

@@ -17,7 +17,7 @@ import ConfirmSubmitTest from '../../components/Dialog/ConfirmSubmitTest';
 import CustomDialog from '../../components/Share/CustomDialog';
 import { useTimer } from 'react-timer-hook';
 import { Box } from '@mui/system';
-import { createTest } from '../../services/test';
+import { createTest, testResultApi } from '../../services/test';
 
 import classNames from 'classnames/bind';
 import styles from './Test.module.scss';
@@ -174,7 +174,7 @@ export default function TestDetail() {
         let correctTimes = 0;
         let wrongTimes = 0;
         pause();
-
+        let dataSend = [];
         testProcessing.forEach((process) => {
             const newArr = process.userChoose.map((item) => {
                 return { ...item, status: process.correct_answers.includes(item.answer) };
@@ -185,6 +185,11 @@ export default function TestDetail() {
             } else {
                 wrongTimes += 1;
             }
+            dataSend.push({
+                question_practice_id: process.question_practice_id,
+                question_id: process.question_id,
+                isCorrect: checkData && process.userChoose.length > 0,
+            });
         });
         dispatch(
             getTestResult.getTestResultSuccess({ successTime: correctTimes, wrongTime: wrongTimes, openResult: true }),
@@ -202,7 +207,8 @@ export default function TestDetail() {
             questions: questionsData,
             correct_count: correctTimes,
             wrong_count: wrongTimes,
-        }).then(({ data }) => {
+        });
+        testResultApi(dataSend).then(({ data }) => {
             console.log(data);
         });
     };

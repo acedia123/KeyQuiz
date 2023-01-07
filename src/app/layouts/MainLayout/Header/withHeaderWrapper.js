@@ -31,10 +31,8 @@ export default function withHeaderWrapper(WrapperComponent) {
         };
 
         const handleChangeSearch = (e) => {
-            if (e.target.value != '') {
-                setSearchText(e.target.value);
-                debounceDropDown(e.target.value);
-            }
+            setSearchText(e.target.value);
+            debounceDropDown(e.target.value);
         };
 
         window.addEventListener('resize', (e) => {

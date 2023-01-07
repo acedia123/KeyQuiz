@@ -20,7 +20,7 @@ import {
     Visibility,
     VisibilityOff,
 } from '@mui/icons-material';
-import { convertNumber } from '../../constants/functions';
+import { convertNumber, getUserFromLocalStorage } from '../../constants/functions';
 import { Link, useNavigate } from 'react-router-dom';
 import moment from 'moment/moment';
 import { routes } from '../../configs';
@@ -51,16 +51,20 @@ const CardCourse = ({ data, topic = true }, ref) => {
     const handleCheckPassword = (e) => {
         if (data.public_status === '1') {
             e.preventDefault();
-            const courseJoin = JSON.parse(localStorage.getItem('courseJoin'));
-            if (courseJoin) {
-                let checkData = courseJoin.find((item) => item.id === data.course_id);
-                if (checkData) {
-                    navigate(routes.courseDetail + '/' + data.course_id);
+            if (getUserFromLocalStorage() && data.user_id === getUserFromLocalStorage().user_id) {
+                navigate(routes.courseDetail + '/' + data.course_id);
+            } else {
+                const courseJoin = JSON.parse(localStorage.getItem('courseJoin'));
+                if (courseJoin) {
+                    let checkData = courseJoin.find((item) => item.id === data.course_id);
+                    if (checkData) {
+                        navigate(routes.courseDetail + '/' + data.course_id);
+                    } else {
+                        setOpenPasswordDialog(true);
+                    }
                 } else {
                     setOpenPasswordDialog(true);
                 }
-            } else {
-                setOpenPasswordDialog(true);
             }
         }
     };
