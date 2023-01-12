@@ -84,8 +84,8 @@ export default function EditCourse() {
                 let newQues = item.questions.map((ques) => {
                     return {
                         ...ques,
-                        answers: JSON.parse(ques.answers),
-                        correctAnswers: JSON.parse(ques.correct_answers),
+                        answers: ques.answers,
+                        correctAnswers: ques.correct_answers,
                     };
                 });
                 return { ...item, questions: newQues };
@@ -349,14 +349,6 @@ export default function EditCourse() {
                 return { ...preState, data: merged };
             });
         }
-
-        let a = 0,
-            b = 11,
-            c = 19,
-            total = 30,
-            cal = (b / c) * 100,
-            cal1 = (a / c) * 100;
-        0 === a ? cal >= 70 && console.log('convert') : cal1 >= 70 && console.log('convert1');
 
         setDataError({ ...dataError, terms: newDataError });
         setExpand(newExpand);

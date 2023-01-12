@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React from 'react';
 import Highcharts from 'highcharts';
 
 class BarTotal extends React.Component {
@@ -7,24 +7,20 @@ class BarTotal extends React.Component {
         this.state = {
             series: [
                 {
-                    name: 'Accounts',
-                    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
-                },
-                {
-                    name: 'Courses',
-                    data: [83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3],
+                    name: props.type[0].toUpperCase() + props.type.substring(1),
+                    data: props.state[props.type],
                 },
             ],
         };
     }
 
     highChartsRender() {
-        Highcharts.chart('chart-dashboard', {
+        Highcharts.chart('chart-dashboard-' + this.props.type, {
             chart: {
                 type: 'column',
             },
             title: {
-                text: 'Number of account created by month',
+                text: `Number of ${this.props.type} created by month`,
             },
 
             xAxis: {
@@ -41,7 +37,7 @@ class BarTotal extends React.Component {
                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
                 pointFormat:
                     '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                    '<td style="padding:0">&nbsp<b>{point.y:.0f}</b></td></tr>',
                 footerFormat: '</table>',
                 shared: true,
                 useHTML: true,
@@ -61,7 +57,7 @@ class BarTotal extends React.Component {
     }
 
     render() {
-        return <div id="chart-dashboard"></div>;
+        return <div className="mt-5" id={'chart-dashboard-' + this.props.type}></div>;
     }
 }
 export default BarTotal;

@@ -39,6 +39,7 @@ import { routes } from '../../configs';
 import { IMAGE_PATH } from '../../appConfig';
 import { getUserFromLocalStorage } from '../../constants/functions';
 import { getTerm } from '../../redux/test/actions';
+import { levels } from '../../constants/constObject';
 
 import classNames from 'classnames/bind';
 import styles from './Learn.module.scss';
@@ -65,6 +66,7 @@ export default function Learn() {
     const [dataSetting, setDataSetting] = useState({
         chapter: 0,
         type: 0,
+        level: 0,
         numberRound: JSON.parse(localStorage.getItem('learnRound'))
             ? JSON.parse(localStorage.getItem('learnRound'))
             : 10,
@@ -72,23 +74,12 @@ export default function Learn() {
         type_of_question: 0,
     });
 
-    const parseJSON = (data) => {
-        return data.map((item) => {
-            return {
-                ...item,
-                answers: JSON.parse(item.answers),
-                correct_answers: JSON.parse(item.correct_answers),
-            };
-        });
-    };
-
     useEffect(() => {
         document.title = 'Learn - PRJ321 | Key Quiz';
         const SIZE_OF_ROUND = +dataSetting.numberRound;
         getQuestionToLearn({ course_id: courseId, type: 0, user_id: getUserFromLocalStorage().user_id }).then(
             ({ data }) => {
-                let newData = parseJSON(data);
-                fetchData(newData, SIZE_OF_ROUND);
+                fetchData(data, SIZE_OF_ROUND);
             },
         );
         dispatch(getTerm.getTermRequest({ course_id: courseId }));
@@ -147,6 +138,8 @@ export default function Learn() {
         }
     };
 
+    const handleChangeLevel = (e) => setDataSetting({ ...dataSetting, level: e.target.value });
+
     const handleOpenSettingDialog = () => setOpenDialogSetting(true);
 
     const handleCloseSettingDialog = () => setOpenDialogSetting(false);
@@ -168,20 +161,23 @@ export default function Learn() {
         const SIZE_OF_ROUND = +dataSetting.numberRound;
         getQuestionToLearn({ course_id: courseId, type: 0, user_id: getUserFromLocalStorage().user_id }).then(
             ({ data }) => {
-                let newData = parseJSON(data);
                 if (dataSetting.type === 1) {
                     if (dataSetting.type_of_question === 0) {
-                        newData = newData.filter((item) => item.type_of_question === 0);
+                        data = data.filter((item) => item.type_of_question === 0);
                     } else if (dataSetting.type_of_question === 1) {
-                        newData = newData.filter((item) => item.type_of_question === 1);
+                        data = data.filter((item) => item.type_of_question === 1);
                     } else {
-                        newData = newData.filter((item) => item.is_important === 1);
+                        data = data.filter((item) => item.is_important === 1);
                     }
                 } else if (dataSetting.type === 2) {
-                    newData = newData.filter((item) => item.term_id === dataSetting.chapter);
+                    data = data.filter((item) => item.term_id === dataSetting.chapter);
+                } else if (dataSetting.type === 3) {
+                    console.log(dataSetting.level);
+                    data = data.filter((item) => item.level === +dataSetting.level);
+                    console.log(data);
                 }
-                setDataSetting({ ...dataSetting, numberRound: newData.length });
-                fetchData(newData, SIZE_OF_ROUND);
+                setDataSetting({ ...dataSetting, numberRound: data.length });
+                fetchData(data, SIZE_OF_ROUND);
             },
         );
         setOpenDialogSetting(false);
@@ -282,13 +278,6 @@ export default function Learn() {
                 </div>
                 <div className={cx('header-title')}>Round {indexRound + 1}</div>
                 <div className={cx('header-actions')}>
-                    {/* <CustomIconAction
-                        label={'Setting'}
-                        arrow={true}
-                        className={`mr-3 ${cx('kq-btn')}`}
-                        handleClick={() => setIsOpenSearch(!isOpenSearch)}
-                        icon={<Search className={cx('icon')} />}
-                    /> */}
                     <CustomIconAction
                         label={'Setting'}
                         arrow={true}
@@ -333,7 +322,7 @@ export default function Learn() {
                 handleClose={handleCloseSettingDialog}
                 title={'Setting'}
                 noButton={false}
-                size="sm"
+                size="md"
             >
                 <div className={cx('form-flex')}>
                     <label className={cx('label')} htmlFor="numberRound">
@@ -374,6 +363,12 @@ export default function Learn() {
                         >
                             Chapter
                         </button>
+                        <button
+                            onClick={() => handleChooseTypeQues(3)}
+                            className={cx(dataSetting.type === 3 ? 'button--active' : '', 'ml-3')}
+                        >
+                            Level
+                        </button>
                     </div>
                 </div>
 
@@ -397,6 +392,19 @@ export default function Learn() {
                             {terms.map((item, index) => (
                                 <option key={index} value={item.term_id}>
                                     {item.term_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {dataSetting.type === 3 && (
+                    <div className={cx('form-flex')}>
+                        <label className={cx('label')}>Level</label>
+                        <select className={cx('filter')} name="filter" onChange={handleChangeLevel}>
+                            {levels.map((item, index) => (
+                                <option key={index} value={item.value}>
+                                    {item.name}
                                 </option>
                             ))}
                         </select>

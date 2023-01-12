@@ -1,16 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import CustomBreadcrumbs from '../../components/Share/CustomBreadcrumbs';
 import { Grid } from '@mui/material';
 import HighChart from './HighChart';
 
 import classNames from 'classnames/bind';
 import styles from './Dashboard.module.scss';
+import { dashboardAccount, dashboardCourse } from '../../services/dashboard';
 
 const cx = classNames.bind(styles);
 
 export default function Dashboard() {
+    const [state, setState] = useState({ courses: [], accounts: [], totalCourses: 0, totalAccounts: 0 });
     useEffect(() => {
         document.title = 'Dashboard | Key Quiz';
+        const thisYear = new Date().getFullYear();
+        dashboardCourse({ year: thisYear }).then(({ data }) => {
+            setState((preState) => {
+                return {
+                    ...preState,
+                    courses: data.data,
+                    totalCourses: data.data.reduce((store, value) => store + value, 0),
+                };
+            });
+        });
+        dashboardAccount({ year: thisYear }).then(({ data }) => {
+            setState((preState) => {
+                return {
+                    ...preState,
+                    accounts: data.data,
+                    totalAccounts: data.data.reduce((store, value) => store + value, 0),
+                };
+            });
+        });
     }, []);
 
     return (
@@ -71,7 +92,7 @@ export default function Dashboard() {
                             <div className="wc-item">
                                 <h4 className={cx('wc-title')}>New Users</h4>
                                 <span className={cx('wc-des')}>Joined New User</span>
-                                <span className={cx('wc-stats', 'counter')}>350</span>
+                                <span className={cx('wc-stats', 'counter')}>{state.totalCourses}</span>
                                 <div className={cx('progress', 'wc-progress')}>
                                     <div
                                         className={cx('progress-bar')}
@@ -94,7 +115,7 @@ export default function Dashboard() {
                             <div className="wc-item">
                                 <h4 className={cx('wc-title')}>New Course</h4>
                                 <span className={cx('wc-des')}>Joined New User</span>
-                                <span className={cx('wc-stats', 'counter')}>772</span>
+                                <span className={cx('wc-stats', 'counter')}>{state.totalAccounts}</span>
                                 <div className={cx('progress', 'wc-progress')}>
                                     <div
                                         className={cx('progress-bar')}
@@ -114,7 +135,9 @@ export default function Dashboard() {
                     </Grid>
                 </Grid>
 
-                <HighChart />
+                {state.courses.length && <HighChart state={state} type="courses" />}
+
+                {state.accounts.length && <HighChart state={state} type="accounts" />}
             </div>
         </div>
     );

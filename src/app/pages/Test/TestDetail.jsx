@@ -41,19 +41,15 @@ export default function TestDetail() {
                     openResult: true,
                 }),
             );
-
             let testProcess = location.state.questions.map((item) => {
                 let userChoose = JSON.parse(item.user_answers);
-                let answers = JSON.parse(item.answers);
                 let userChooseConvert = userChoose.map((choose) => {
-                    return { index: answers.findIndex((ans) => ans === choose), answer: choose };
+                    return { index: item.answers.findIndex((ans) => ans === choose), answer: choose };
                 });
                 return {
                     ...item,
                     id: item.question_id,
                     userChoose: userChooseConvert,
-                    answers,
-                    correct_answers: JSON.parse(item.correct_answers),
                 };
             });
             dispatch(getTestProcessing.getTestProcessingSuccess(testProcess));

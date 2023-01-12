@@ -9,6 +9,7 @@ import {
     StarRounded,
     StarOutline,
     Search,
+    SaveOutlined,
 } from '@mui/icons-material';
 import {
     addRoundProcess,
@@ -22,9 +23,11 @@ import {
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeTypeOfQuestion } from '../../services/courses';
+import CustomIconAction from '../Share/CustomIconAction';
 
 import classNames from 'classnames/bind';
 import styles from './Question.module.scss';
+import TextEditor from '../../pages/Learn/TextEditor';
 
 const cx = classNames.bind(styles);
 
@@ -126,35 +129,60 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
     };
 
     return (
-        <Card className={cx('card', isNewQuestion ? cx('--animation-slide') : '')}>
+        <Card
+            className={cx('card', isNewQuestion ? cx('--animation-slide') : '', 'position-relative')}
+            style={{ overflow: 'visible' }}
+        >
             <CardContent className={cx('card-content')}>
                 <Grid className={cx('card__header')}>
                     <Typography className="normal-font font-weight-bold">
                         This is a question with one answers
                     </Typography>
                     <div className={cx('card-header-action')}>
-                        <button onClick={handleToggleStar} className={cx('btn') + ' ml-3'}>
-                            {data.is_important ? (
-                                <StarRounded className={cx('icon', 'icon-primary')} />
-                            ) : (
-                                <StarOutline className={cx('icon')} />
-                            )}
-                        </button>
+                        <CustomIconAction
+                            label={'Starred'}
+                            arrow={true}
+                            className={cx('kq-btn', 'btn') + ' ml-3'}
+                            handleClick={() => handleToggleStar()}
+                            icon={
+                                data.is_important ? (
+                                    <StarRounded className={cx('icon', 'icon-primary')} />
+                                ) : (
+                                    <StarOutline className={cx('icon')} />
+                                )
+                            }
+                        />
                         {data.hint && (
-                            <button onClick={handleToggleHint} className={cx('btn') + ' ml-3'}>
-                                <QuestionMark className={cx('icon')} />
-                            </button>
+                            <CustomIconAction
+                                label={'Hint'}
+                                arrow={true}
+                                className={cx('kq-btn', 'btn') + ' ml-3'}
+                                handleClick={() => handleToggleHint()}
+                                icon={<QuestionMark className={cx('icon')} />}
+                            />
                         )}
-                        <button onClick={handleReportQuestion} className={cx('btn') + ' ml-3'}>
-                            <FlagOutlined className={cx('icon')} />
-                        </button>
-                        <button onClick={() => handleSearch(data.content)} className={cx('btn') + ' ml-3'}>
-                            <Search className={cx('icon')} />
-                        </button>
+                        <CustomIconAction
+                            label={'Report'}
+                            arrow={true}
+                            className={cx('kq-btn', 'btn') + ' ml-3'}
+                            handleClick={() => handleReportQuestion()}
+                            icon={<FlagOutlined className={cx('icon')} />}
+                        />
+                        <CustomIconAction
+                            label={'Search'}
+                            arrow={true}
+                            className={cx('kq-btn', 'btn') + ' ml-3'}
+                            handleClick={() => handleSearch(data.content)}
+                            icon={<Search className={cx('icon')} />}
+                        />
                         {!isAnswer && (
-                            <button onClick={handleSkipQuestion} className={cx('btn') + ' ml-3'}>
-                                <SkipNext className={cx('icon')} />
-                            </button>
+                            <CustomIconAction
+                                label={'Skip'}
+                                arrow={true}
+                                className={cx('kq-btn', 'btn') + ' ml-3'}
+                                handleClick={() => handleSkipQuestion()}
+                                icon={<SkipNext className={cx('icon')} />}
+                            />
                         )}
                     </div>
                 </Grid>
@@ -209,6 +237,21 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
                     </div>
                 )}
             </CardContent>
+
+            <Card className={cx('note-wrapper')}>
+                <div className="d-flex-center-between">
+                    <h2>Note</h2>
+                    <CustomIconAction
+                        label={'Save'}
+                        arrow={true}
+                        className={cx('kq-btn', 'btn') + ' ml-3'}
+                        // handleClick={() => handleCopyCourse()}
+                        icon={<SaveOutlined fontSize="large" />}
+                    />
+                </div>
+                {/* <textarea className={cx('text-input')} placeholder="Enter your note here"></textarea> */}
+                <TextEditor />
+            </Card>
         </Card>
     );
 }

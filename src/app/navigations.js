@@ -55,15 +55,6 @@ export const homeNavigation = [
         path: routes.addCourse,
         status: 'private',
     },
-
-    // {
-    //     name: 'Tests',
-    //     icon: {
-    //         default: AssignmentTurnedInOutlined,
-    //         active: AssignmentTurnedInRounded,
-    //     },
-    //     path: routes.tests,
-    // },
 ];
 
 export const navigation = [
@@ -73,22 +64,28 @@ export const navigation = [
         path: routes.admin.dashboard,
         children: null,
     },
+    // {
+    //     title: 'Manage Courses',
+    //     icon: <SchoolRounded />,
+    //     path: '/',
+    //     children: [
+    //         // {
+    //         //     title: 'List Courses Today',
+    //         //     icon: <ListAlt />,
+    //         //     path: '/administrator/courses-today',
+    //         // },
+    //         {
+    //             title: 'List Courses',
+    //             icon: <ListAlt />,
+    //             path: routes.admin.courses,
+    //         },
+    //     ],
+    // },
     {
         title: 'Manage Courses',
         icon: <SchoolRounded />,
-        path: '/',
-        children: [
-            // {
-            //     title: 'List Courses Today',
-            //     icon: <ListAlt />,
-            //     path: '/administrator/courses-today',
-            // },
-            {
-                title: 'List Courses',
-                icon: <ListAlt />,
-                path: routes.admin.courses,
-            },
-        ],
+        path: routes.admin.courses,
+        children: null,
     },
     {
         title: 'Manage Topics',

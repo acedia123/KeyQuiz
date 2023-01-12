@@ -22,7 +22,7 @@ const CourseDetail = React.lazy(() => import('../pages/CourseDetail'));
 const Learn = React.lazy(() => import('../pages/Learn'));
 
 //Test
-const Test = React.lazy(() => import('../pages/Test'));
+const Test = React.lazy(() => import('../pages/Test/index'));
 const TestDetail = React.lazy(() => import('../pages/Test/TestDetail'));
 
 // Topic
@@ -40,6 +40,8 @@ const AdminAccountDetail = React.lazy(() => import('../pages/User/AdminAccountDe
 const ReportCourse = React.lazy(() => import('../pages/Report/ReportCourse'));
 const ReportQuestion = React.lazy(() => import('../pages/Report/ReportQuestion'));
 const ReportRate = React.lazy(() => import('../pages/Report/ReportRate'));
+
+const TextEditor = React.lazy(() => import('../pages/Learn/TextEditor.js'));
 
 export const publicRoutes = [
     { path: routes.learn + '/:courseId', component: Learn, layout: null },
@@ -68,7 +70,7 @@ export const publicRoutes = [
     { path: routes.admin.dashboard, component: Dashboard, layout: Admin },
     { path: routes.admin.courses, component: AdminCourses, layout: Admin },
     { path: routes.admin.topics, component: AdminTopics, layout: Admin },
-    { path: routes.admin.courseDetail, component: AdminCourseDetail, layout: Admin },
+    { path: routes.admin.courseDetail + '/:id', component: AdminCourseDetail, layout: Admin },
     { path: routes.admin.accounts, component: AdminUsers, layout: Admin },
     { path: routes.admin.adminProfile, component: AdminProfile, layout: Admin },
     { path: routes.admin.accountDetail + '/:id', component: AdminAccountDetail, layout: Admin },
@@ -76,6 +78,7 @@ export const publicRoutes = [
     { path: routes.admin.reportCourse, component: ReportCourse, layout: Admin },
     { path: routes.admin.reportQuestion, component: ReportQuestion, layout: Admin },
     { path: routes.admin.reportRate, component: ReportRate, layout: Admin },
+    { path: '/abc', component: TextEditor, layout: DefaultLayout },
 ];
 
 export const privateRoutes = [];

@@ -51,24 +51,57 @@ export default function TabListCourses({ data, id }) {
     };
 
     const handleChangeFilter = (e) => {
-        if (e.target.value === '2') {
-            dispatch(actions.getSearchCourse.getSearchCourseSuccess({ ...dataSearch, is_important: '1' }));
-        } else if (e.target.value === '3') {
-            dispatch(
-                actions.getSearchCourse.getSearchCourseSuccess({
-                    ...dataSearch,
-                    is_important: null,
-                    type_of_question: null,
-                }),
-            );
-        } else {
-            dispatch(
-                actions.getSearchCourse.getSearchCourseSuccess({
-                    ...dataSearch,
-                    is_important: null,
-                    type_of_question: e.target.value,
-                }),
-            );
+        switch (e.target.value) {
+            case '2':
+                dispatch(
+                    actions.getSearchCourse.getSearchCourseSuccess({
+                        ...dataSearch,
+                        is_important: '1',
+                        type_of_question: null,
+                        level: null,
+                    }),
+                );
+                break;
+            case '3':
+                dispatch(
+                    actions.getSearchCourse.getSearchCourseSuccess({
+                        ...dataSearch,
+                        is_important: null,
+                        type_of_question: null,
+                        level: null,
+                    }),
+                );
+                break;
+            case '4':
+                dispatch(
+                    actions.getSearchCourse.getSearchCourseSuccess({
+                        ...dataSearch,
+                        level: '0',
+                        type_of_question: null,
+                        is_important: null,
+                    }),
+                );
+                break;
+            case '5':
+                dispatch(
+                    actions.getSearchCourse.getSearchCourseSuccess({
+                        ...dataSearch,
+                        level: '1',
+                        type_of_question: null,
+                        is_important: null,
+                    }),
+                );
+                break;
+            default:
+                dispatch(
+                    actions.getSearchCourse.getSearchCourseSuccess({
+                        ...dataSearch,
+                        is_important: null,
+                        type_of_question: e.target.value,
+                        level: null,
+                    }),
+                );
+                break;
         }
     };
 
@@ -104,6 +137,14 @@ export default function TabListCourses({ data, id }) {
         {
             name: 'Is important',
             value: 2,
+        },
+        {
+            name: 'Easy',
+            value: 4,
+        },
+        {
+            name: 'Difficult',
+            value: 5,
         },
     ];
 

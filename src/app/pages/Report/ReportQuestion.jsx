@@ -14,12 +14,10 @@ import CustomButton from '../../components/Share/CustomButton';
 import { getListQuestionReport } from '../../services/report';
 
 import { ToastContext } from '../../context/ToastContextProvider';
-import CustomDialog from '../../components/Share/CustomDialog';
 import CustomChipLabel from '../../components/Chip/CustomChipLabel';
 
 import classNames from 'classnames/bind';
 import styles from './Report.module.scss';
-import CardQuestion from '../../components/Card/CardQuestion';
 
 const cx = classNames.bind(styles);
 

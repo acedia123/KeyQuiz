@@ -48,7 +48,7 @@ const ProgressLabel = ({ value }) => {
     );
 };
 
-export default function TestDetail() {
+export default function Test() {
     let navigate = useNavigate();
     let dispatch = useDispatch();
     const { id } = useParams();

@@ -1,12 +1,12 @@
 import * as actions from './actions';
 import { all, call, fork, put, takeEvery } from 'redux-saga/effects';
-import { getAllCourses, addCourse, getCourseById, getQuestionByCourse, getQuestionDemo } from '../../services/courses';
+import { getAllCourses, getCourseById, getQuestionByCourse, getQuestionDemo } from '../../services/courses';
 import { getUserFromLocalStorage } from '../../constants/functions';
 
 function sliceCourse(arr, pageIndex, pageSize, totalElement) {
     return new Promise(function (resolve) {
         resolve({
-            courses: arr.slice(pageIndex == 0 ? pageIndex : totalElement, totalElement + pageSize),
+            courses: arr.slice(pageIndex === 0 ? pageIndex : totalElement, totalElement + pageSize),
             hasMore: Math.floor((arr.length - 18) / pageSize) + 1 > pageIndex,
         });
     });
@@ -88,24 +88,12 @@ function* getCourseDetailSaga(action) {
 }
 
 function* getQuestionSaga(action) {
-    const { searchText, type_of_question, course_id, is_important, term_id } = action.payload;
     try {
         let fetchQuestionByCourse = yield call(getQuestionByCourse, {
-            course_id,
             user_id: getUserFromLocalStorage().user_id,
-            type_of_question,
-            searchText,
-            is_important,
-            term_id,
+            ...action.payload,
         });
-        let questions = fetchQuestionByCourse.data.map((item) => {
-            return {
-                ...item,
-                answers: JSON.parse(item.answers),
-                correct_answers: JSON.parse(item.correct_answers),
-            };
-        });
-        yield put(actions.getQuestionByCourse.getQuestionByCourseSuccess(questions));
+        yield put(actions.getQuestionByCourse.getQuestionByCourseSuccess(fetchQuestionByCourse.data));
     } catch (error) {
         let message;
         if (error.response) {
@@ -132,17 +120,8 @@ function* getQuestionDemoSaga(action) {
         let fetchQuestionByCourse = yield call(getQuestionDemo, {
             course_id,
         });
-        let newArr = [];
-        for (let item in fetchQuestionByCourse.data) {
-            let newObj = {
-                ...fetchQuestionByCourse.data[item],
-                answers: JSON.parse(fetchQuestionByCourse.data[item].answers),
-                correct_answers: JSON.parse(fetchQuestionByCourse.data[item].correct_answers),
-            };
-            newArr.push(newObj);
-        }
 
-        yield put(actions.getQuestionByCourseDemo.getQuestionByCourseDemoSuccess(newArr));
+        yield put(actions.getQuestionByCourseDemo.getQuestionByCourseDemoSuccess(fetchQuestionByCourse.data));
     } catch (error) {
         let message;
         if (error.response) {

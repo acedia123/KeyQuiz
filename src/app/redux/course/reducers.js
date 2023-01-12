@@ -14,6 +14,7 @@ const initialState = {
     questions: [],
     loading: false,
     dataSearch: {
+        level: null,
         type_of_question: null,
         is_important: null,
         searchText: null,

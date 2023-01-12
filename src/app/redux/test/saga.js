@@ -6,13 +6,7 @@ var getMeRandomElements = function (sourceArray, neededElements) {
     var result = [];
     for (var i = 0; i < neededElements; i++) {
         let randomQues = sourceArray[Math.floor(Math.random() * sourceArray.length)];
-        let newObj = {
-            ...randomQues,
-            answers: JSON.parse(randomQues.answers),
-            correct_answers: JSON.parse(randomQues.correct_answers),
-        };
-        // console.log(newObj);
-        result.push(newObj);
+        result.push(randomQues);
     }
     return result;
 };

@@ -17,7 +17,6 @@ import { checkPasswordService } from '../../services/auth';
 
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
-import { useParams } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
@@ -110,10 +109,10 @@ export default function UserProfile() {
         const user = JSON.parse(localStorage.getItem('user'));
         getAccountById({ user_id: user.user_id }).then(({ data }) => {
             setDataLoading((preState) => {
-                return { ...preState, ...data[0] };
+                return { ...preState, ...data };
             });
             setDataForm((preState) => {
-                return { ...preState, ...data[0] };
+                return { ...preState, ...data };
             });
         });
     };

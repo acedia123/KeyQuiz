@@ -165,7 +165,7 @@ export default function CourseDetail() {
             course_id: id,
             type_of_report,
             other,
-        }).then(({ data }) => {
+        }).then(() => {
             context.setDataAlert({
                 ...context.dataAlert,
                 isOpen: true,

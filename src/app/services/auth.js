@@ -17,7 +17,13 @@ export const checkPasswordService = (data) => {
     var url = API_PATH + '/check-password';
     return axios.post(url, data);
 };
+
 export const loginWithGoogle = (data) => {
     var url = API_PATH + '/login-with-google';
+    return axios.post(url, data);
+};
+
+export const changeStatus = (data) => {
+    var url = API_PATH + '/toggle-account';
     return axios.post(url, data);
 };

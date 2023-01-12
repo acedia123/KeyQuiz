@@ -39,7 +39,7 @@ export default function AdminCourses() {
 
     const [dialogForm, setDialogForm] = useState(false);
     const [dataSearch, setDataSearch] = useState({ searchText: '' });
-    const [dataSubmit, setDataSubmit] = useState(null);
+    const [dataSubmit, setDataSubmit] = useState({ name: '', status: 1 });
     const [notification, setNotification] = useState(null);
 
     useEffect(() => {
@@ -53,23 +53,19 @@ export default function AdminCourses() {
     const fetchData = () => {
         searchOrFilterCategories(dataSearch).then(({ data }) => {
             setDataForm(data);
-            // console.log(data);
         });
     };
 
     const handleChangeSelection = (data) => {
         setDataSelected(data);
-        console.log(data);
     };
 
     const handleRemoveRow = (id) => {
-        // console.log(id);
         setDialog(true);
         setDataSelected([id]);
     };
 
     const handleDeleteAll = () => {
-        console.log('hihi');
         deleteCategoryById({ category_id: dataSelected })
             .then(({ data }) => {
                 if (data.length > 0) {
@@ -89,7 +85,6 @@ export default function AdminCourses() {
                 }
                 setDialog(false);
                 fetchData();
-                // console.log(data);
             })
             .catch((err) => {
                 console.log(err.response);
@@ -108,22 +103,21 @@ export default function AdminCourses() {
         if (dataSubmit?.category_id) {
             editCategory(dataSubmit)
                 .then((data) => {
-                    console.log(data);
                     context.setDataAlert({
                         ...context.dataAlert,
                         isOpen: true,
                         message: 'Edit Successfully!',
                         status: 'success',
                     });
+                    setDialogForm(false);
                     fetchData();
                 })
                 .catch((err) => {
-                    setNotification({ name: err.response.data.message, status: 'error' });
+                    setNotification({ name: "Name can't empty", status: 'error' });
                 });
         } else {
             addCategory(dataSubmit)
                 .then((data) => {
-                    console.log(data);
                     context.setDataAlert({
                         ...context.dataAlert,
                         isOpen: true,
@@ -132,15 +126,16 @@ export default function AdminCourses() {
                     });
                     setDialogForm(false);
                     fetchData();
+                    handleClearForm();
                 })
                 .catch((err) => {
-                    setNotification({ name: err.response.data.message, status: 'error' });
+                    setNotification({ name: "Name can't empty", status: 'error' });
                 });
         }
     };
 
     const handleClearForm = () => {
-        setDataSubmit(null);
+        setDataSubmit({ name: '', status: 1 });
         setNotification(null);
     };
 
@@ -163,9 +158,6 @@ export default function AdminCourses() {
         setDataSubmit((preState) => {
             return { ...preState, status: event.target.value };
         });
-        // setDataSearch((preState) => {
-        //     return { ...preState, filter: e.target.value };
-        // });
     };
 
     const handleOpenEditDialog = (id) => {
@@ -175,26 +167,14 @@ export default function AdminCourses() {
         });
     };
 
-    const filters = [
-        {
-            name: 'Latest Courses',
-            value: 0,
-        },
-        {
-            name: 'Oldest Courses',
-            value: 1,
-        },
-        { name: 'Most View', value: 2 },
-    ];
-
     const status = [
-        {
-            name: 'Hidden',
-            value: 0,
-        },
         {
             name: 'Activated',
             value: 1,
+        },
+        {
+            name: 'Hidden',
+            value: 0,
         },
     ];
 
@@ -306,13 +286,6 @@ export default function AdminCourses() {
                     )}
                 </div>
                 <div className="d-flex-align-center">
-                    {/* <select className={cx('filter', 'mr-3')} name="filter" onChange={handleChangeFilter}>
-                        {filters.map((item, index) => (
-                            <option key={index} value={item.value}>
-                                {item.name}
-                            </option>
-                        ))}
-                    </select> */}
                     <CustomizationSearch placeholder="Searching topics..." handleChangeSearch={handleChangeSearch} />
                 </div>
             </div>
@@ -351,7 +324,6 @@ export default function AdminCourses() {
                             </option>
                         ))}
                     </select>
-                    {/* {error && <span className={cx('text-danger')}>{helperText}</span>} */}
                 </div>
             </CustomDialog>
 

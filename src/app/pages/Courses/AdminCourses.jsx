@@ -3,19 +3,18 @@ import moment from 'moment';
 import { Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import CustomIconAction from '../../components/Share/CustomIconAction';
-import { Add, DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
+import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
 import CustomizationSearch from '../../components/Search/CustomizationSearch';
 import CustomBreadcrumbs from '../../components/Share/CustomBreadcrumbs';
 import CustomButton from '../../components/Share/CustomButton';
-import { userTerm } from '../../constants/fakeData';
 import { useNavigate } from 'react-router-dom';
 import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
-
-import classNames from 'classnames/bind';
-import styles from './Courses.module.scss';
 import { routes } from '../../configs';
 import { getCourseAdmin } from '../../services/courses';
 import CustomChip from '../../components/Share/CustomChip';
+
+import classNames from 'classnames/bind';
+import styles from './Courses.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -24,22 +23,28 @@ export default function AdminCourses() {
     let [dataForm, setDataForm] = useState(null);
     const [dataSelected, setDataSelected] = useState([]);
     const [dialog, setDialog] = useState(false);
+    const [dataSearch, setDataSearch] = useState({ searchText: '', orderBy: 0 });
 
     useEffect(() => {
         document.title = 'List Courses | Key Quiz';
-        // userTerm(50, 0, 50, 0).then((data) => {
-        //     setDataForm(data.courses);
-        //     // console.log(data);
-        // });
-        getCourseAdmin().then(({ data }) => {
+    }, []);
+
+    useEffect(() => {
+        getCourseAdmin(dataSearch).then(({ data }) => {
             console.log(data);
             setDataForm(data);
         });
-    }, []);
+    }, [dataSearch]);
 
     const handleChangeSelection = (data) => {
         setDataSelected(data);
         console.log(data);
+    };
+
+    const handleChangeSearch = (value) => {
+        setDataSearch((preState) => {
+            return { ...preState, searchText: value };
+        });
     };
 
     const handleRemoveRow = (id) => {
@@ -54,10 +59,6 @@ export default function AdminCourses() {
         // });
     };
 
-    const handleAddAnswer = () => {
-        setDataForm();
-    };
-
     const handleDeleteAll = () => {
         let newArr = dataForm.slice();
         for (let i = dataSelected.length - 1; i >= 0; i--) {
@@ -70,9 +71,9 @@ export default function AdminCourses() {
     };
 
     const handleChangeFilter = (e) => {
-        // setDataSearch((preState) => {
-        //     return { ...preState, filter: e.target.value };
-        // });
+        setDataSearch((preState) => {
+            return { ...preState, orderBy: +e.target.value };
+        });
     };
 
     const handleCloseDialog = () => {
@@ -88,7 +89,6 @@ export default function AdminCourses() {
             name: 'Oldest Courses',
             value: 1,
         },
-        { name: 'Most View', value: 2 },
     ];
 
     const columns = [
@@ -113,20 +113,20 @@ export default function AdminCourses() {
             renderCell: (params) => <div className="normal-font row-center">{params.row.course_name}</div>,
         },
         {
-            field: 'category_id',
+            field: 'category_name',
             minWidth: 250,
             sortable: false,
             editable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Topic</span>,
-            renderCell: (params) => <div className="normal-font row-center">{params.row.category_id}</div>,
+            renderCell: (params) => <div className="normal-font row-center">{params.row.category_name}</div>,
         },
         {
             field: 'totalQues',
             minWidth: 150,
             sortable: false,
             headerAlign: 'center',
-            renderHeader: (params) => <span className="header-table">Number of questions</span>,
+            renderHeader: (params) => <span className="header-table">Total Questions</span>,
             renderCell: (params) => <div className="normal-font row-center">{params.row.totalQues}</div>,
             editable: false,
         },
@@ -160,24 +160,18 @@ export default function AdminCourses() {
             renderHeader: (params) => <span className="header-table">Status</span>,
             renderCell: (params) => (
                 <div className="normal-font row-center">
-                    {/* {params.row.public_status === 0
-                        ? 'Hidden'
-                        : params.row.public_status === 1
-                        ? 'Activated'
-                        : 'Deactivated'}
-                    {params.row.public_status === 1 ? 'primary' : 'danger'} */}
                     <CustomChip
                         label={
-                            params.row.public_status == 0
+                            params.row.public_status === 0
                                 ? 'Only Me'
-                                : params.row.public_status == 1
+                                : params.row.public_status === 1
                                 ? 'Private'
                                 : 'Public'
                         }
                         color={
-                            params.row.public_status == 0
+                            params.row.public_status === 0
                                 ? 'default'
-                                : params.row.public_status == 1
+                                : params.row.public_status === 1
                                 ? 'error'
                                 : 'primary'
                         }
@@ -198,7 +192,7 @@ export default function AdminCourses() {
                         label="View"
                         arrow
                         handleClick={() => {
-                            navigate(routes.admin.courseDetail);
+                            navigate(routes.admin.courseDetail + '/' + params.id);
                         }}
                     >
                         <RemoveRedEyeRounded className="text-primary icon" />
@@ -235,7 +229,7 @@ export default function AdminCourses() {
                             </option>
                         ))}
                     </select>
-                    <CustomizationSearch placeholder="Find courses" />
+                    <CustomizationSearch placeholder="Find courses" handleChangeSearch={handleChangeSearch} />
                 </div>
             </div>
 

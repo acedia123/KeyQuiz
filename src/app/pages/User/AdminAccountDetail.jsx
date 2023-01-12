@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 // Material UI
 import { Avatar, Card, CardContent } from '@mui/material';
 import { BackspaceOutlined, LockOutlined, LockReset, SaveOutlined, ToggleOn } from '@mui/icons-material';
@@ -10,28 +10,22 @@ import CustomBreadcrumbs from '../../components/Share/CustomBreadcrumbs';
 // Other
 import { routes } from '../../configs';
 import { useParams } from 'react-router-dom';
-import { userTerm } from '../../constants/fakeData';
 import { IMAGE_PATH } from '../../appConfig';
 import { avatars } from '../../constants/avatar';
+import { getAccountById } from '../../services/account';
+import moment from 'moment';
+import { changeStatus } from '../../services/auth';
+import { ToastContext } from '../../context/ToastContextProvider';
 
 import classNames from 'classnames/bind';
 import styles from './User.module.scss';
-import { getAccountById } from '../../services/account';
-import moment from 'moment';
 
 const cx = classNames.bind(styles);
 
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
 export default function AdminAccountDetail() {
     let { id } = useParams();
+    const context = useContext(ToastContext);
     const [data, setData] = useState([]);
-    const [value, setValue] = useState(0);
     const [avatarDialog, setAvatarDialog] = useState({ open: false, value: '' });
     const [dataForm, setDataForm] = useState({ username: 'a', lastName: '', firstName: '', email: '' });
     const [dataError, setDataError] = useState({
@@ -41,22 +35,19 @@ export default function AdminAccountDetail() {
         passText: '',
     });
 
-    const [allowEdit, setAllowEdit] = useState(true);
-
     useEffect(() => {
-        getAccountById({ user_id: id }).then(({ data }) => {
-            console.log(data[0]);
-            document.title = `${data[0].user_name} | Key Quiz`;
-            setData(data[0]);
-        });
+        fetchData();
     }, []);
+
+    const fetchData = () => {
+        getAccountById({ user_id: id }).then(({ data }) => {
+            document.title = `${data.user_name} | Key Quiz`;
+            setData(data);
+        });
+    };
 
     const handleChange = (event) => {
         setDataForm({ ...dataForm, [event.target.name]: event.target.value });
-    };
-
-    const handleChangeTab = (event, newValue) => {
-        setValue(newValue);
     };
 
     const handleOpenFile = () => {
@@ -78,6 +69,32 @@ export default function AdminAccountDetail() {
     };
 
     const handleAvatarSubmit = () => {};
+
+    const handleActivated = () => {
+        changeStatus({ user_id: id, status: 1 }).then(({ data }) => {
+            console.log(data);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Activated account successfully!',
+                status: 'success',
+            });
+            fetchData();
+        });
+    };
+
+    const handleBanned = (type) => {
+        changeStatus({ user_id: id, status: type }).then(({ data }) => {
+            console.log(data);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: `${type === 0 ? 'Banned' : 'UnBanned'} account successfully!`,
+                status: 'success',
+            });
+            fetchData();
+        });
+    };
 
     return (
         <div className={cx('account-detail')}>
@@ -143,7 +160,7 @@ export default function AdminAccountDetail() {
                                 value={data.email}
                                 error={dataError.username}
                                 helperText={dataError.emailText}
-                                disabled={allowEdit}
+                                disabled={true}
                             />
                             <AuthTextField
                                 label="Username"
@@ -153,64 +170,50 @@ export default function AdminAccountDetail() {
                                 value={data.user_name}
                                 error={dataError.username}
                                 helperText={dataError.emailText}
-                                disabled={allowEdit}
+                                disabled={true}
                             />
-                            {!allowEdit ? (
-                                <div className="d-flex-align-center justify-content-end mt-4">
-                                    <CustomButton
-                                        className="dialog-button"
-                                        title="Save"
-                                        colorButton="primary"
-                                        startIcon={<SaveOutlined fontSize="large" />}
-                                        // handleClick={handleSubmit}
-                                    />
-                                    <CustomButton
-                                        className="dialog-button ml-3"
-                                        title="Cancel"
-                                        colorButton="light"
-                                        startIcon={<BackspaceOutlined fontSize="large" />}
-                                        handleClick={() => {
-                                            setAllowEdit(true);
-                                        }}
-                                    />
-                                </div>
-                            ) : (
-                                <div style={{ minHeight: 40 }}></div>
-                            )}
                         </form>
                     </div>
                     <div className={cx('card-analytics')}>
-                        <span className={cx('avatar-detail')}>Total course created: 10</span>
-                        <span className={cx('avatar-detail')}>Total course studied: 8</span>
+                        <span className={cx('avatar-detail')}>Total course created: {data.totalCourseCreated}</span>
+                        <span className={cx('avatar-detail')}>Total course studied: {data.totalCourseStudied}</span>
                     </div>
                     <div className={cx('card-actions')}>
                         <CustomButton
                             title={'Reset password'}
                             className={cx('card-btn')}
                             colorButton="warning"
-                            handleClick={() => {
-                                setAllowEdit(false);
-                            }}
+                            // handleClick={() => {
+                            //     setAllowEdit(false);
+                            // }}
                             startIcon={<LockReset fontSize="large" />}
                         />
-                        <CustomButton
-                            title={'Ban'}
-                            className={cx('card-btn')}
-                            colorButton="danger"
-                            handleClick={() => {
-                                setAllowEdit(false);
-                            }}
-                            startIcon={<LockOutlined fontSize="large" />}
-                        />
-                        <CustomButton
-                            title={'Activated Account'}
-                            className={cx('card-btn')}
-                            colorButton="success"
-                            handleClick={() => {
-                                console.log('hihi');
-                            }}
-                            startIcon={<ToggleOn fontSize="large" />}
-                        />
+                        {data.status === 1 ? (
+                            <CustomButton
+                                title={'Ban'}
+                                className={cx('card-btn')}
+                                colorButton="danger"
+                                handleClick={() => handleBanned(0)}
+                                startIcon={<LockOutlined fontSize="large" />}
+                            />
+                        ) : (
+                            <CustomButton
+                                title={'UnBanned'}
+                                className={cx('card-btn')}
+                                colorButton="secondary"
+                                handleClick={() => handleBanned(1)}
+                                startIcon={<LockOutlined fontSize="large" />}
+                            />
+                        )}
+                        {data.status === 2 && (
+                            <CustomButton
+                                title={'Activated Account'}
+                                className={cx('card-btn')}
+                                colorButton="success"
+                                handleClick={() => handleActivated()}
+                                startIcon={<ToggleOn fontSize="large" />}
+                            />
+                        )}
                     </div>
                 </CardContent>
             </Card>
