@@ -26,7 +26,7 @@ import {
 
 import classNames from 'classnames/bind';
 import styles from './Question.module.scss';
-import { changeTypeOfQuestion } from '../../services/courses';
+import { changeTypeOfQuestion, toggleIsImportant } from '../../services/courses';
 
 const cx = classNames.bind(styles);
 
@@ -38,7 +38,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
     const { isAnswer } = useSelector((state) => state.question);
     const { isNewQuestion } = useSelector((state) => state.question);
     const { roundProcess } = useSelector((state) => state.question);
-    const [isImportant, setIsImportant] = useState(false);
+    const [isImportant, setIsImportant] = useState(data.is_important);
 
     useEffect(() => {
         dispatch(userAnswer.getUserAnswerSuccess([]));
@@ -138,7 +138,11 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
         }
     };
 
-    const handleToggleStar = () => {};
+    const handleToggleStar = () => {
+        toggleIsImportant({ question_practice_id: data.question_practice_id }).then(({ data }) => {
+            setIsImportant(data.data === 1);
+        });
+    };
 
     const { searchSelected } = useSelector((state) => state.question);
     const [pos, setPos] = useState({});
@@ -154,7 +158,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
 
     const handleSearch = (data) => {
         dispatch(getSearchText.getSearchTextSuccess(data));
-        handleClickSearch();
+        handleClickSearch(data);
     };
 
     return (
@@ -171,7 +175,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
                             </button>
                         )}
                         <button onClick={handleToggleStar} className={cx('btn') + ' ml-3'}>
-                            {data.is_important ? (
+                            {isImportant ? (
                                 <StarRounded className={cx('icon', 'icon-primary')} />
                             ) : (
                                 <StarOutline className={cx('icon')} />

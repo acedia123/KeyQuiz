@@ -1,7 +1,6 @@
 import { login, register } from '../../services/auth';
 import * as actions from './actions';
-import { Cookies } from 'react-cookie';
-import { all, call, fork, put, takeEvery, takeLatest } from 'redux-saga/effects';
+import { all, call, fork, put, takeEvery } from 'redux-saga/effects';
 import { routes } from '../../configs';
 
 const setSession = (user) => {

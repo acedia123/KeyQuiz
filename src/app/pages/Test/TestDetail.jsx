@@ -42,7 +42,7 @@ export default function TestDetail() {
                 }),
             );
             let testProcess = location.state.questions.map((item) => {
-                let userChoose = JSON.parse(item.user_answers);
+                let userChoose = item.user_answers;
                 let userChooseConvert = userChoose.map((choose) => {
                     return { index: item.answers.findIndex((ans) => ans === choose), answer: choose };
                 });

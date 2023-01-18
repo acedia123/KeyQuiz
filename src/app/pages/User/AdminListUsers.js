@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // Material Library
 import { Alert, Avatar, Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { Add, DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
+import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
 // Component
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import CustomizationSearch from '../../components/Search/CustomizationSearch';
@@ -18,10 +18,10 @@ import { ToastContext } from '../../context/ToastContextProvider';
 import CustomDialog from '../../components/Share/CustomDialog';
 import FormTextField from '../../components/TextField/FormTextField';
 import { routes } from '../../configs';
+import CustomChip from '../../components/Share/CustomChip';
 
 import classNames from 'classnames/bind';
 import styles from './User.module.scss';
-import CustomChip from '../../components/Share/CustomChip';
 
 const cx = classNames.bind(styles);
 

@@ -23,7 +23,7 @@ import { searchingGoogle } from '../../services/ulti';
 import { reportQuestion } from '../../services/report';
 // Material UI
 import { debounce, Grid } from '@mui/material';
-import { SettingsOutlined, CloseOutlined, Search } from '@mui/icons-material';
+import { SettingsOutlined, CloseOutlined } from '@mui/icons-material';
 // Component
 import LearnOneAnswer from '../../components/Question/LearnOneAnswer';
 import LearnMultiAnswer from '../../components/Question/LearnMultiAnswer';
@@ -64,11 +64,11 @@ export default function Learn() {
     const [openReport, setOpenReport] = useState(false);
     const [questionId, setQuestionId] = useState(null);
     const [dataSetting, setDataSetting] = useState({
-        chapter: 0,
+        chapter: null,
         type: 0,
         level: 0,
         numberRound: JSON.parse(localStorage.getItem('learnRound'))
-            ? JSON.parse(localStorage.getItem('learnRound'))
+            ? +JSON.parse(localStorage.getItem('learnRound'))
             : 10,
         timer: { h: 0, m: 0, s: 30 },
         type_of_question: 0,
@@ -76,12 +76,14 @@ export default function Learn() {
 
     useEffect(() => {
         document.title = 'Learn - PRJ321 | Key Quiz';
-        const SIZE_OF_ROUND = +dataSetting.numberRound;
-        getQuestionToLearn({ course_id: courseId, type: 0, user_id: getUserFromLocalStorage().user_id }).then(
-            ({ data }) => {
-                fetchData(data, SIZE_OF_ROUND);
-            },
-        );
+        getQuestionToLearn({
+            course_id: courseId,
+            user_id: getUserFromLocalStorage().user_id,
+            ...dataSetting,
+        }).then(({ data }) => {
+            setRounds(data);
+        });
+
         dispatch(getTerm.getTermRequest({ course_id: courseId }));
     }, []);
 
@@ -144,48 +146,20 @@ export default function Learn() {
 
     const handleCloseSettingDialog = () => setOpenDialogSetting(false);
 
-    const fetchData = (newData, size) => {
-        let round = [];
-        let counter = newData.length / size;
-
-        for (let i = 0; i < counter; i++) {
-            round.push({
-                index: i,
-                questions: newData.slice(i * size, i * size + size),
-            });
-        }
-        setRounds(round);
-    };
-
     const handleSubmitForm = () => {
-        const SIZE_OF_ROUND = +dataSetting.numberRound;
-        getQuestionToLearn({ course_id: courseId, type: 0, user_id: getUserFromLocalStorage().user_id }).then(
-            ({ data }) => {
-                if (dataSetting.type === 1) {
-                    if (dataSetting.type_of_question === 0) {
-                        data = data.filter((item) => item.type_of_question === 0);
-                    } else if (dataSetting.type_of_question === 1) {
-                        data = data.filter((item) => item.type_of_question === 1);
-                    } else {
-                        data = data.filter((item) => item.is_important === 1);
-                    }
-                } else if (dataSetting.type === 2) {
-                    data = data.filter((item) => item.term_id === dataSetting.chapter);
-                } else if (dataSetting.type === 3) {
-                    console.log(dataSetting.level);
-                    data = data.filter((item) => item.level === +dataSetting.level);
-                    console.log(data);
-                }
-                setDataSetting({ ...dataSetting, numberRound: data.length });
-                fetchData(data, SIZE_OF_ROUND);
-            },
-        );
+        getQuestionToLearn({
+            course_id: courseId,
+            user_id: getUserFromLocalStorage().user_id,
+            ...dataSetting,
+        }).then(({ data }) => {
+            setRounds(data);
+        });
         setOpenDialogSetting(false);
     };
 
     const handleChangeNumRound = (e) => {
         setDataSetting((preState) => {
-            return { ...preState, numberRound: e.target.value };
+            return { ...preState, numberRound: +e.target.value };
         });
     };
 
@@ -220,7 +194,9 @@ export default function Learn() {
     const typeOfQues = [
         { name: 'Not Learned', value: 0 },
         { name: 'Learned', value: 1 },
-        { name: 'Is Important', value: 2 },
+        { name: 'Is Important', value: 4 },
+        { name: 'Easy', value: 2 },
+        { name: 'Difficult', value: 3 },
     ];
 
     const handleReport = (id) => {
@@ -245,6 +221,7 @@ export default function Learn() {
     };
 
     const fetchDropdownOptions = (value) => {
+        console.log(value);
         searchingGoogle(value).then(({ data }) => {
             setDataSearch(data);
             dispatch(getSearchSelected.getSearchSelectedSuccess(false));
@@ -257,7 +234,7 @@ export default function Learn() {
         [],
     );
 
-    const handleClickSearch = () => {
+    const handleClickSearch = (searchText) => {
         if (!isOpenSearch) {
             setIsOpenSearch(true);
             fetchDropdownOptions(searchText);
@@ -343,7 +320,7 @@ export default function Learn() {
                 </div>
 
                 <div className={cx('form-flex', 'flex-mobile')}>
-                    <label className={cx('label')}>Type of question</label>
+                    <label className={cx('label')}>Options</label>
                     <div className="d-flex">
                         <button
                             onClick={() => handleChooseTypeQues(0)}

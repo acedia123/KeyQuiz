@@ -22,12 +22,12 @@ import {
     userAnswer,
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeTypeOfQuestion } from '../../services/courses';
+import { changeTypeOfQuestion, toggleIsImportant } from '../../services/courses';
 import CustomIconAction from '../Share/CustomIconAction';
+import TextEditor from '../../pages/Learn/TextEditor';
 
 import classNames from 'classnames/bind';
 import styles from './Question.module.scss';
-import TextEditor from '../../pages/Learn/TextEditor';
 
 const cx = classNames.bind(styles);
 
@@ -39,7 +39,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
     const { isAnswer } = useSelector((state) => state.question);
     const { checkQuestion } = useSelector((state) => state.question);
     const { roundProcess } = useSelector((state) => state.question);
-    const [isImportant, setIsImportant] = useState(false);
+    const [isImportant, setIsImportant] = useState(data.is_important);
 
     useEffect(() => {
         setShowHint(false);
@@ -47,7 +47,6 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
         dispatch(getIsAnswer.getIsAnswerSuccess(false));
         dispatch(getCheckQuestion.getCheckQuestionSuccess(null));
         dispatch(getNewQuestion.getNewQuestionSuccess(true));
-        setIsImportant(data.is_important === 1);
     }, [isNewQuestion]);
 
     const handleCheckQuestion = (event, answer, index) => {
@@ -109,7 +108,11 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
         }
     };
 
-    const handleToggleStar = () => {};
+    const handleToggleStar = () => {
+        toggleIsImportant({ question_practice_id: data.question_practice_id }).then(({ data }) => {
+            setIsImportant(data.data === 1);
+        });
+    };
 
     const { searchSelected } = useSelector((state) => state.question);
     const [pos, setPos] = useState({});
@@ -125,7 +128,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
 
     const handleSearch = (data) => {
         dispatch(getSearchText.getSearchTextSuccess(data));
-        handleClickSearch();
+        handleClickSearch(data);
     };
 
     return (
@@ -145,7 +148,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
                             className={cx('kq-btn', 'btn') + ' ml-3'}
                             handleClick={() => handleToggleStar()}
                             icon={
-                                data.is_important ? (
+                                isImportant ? (
                                     <StarRounded className={cx('icon', 'icon-primary')} />
                                 ) : (
                                     <StarOutline className={cx('icon')} />

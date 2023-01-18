@@ -30,7 +30,7 @@ export default function TabTestResult({}) {
                 <div className={cx('banner')}>
                     <div className={cx('banner-inner')}>
                         <span className={cx('banner-text-title')}>
-                            Test Result {index + 1} - {item.total_question} question
+                            Test Result {index + 1} - {item.questions.length} question
                         </span>
                         <span className={cx('banner-text')}>
                             {moment(item.created_at).format('DD/MM/YYYY HH:ss:mm')}

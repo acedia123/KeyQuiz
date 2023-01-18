@@ -1,4 +1,4 @@
-import { getCategories, addCategory, getType } from '../category/actions';
+import { getCategories, getType } from '../category/actions';
 
 const initialState = {
     categories: null,

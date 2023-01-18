@@ -44,29 +44,34 @@ const ReportRate = React.lazy(() => import('../pages/Report/ReportRate'));
 const TextEditor = React.lazy(() => import('../pages/Learn/TextEditor.js'));
 
 export const publicRoutes = [
-    { path: routes.learn + '/:courseId', component: Learn, layout: null },
     { path: routes.home, component: Home, layout: DefaultLayout },
-
     { path: routes.courses, component: Courses, layout: DefaultLayout },
     { path: routes.courseDetail + '/:id', component: CourseDetail, layout: DefaultLayout },
 
     { path: routes.topics, component: Topics, layout: DefaultLayout },
 
-    { path: routes.test + '/:id', component: Test, layout: null },
-    { path: routes.testDetail + '/:id', component: TestDetail, layout: null },
-
     { path: routes.login, component: Login, layout: Auth },
-    { path: routes.activePage + '/:id', component: LoginFake, layout: Auth },
-
     { path: routes.register, component: SignUp, layout: Auth },
     { path: routes.forgotPass, component: ForgotPassword, layout: Auth },
+
+    { path: routes.activePage + '/:id', component: LoginFake, layout: Auth },
+
+    { path: routes.authorProfile + '/:id', component: AuthorProfile, layout: DefaultLayout },
+];
+
+export const privateRoutes = [
+    // private
+    { path: routes.learn + '/:courseId', component: Learn, layout: null },
+
+    { path: routes.test + '/:id', component: Test, layout: null },
+    { path: routes.testDetail + '/:id', component: TestDetail, layout: null },
 
     { path: routes.addCourse, component: AddCourse, layout: DefaultLayout },
     { path: routes.editCourse + '/:id', component: EditCourse, layout: DefaultLayout },
 
     { path: routes.userProfile, component: UserProfile, layout: DefaultLayout },
-    { path: routes.authorProfile + '/:id', component: AuthorProfile, layout: DefaultLayout },
 
+    //auth
     { path: routes.admin.dashboard, component: Dashboard, layout: Admin },
     { path: routes.admin.courses, component: AdminCourses, layout: Admin },
     { path: routes.admin.topics, component: AdminTopics, layout: Admin },
@@ -80,5 +85,3 @@ export const publicRoutes = [
     { path: routes.admin.reportRate, component: ReportRate, layout: Admin },
     { path: '/abc', component: TextEditor, layout: DefaultLayout },
 ];
-
-export const privateRoutes = [];

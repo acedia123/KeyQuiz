@@ -4,7 +4,6 @@ $header-height: 56px;
     background-color: $bg-layout;
     min-height: calc(100vh - $header-height);
     height: auto;
-    // position: relative;
 }
 
 .header {
@@ -55,7 +54,7 @@ $header-height: 56px;
 
 .main {
     width: 800px;
-    margin: $header-height auto;
+    margin: $header-height auto 0;
     padding: 20px 0;
 }
 

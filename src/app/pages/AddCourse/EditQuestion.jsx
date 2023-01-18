@@ -29,6 +29,7 @@ import { getAllCategories } from '../../services/category';
 import { routes } from '../../configs/index';
 import { checkCourseName, checkPassword, checkTermName } from '../../constants/validate';
 import { statusCourse } from '../../constants/constObject';
+import { getUserFromLocalStorage } from '../../constants/functions';
 
 import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
@@ -46,7 +47,7 @@ export default function EditCourse() {
         public_status: '2',
         password: null,
         category_id: 'cate1',
-        user_id: JSON.parse(localStorage.getItem('user')).user_id,
+        user_id: getUserFromLocalStorage().user_id,
         data: [],
     });
     const [dataAddQuestion, setDataAddQuestion] = useState(null);
