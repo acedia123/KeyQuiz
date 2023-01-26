@@ -46,7 +46,7 @@ const TextEditor = React.lazy(() => import('../pages/Learn/TextEditor.js'));
 export const publicRoutes = [
     { path: routes.home, component: Home, layout: DefaultLayout },
     { path: routes.courses, component: Courses, layout: DefaultLayout },
-    { path: routes.courseDetail + '/:id', component: CourseDetail, layout: DefaultLayout },
+    { path: routes.courseDetail + '/:id&tab=:tab', component: CourseDetail, layout: DefaultLayout },
 
     { path: routes.topics, component: Topics, layout: DefaultLayout },
 

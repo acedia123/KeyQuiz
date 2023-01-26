@@ -2,7 +2,15 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 // Material UI
 import { Avatar, Box, Grid, Rating, Tabs, Tab, Typography, Snackbar, Tooltip, IconButton } from '@mui/material';
-import { FileCopyOutlined, ShareRounded, MoreHoriz, RotateLeftOutlined, FlagOutlined } from '@mui/icons-material';
+import {
+    FileCopyOutlined,
+    ShareRounded,
+    MoreHoriz,
+    RotateLeftOutlined,
+    FlagOutlined,
+    ModeEdit,
+    DeleteRounded,
+} from '@mui/icons-material';
 // Component
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import CustomDialog from '../../components/Share/CustomDialog';
@@ -11,9 +19,10 @@ import CustomTippyPopper from '../../components/Share/CustomTippyPopper';
 import TabListCourses from './TabListCourses';
 import TabComments from './TabComments';
 // Service
-import { addCourseToLearn, learnAgain } from '../../services/courses';
+import { addCourseToLearn, deleteCourse, learnAgain } from '../../services/courses';
 import * as actions from '../../redux/course/actions';
 import { getRate } from '../../redux/rate/actions';
+import { getListTest } from '../../redux/test/actions';
 //Redux
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -30,6 +39,7 @@ import classNames from 'classnames/bind';
 import styles from './CourseDetail.module.scss';
 import { getTerm } from '../../redux/test/actions';
 import TabTestResult from './TabTestResult';
+import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
 
 const cx = classNames.bind(styles);
 
@@ -41,11 +51,10 @@ function a11yProps(index) {
 }
 
 export default function CourseDetail() {
-    let { id } = useParams();
+    let { id, tab } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const inputRef = useRef(null);
-    const [value, setValue] = useState(0);
     const [isOpenShareDialog, setIsOpenShareDialog] = useState(false);
     const [openStack, setOpenStack] = useState(false);
 
@@ -53,6 +62,7 @@ export default function CourseDetail() {
     const context = useContext(ToastContext);
     const [popper, setPopper] = useState(false);
     const [openReport, setOpenReport] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
 
     const { courseDetail } = useSelector((state) => state.course);
     const { questions } = useSelector((state) => state.course);
@@ -68,6 +78,7 @@ export default function CourseDetail() {
         if (user) {
             addCourseToLearn({ course_id: id, user_id: user.user_id }).then(() => {
                 dispatch(actions.getSearchCourse.getSearchCourseSuccess({ ...dataSearch, course_id: id }));
+                dispatch(getListTest.getListTestRequest({ user_id: user.user_id, course_id: id }));
                 // dispatch(actions.getQuestionByCourse.getQuestionByCourseRequest({ course_id: id, ...dataSearch }));
             });
         } else {
@@ -91,9 +102,7 @@ export default function CourseDetail() {
         }
     }, [courseDetail]);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+    const handleChange = (event, newValue) => changeTab(newValue);
 
     const hide = () => setPopper(false);
     const show = () => setPopper(true);
@@ -108,6 +117,10 @@ export default function CourseDetail() {
     const handleConfirmLearnAgain = () => {
         hide();
         setConfirmLearnAgain(true);
+    };
+
+    const changeTab = (value) => {
+        navigate(routes.courseDetail + '/' + courseDetail.course_id + '&tab=' + value);
     };
 
     const handleLearnAgain = () => {
@@ -176,6 +189,29 @@ export default function CourseDetail() {
         });
     };
 
+    const handleOpenDialog = () => {
+        hide();
+        setOpenDialog(true);
+    };
+
+    const handleConfirm = () => {
+        deleteCourse({ course_id: courseDetail.course_id }).then(({ data }) => {
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Delete Successfully!',
+                status: 'success',
+            });
+            dispatch(
+                actions.getQuestionByCourse.getQuestionByCourseRequest({
+                    course_id: id,
+                    ...dataSearch,
+                }),
+            );
+            setOpenDialog(false);
+        });
+    };
+
     return (
         <Grid className="inner">
             {courseDetail && (
@@ -185,11 +221,11 @@ export default function CourseDetail() {
                         <Grid container alignItems="center" className="normal-font text-muted font-weight-bold">
                             <Typography className={cx('title')}>{courseDetail.category[0].name}</Typography>
                             <div className={cx('separate-text')}></div>
-                            <button className="d-flex-align-center" onClick={() => setValue(0)}>
+                            <button className="d-flex-align-center" onClick={() => changeTab(0)}>
                                 <Typography className={cx('title')}>{courseDetail.totalQues} questions</Typography>
                             </button>
                             <div className={cx('separate-text')}></div>
-                            <button className="d-flex-align-center" onClick={() => setValue(1)}>
+                            <button className="d-flex-align-center" onClick={() => changeTab(1)}>
                                 <Typography className={cx('title') + ' text-muted'}>
                                     {courseDetail.rate.value.toFixed(1)}
                                 </Typography>
@@ -255,7 +291,7 @@ export default function CourseDetail() {
                                         open={isOpenShareDialog}
                                         size="sm"
                                         noButton={false}
-                                        handleClose={() => setOpenStack(false)}
+                                        handleClose={() => setIsOpenShareDialog(false)}
                                     >
                                         <div className={cx('form-dialog')}>
                                             <span className={cx('form-title')}>Share link</span>
@@ -296,6 +332,32 @@ export default function CourseDetail() {
                                             handleClosePopper={hide}
                                             popperRender={
                                                 <ul>
+                                                    {courseDetail.author[0].user_id ===
+                                                        getUserFromLocalStorage().user_id && (
+                                                        <div>
+                                                            <li>
+                                                                <Link
+                                                                    to={
+                                                                        routes.editCourse + '/' + courseDetail.course_id
+                                                                    }
+                                                                    className="popper-link"
+                                                                    onClick={hide}
+                                                                >
+                                                                    <ModeEdit className="mr-2" fontSize="large" />
+                                                                    Edit course
+                                                                </Link>
+                                                            </li>
+                                                            <li>
+                                                                <button
+                                                                    className="popper-link"
+                                                                    onClick={handleOpenDialog}
+                                                                >
+                                                                    <DeleteRounded className="mr-2" fontSize="large" />
+                                                                    Delete course
+                                                                </button>
+                                                            </li>
+                                                        </div>
+                                                    )}
                                                     <li>
                                                         <button
                                                             className="popper-link"
@@ -346,22 +408,33 @@ export default function CourseDetail() {
                         handleClose={() => setConfirmLearnAgain(false)}
                     />
 
+                    <CustomConfirmDialog
+                        open={openDialog}
+                        label={'course'}
+                        handleClose={() => setOpenDialog(false)}
+                        handleSubmit={handleConfirm}
+                    />
+
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                        <Tabs value={value} onChange={handleChange}>
+                        <Tabs value={+tab} onChange={handleChange}>
                             <Tab label="Questions" {...a11yProps(0)} className="normal-font font-weight-bold" />
                             <Tab label="Course Reviews" {...a11yProps(1)} className="normal-font font-weight-bold" />
-                            <Tab label="Test Result" {...a11yProps(2)} className="normal-font font-weight-bold" />
+                            {getUserFromLocalStorage() && (
+                                <Tab label="Test Result" {...a11yProps(2)} className="normal-font font-weight-bold" />
+                            )}
                         </Tabs>
                     </Box>
-                    <TabPanel value={value} index={0}>
+                    <TabPanel value={+tab} index={0}>
                         <TabListCourses data={questions ? questions : []} id={id} />
                     </TabPanel>
-                    <TabPanel value={value} index={1}>
+                    <TabPanel value={+tab} index={1}>
                         <TabComments courseId={id} courseDetail={courseDetail} />
                     </TabPanel>
-                    <TabPanel value={value} index={2}>
-                        <TabTestResult courseId={id} courseDetail={courseDetail} />
-                    </TabPanel>
+                    {getUserFromLocalStorage() && (
+                        <TabPanel value={+tab} index={2}>
+                            <TabTestResult courseId={id} courseDetail={courseDetail} />
+                        </TabPanel>
+                    )}
                 </div>
             )}
         </Grid>

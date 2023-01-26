@@ -99,25 +99,23 @@ export default function Courses() {
                     <h2 className={cx('header-title')}>List courses</h2>
                 </Grid>
                 <Grid item xs={12} sm={9} md={8} lg={7}>
-                    {data && data.length > 0 && (
-                        <Grid container spacing={2} alignItems="center" justifyContent="flex-end">
-                            <Grid item xs={12} sm={4} lg={4}>
-                                <select className={cx('filter')} name="filter" onChange={handleChangeFilter}>
-                                    {filters.map((item, index) => (
-                                        <option key={index} value={item.value}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </Grid>
-                            <Grid item xs={12} sm={8} lg={8}>
-                                <CustomizationSearch
-                                    placeholder="Searching course..."
-                                    handleChangeSearch={handleChangeSearch}
-                                />
-                            </Grid>
+                    <Grid container spacing={2} alignItems="center" justifyContent="flex-end">
+                        <Grid item xs={12} sm={4} lg={4}>
+                            <select className={cx('filter')} name="filter" onChange={handleChangeFilter}>
+                                {filters.map((item, index) => (
+                                    <option key={index} value={item.value}>
+                                        {item.name}
+                                    </option>
+                                ))}
+                            </select>
                         </Grid>
-                    )}
+                        <Grid item xs={12} sm={8} lg={8}>
+                            <CustomizationSearch
+                                placeholder="Searching course..."
+                                handleChangeSearch={handleChangeSearch}
+                            />
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
 

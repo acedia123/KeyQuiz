@@ -75,7 +75,7 @@ export default function TestDetail() {
     const hide = () => setPopper(false);
 
     const handleCloseTest = () => {
-        navigate(routes.courseDetail + '/' + id);
+        navigate(routes.courseDetail + '/' + id + '&tab=2');
     };
 
     const handleClickResult = (id) => {
@@ -101,15 +101,7 @@ export default function TestDetail() {
                                 </Link>
                             </div>
                         </div>
-                        <div className={cx('header-title')}>
-                            {(data.time.split(':')[0] > 9 ? data.time.split(':')[0] : '0' + data.time.split(':')[0]) +
-                                ':' +
-                                (data.time.split(':')[1] > 9
-                                    ? data.time.split(':')[1]
-                                    : '0' + data.time.split(':')[1]) +
-                                ':' +
-                                (data.time.split(':')[2] > 9 ? data.time.split(':')[2] : '0' + data.time.split(':')[2])}
-                        </div>
+                        <div className={cx('header-title')}>{data.time}</div>
                         <div className={cx('header-actions')}>
                             <CustomTippyPopper
                                 className={cx('user-avatar-popper')}
@@ -119,15 +111,15 @@ export default function TestDetail() {
                                 // handleClosePopper={hide}
                                 popperRender={
                                     <ul className={cx('questions-wrapper')}>
+                                        {console.log(data.testProcessing)}
                                         {data.testProcessing.map((test, index) => {
                                             let checkStatus = '--is-wrong';
-                                            if (test.userChoose[index]) {
-                                                checkStatus = test.userChoose.every((item) =>
-                                                    test.correct_answers.includes(item.answer),
-                                                )
-                                                    ? '--is-correct'
-                                                    : '--is-wrong';
-                                            }
+                                            checkStatus = test.userChoose.every((item) =>
+                                                test.correct_answers.includes(item.answer),
+                                            )
+                                                ? '--is-correct'
+                                                : '--is-wrong';
+                                            console.log(checkStatus);
 
                                             return (
                                                 <li>

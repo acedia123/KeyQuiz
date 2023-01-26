@@ -15,4 +15,9 @@ export const avatars = [
     'a14.jpg',
 ];
 
-export const noData = { course: 'noData.webp', rate: 'no-data-rate.png', question: 'no-question.png' };
+export const noData = {
+    course: 'noData.webp',
+    rate: 'no-data-rate.png',
+    question: 'no-question.png',
+    test: 'no-data-test.png',
+};

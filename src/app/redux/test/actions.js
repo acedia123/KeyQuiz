@@ -32,3 +32,9 @@ export const getTotalQues = createActions({
     getTotalQuesRequest: (payload) => payload,
     getTotalQuesSuccess: (payload) => payload,
 });
+
+export const getListTest = createActions({
+    getListTestRequest: (payload) => payload,
+    getListTestSuccess: (payload) => payload,
+    getListTestFailure: (payload) => payload,
+});

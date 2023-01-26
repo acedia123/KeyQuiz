@@ -52,13 +52,13 @@ const CardCourse = ({ data, topic = true }, ref) => {
         if (data.public_status === '1') {
             e.preventDefault();
             if (getUserFromLocalStorage() && data.user_id === getUserFromLocalStorage().user_id) {
-                navigate(routes.courseDetail + '/' + data.course_id);
+                navigate(routes.courseDetail + '/' + data.course_id + '&tab=0');
             } else {
                 const courseJoin = JSON.parse(localStorage.getItem('courseJoin'));
                 if (courseJoin) {
                     let checkData = courseJoin.find((item) => item.id === data.course_id);
                     if (checkData) {
-                        navigate(routes.courseDetail + '/' + data.course_id);
+                        navigate(routes.courseDetail + '/' + data.course_id + '&tab=0');
                     } else {
                         setOpenPasswordDialog(true);
                     }
@@ -81,7 +81,7 @@ const CardCourse = ({ data, topic = true }, ref) => {
 
     const handleSubmitForm = () => {
         if (data.password === dataForm.password) {
-            navigate(routes.courseDetail + '/' + data.course_id);
+            navigate(routes.courseDetail + '/' + data.course_id + '&tab=0');
             const courseJoin = JSON.parse(localStorage.getItem('courseJoin'));
             if (courseJoin) {
                 courseJoin.push({ id: data.course_id });
@@ -131,7 +131,7 @@ const CardCourse = ({ data, topic = true }, ref) => {
             </CustomDialog>
             <Card>
                 <CardContent className="d-flex-center-between pb-0" sx={{ minHeight: 54 }}>
-                    <Link to={routes.courseDetail + '/' + data.course_id} onClick={handleCheckPassword}>
+                    <Link to={routes.courseDetail + '/' + data.course_id + '&tab=0'} onClick={handleCheckPassword}>
                         <Grid className="d-flex-align-center">
                             <CalendarMonth fontSize="large" />
                             <Typography className="normal-font ml-1" noWrap>
@@ -177,7 +177,7 @@ const CardCourse = ({ data, topic = true }, ref) => {
                             <Typography className="normal-font font-weight-bold">{data.category[0].name}</Typography>
                         </Link>
                     )}
-                    <Link to={routes.courseDetail + '/' + data.course_id} onClick={handleCheckPassword}>
+                    <Link to={routes.courseDetail + '/' + data.course_id + '&tab=0'} onClick={handleCheckPassword}>
                         <Typography
                             className="lg-font"
                             sx={{
@@ -196,7 +196,7 @@ const CardCourse = ({ data, topic = true }, ref) => {
                         </Typography>
                     </Link>
                 </CardContent>
-                <Link to={routes.courseDetail + '/' + data.course_id} onClick={handleCheckPassword}>
+                <Link to={routes.courseDetail + '/' + data.course_id + '&tab=0'} onClick={handleCheckPassword}>
                     <CardContent className="d-flex justify-content-around pt-0">
                         <Grid className="d-flex-align-center flex-column justify-content-center">
                             <Typography component="legend" className="text-center small-font" gutterBottom>

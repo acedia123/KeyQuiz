@@ -1,6 +1,6 @@
 import * as actions from './actions';
 import { all, call, fork, put, takeEvery } from 'redux-saga/effects';
-import { getAllTerm, getQuestionByCourse } from '../../services/courses';
+import { getAllTerm, getListTestByUser, getQuestionByCourse } from '../../services/courses';
 
 var getMeRandomElements = function (sourceArray, neededElements) {
     var result = [];
@@ -99,6 +99,30 @@ function* getTotalTerm(action) {
     yield put(actions.getTotalQues.getTotalQuesSuccess(total));
 }
 
+function* getListTestSaga(action) {
+    try {
+        const tests = yield call(getListTestByUser, { ...action.payload });
+        yield put(actions.getListTest.getListTestSuccess(tests.data));
+    } catch (error) {
+        let message;
+        if (error.response) {
+            switch (error.response.status) {
+                case 500:
+                    message = 'Internal Server Error';
+                    break;
+                case 401:
+                    message = 'Invalid credentials';
+                    break;
+                default:
+                    message = error.message;
+            }
+        } else {
+            message = 'Wrong something ' + error;
+        }
+        yield put(actions.getListTest.getListTestFailure(message));
+    }
+}
+
 export function* watchTestQuestion() {
     yield takeEvery(actions.getQuestionByTest.getQuestionByTestRequest, getQuestionByTest);
 }
@@ -108,9 +132,12 @@ export function* watchTerm() {
 export function* watchTotalQues() {
     yield takeEvery(actions.getTotalQues.getTotalQuesRequest, getTotalTerm);
 }
+export function* watchListTest() {
+    yield takeEvery(actions.getListTest.getListTestRequest, getListTestSaga);
+}
 
 function* testSaga() {
-    yield all([fork(watchTestQuestion), fork(watchTerm), fork(watchTotalQues)]);
+    yield all([fork(watchTestQuestion), fork(watchTerm), fork(watchTotalQues), fork(watchListTest)]);
 }
 
 export default testSaga;

@@ -35,6 +35,17 @@ function getLabelText(value) {
     return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
 }
 
+function CustomizeButton({ value, selectedFilter, handleChangeStar }) {
+    return (
+        <button
+            className={cx('btn-rate', selectedFilter === value ? 'btn--selected' : '')}
+            onClick={() => handleChangeStar(value)}
+        >
+            {value === 0 ? 'All' : value + ' star'}
+        </button>
+    );
+}
+
 export default function TabComments({ courseId, courseDetail }) {
     const inputRef = useRef(null);
     const navigate = useNavigate();
@@ -50,15 +61,6 @@ export default function TabComments({ courseId, courseDetail }) {
     const [openReport, setOpenReport] = useState(false);
 
     const { comments } = useSelector((state) => state.rate);
-
-    // useEffect(() => {
-    //     let checkRate = true;
-
-    //     if (getUserFromLocalStorage() && comments.length > 0) {
-    //         checkRate = comments.some((item) => item.user_id === getUserFromLocalStorage().user_id);
-    //     }
-    //     setIsComment(checkRate);
-    // }, [comments]);
 
     const fetchData = (data) => {
         dispatch(getRate.getRateRequest({ course_id: courseId, ...data }));
@@ -175,42 +177,12 @@ export default function TabComments({ courseId, courseDetail }) {
                             precision={0.5}
                         />
                     </div>
-                    <button
-                        className={cx('btn-rate', selectedFilter === 0 ? 'btn--selected' : '')}
-                        onClick={() => handleChangeStar(0)}
-                    >
-                        All
-                    </button>
-                    <button
-                        className={cx('btn-rate', selectedFilter === 5 ? 'btn--selected' : '')}
-                        onClick={() => handleChangeStar(5)}
-                    >
-                        5 star (12)
-                    </button>
-                    <button
-                        className={cx('btn-rate', selectedFilter === 4 ? 'btn--selected' : '')}
-                        onClick={() => handleChangeStar(4)}
-                    >
-                        4 star (20)
-                    </button>
-                    <button
-                        className={cx('btn-rate', selectedFilter === 3 ? 'btn--selected' : '')}
-                        onClick={() => handleChangeStar(3)}
-                    >
-                        3 star (20)
-                    </button>
-                    <button
-                        className={cx('btn-rate', selectedFilter === 2 ? 'btn--selected' : '')}
-                        onClick={() => handleChangeStar(2)}
-                    >
-                        2 star (20)
-                    </button>
-                    <button
-                        className={cx('btn-rate', selectedFilter === 1 ? 'btn--selected' : '')}
-                        onClick={() => handleChangeStar(1)}
-                    >
-                        1 star (20)
-                    </button>
+                    <CustomizeButton value={0} handleChangeStar={handleChangeStar} selectedFilter={selectedFilter} />
+                    <CustomizeButton value={5} handleChangeStar={handleChangeStar} selectedFilter={selectedFilter} />
+                    <CustomizeButton value={4} handleChangeStar={handleChangeStar} selectedFilter={selectedFilter} />
+                    <CustomizeButton value={3} handleChangeStar={handleChangeStar} selectedFilter={selectedFilter} />
+                    <CustomizeButton value={2} handleChangeStar={handleChangeStar} selectedFilter={selectedFilter} />
+                    <CustomizeButton value={1} handleChangeStar={handleChangeStar} selectedFilter={selectedFilter} />
 
                     <CustomDialog
                         title={'Add Review'}

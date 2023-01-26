@@ -23,10 +23,11 @@ import {
     getSearchText,
     userAnswer,
 } from '../../redux/question/actions';
+import { changeTypeOfQuestion, createNote, toggleIsImportant } from '../../services/courses';
+import TextEditor from '../../pages/Learn/TextEditor';
 
 import classNames from 'classnames/bind';
 import styles from './Question.module.scss';
-import { changeTypeOfQuestion, toggleIsImportant } from '../../services/courses';
 
 const cx = classNames.bind(styles);
 
@@ -161,6 +162,10 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
         handleClickSearch(data);
     };
 
+    const handleBlurTextEditor = (value) => {
+        createNote({ question_practice_id: data.question_practice_id, note: value });
+    };
+
     return (
         <Card className={cx('card', isNewQuestion ? '--animation-slide' : '')}>
             <CardContent className={cx('card-content')}>
@@ -256,6 +261,20 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
                     </div>
                 )}
             </CardContent>
+
+            <Card className={cx('note-wrapper')}>
+                <div className="d-flex-center-between">
+                    <h2>Note</h2>
+                    {/* <CustomIconAction
+                        label={'Save'}
+                        arrow={true}
+                        className={cx('kq-btn', 'btn') + ' ml-3'}
+                        // handleClick={() => handleCopyCourse()}
+                        icon={<SaveOutlined fontSize="large" />}
+                    /> */}
+                </div>
+                <TextEditor data={data.note} handleBlurText={handleBlurTextEditor} />
+            </Card>
         </Card>
     );
 }

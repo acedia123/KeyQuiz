@@ -58,6 +58,11 @@ export const getQuestionToLearn = (data) => {
     return axios.post(url, data);
 };
 
+export const getTotalQuestion = (data) => {
+    var url = API_PATH + '/vinh-api';
+    return axios.post(url, data);
+};
+
 export const learnAgain = (data) => {
     var url = API_PATH + '/learn-again';
     return axios.post(url, data);
@@ -83,5 +88,10 @@ export const getCourseAdmin = (data) => {
 
 export const getListTestByUser = (data) => {
     var url = API_PATH + '/get-list-test';
+    return axios.post(url, data);
+};
+
+export const createNote = (data) => {
+    var url = API_PATH + '/create-note';
     return axios.post(url, data);
 };

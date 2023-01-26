@@ -22,7 +22,7 @@ import {
     userAnswer,
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeTypeOfQuestion, toggleIsImportant } from '../../services/courses';
+import { changeTypeOfQuestion, createNote, toggleIsImportant } from '../../services/courses';
 import CustomIconAction from '../Share/CustomIconAction';
 import TextEditor from '../../pages/Learn/TextEditor';
 
@@ -129,6 +129,10 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
     const handleSearch = (data) => {
         dispatch(getSearchText.getSearchTextSuccess(data));
         handleClickSearch(data);
+    };
+
+    const handleBlurTextEditor = (value) => {
+        createNote({ question_practice_id: data.question_practice_id, note: value });
     };
 
     return (
@@ -244,16 +248,15 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
             <Card className={cx('note-wrapper')}>
                 <div className="d-flex-center-between">
                     <h2>Note</h2>
-                    <CustomIconAction
+                    {/* <CustomIconAction
                         label={'Save'}
                         arrow={true}
                         className={cx('kq-btn', 'btn') + ' ml-3'}
                         // handleClick={() => handleCopyCourse()}
                         icon={<SaveOutlined fontSize="large" />}
-                    />
+                    /> */}
                 </div>
-                {/* <textarea className={cx('text-input')} placeholder="Enter your note here"></textarea> */}
-                <TextEditor />
+                <TextEditor data={data.note} handleBlurText={handleBlurTextEditor} />
             </Card>
         </Card>
     );

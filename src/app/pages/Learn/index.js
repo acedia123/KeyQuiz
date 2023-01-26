@@ -18,7 +18,7 @@ import {
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
 // Service
-import { getQuestionToLearn } from '../../services/courses';
+import { getQuestionToLearn, getTotalQuestion } from '../../services/courses';
 import { searchingGoogle } from '../../services/ulti';
 import { reportQuestion } from '../../services/report';
 // Material UI
@@ -57,6 +57,7 @@ export default function Learn() {
     const { totalLearn } = useSelector((state) => state.question);
     const { terms } = useSelector((state) => state.test);
 
+    const [totalQuestion, setTotalQues] = useState(0);
     const [dataSearch, setDataSearch] = useState();
     const [isOpenSearch, setIsOpenSearch] = useState(false);
     const [rounds, setRounds] = useState(null);
@@ -70,7 +71,6 @@ export default function Learn() {
         numberRound: JSON.parse(localStorage.getItem('learnRound'))
             ? +JSON.parse(localStorage.getItem('learnRound'))
             : 10,
-        timer: { h: 0, m: 0, s: 30 },
         type_of_question: 0,
     });
 
@@ -83,7 +83,7 @@ export default function Learn() {
         }).then(({ data }) => {
             setRounds(data);
         });
-
+        fetchTotalQuestion({ ...dataSetting });
         dispatch(getTerm.getTermRequest({ course_id: courseId }));
     }, []);
 
@@ -128,19 +128,26 @@ export default function Learn() {
         }
     };
 
-    const handleChange = (e) => setDataSetting({ ...dataSetting, chapter: e.target.value });
-
-    const handleChooseTypeQues = (type) => {
-        if (type === 1) {
-            setDataSetting({ ...dataSetting, type, type_of_question: 0 });
-        } else if (type === 2) {
-            setDataSetting({ ...dataSetting, type, chapter: terms[0].term_id });
-        } else {
-            setDataSetting({ ...dataSetting, type });
-        }
+    const handleChange = (e) => {
+        setDataSetting({ ...dataSetting, chapter: e.target.value });
+        fetchTotalQuestion({ ...dataSetting, chapter: e.target.value });
     };
 
-    const handleChangeLevel = (e) => setDataSetting({ ...dataSetting, level: e.target.value });
+    const handleChooseTypeQues = (type) => {
+        let newObj = { ...dataSetting, type };
+        if (type === 1) {
+            newObj = { ...dataSetting, type, type_of_question: 0 };
+        } else if (type === 2) {
+            newObj = { ...dataSetting, type, chapter: terms[0].term_id };
+        }
+        setDataSetting(newObj);
+        fetchTotalQuestion(newObj);
+    };
+
+    const handleChangeLevel = (e) => {
+        setDataSetting({ ...dataSetting, level: +e.target.value });
+        fetchTotalQuestion({ ...dataSetting, level: +e.target.value });
+    };
 
     const handleOpenSettingDialog = () => setOpenDialogSetting(true);
 
@@ -153,8 +160,22 @@ export default function Learn() {
             ...dataSetting,
         }).then(({ data }) => {
             setRounds(data);
+            dispatch(getIsAnswer.getIsAnswerSuccess(false));
         });
         setOpenDialogSetting(false);
+    };
+
+    const fetchTotalQuestion = (obj) => {
+        getTotalQuestion({
+            course_id: courseId,
+            user_id: getUserFromLocalStorage().user_id,
+            ...obj,
+        }).then(({ data }) => {
+            setDataSetting((preState) => {
+                return { ...preState, numberRound: data };
+            });
+            setTotalQues(data);
+        });
     };
 
     const handleChangeNumRound = (e) => {
@@ -171,12 +192,16 @@ export default function Learn() {
     };
 
     const handleBlurNumRound = (event) => {
-        const totalNum = rounds.reduce((preVal, current) => preVal + current.questions.length, 0);
-        if (event.target.value > totalNum) {
+        if (event.target.value > totalQuestion) {
             setDataSetting((preState) => {
-                return { ...preState, numberRound: totalNum };
+                return { ...preState, numberRound: totalQuestion };
             });
-            localStorage.setItem('learnRound', JSON.stringify(totalNum));
+            localStorage.setItem('learnRound', JSON.stringify(totalQuestion));
+        } else if (event.target.value <= 0) {
+            setDataSetting((preState) => {
+                return { ...preState, numberRound: 1 };
+            });
+            localStorage.setItem('learnRound', JSON.stringify(1));
         } else {
             setDataSetting((preState) => {
                 return { ...preState, numberRound: event.target.value };
@@ -189,14 +214,13 @@ export default function Learn() {
         setDataSetting((preState) => {
             return { ...preState, type_of_question: +event.target.value };
         });
+        fetchTotalQuestion({ ...dataSetting, type_of_question: +event.target.value });
     };
 
     const typeOfQues = [
         { name: 'Not Learned', value: 0 },
         { name: 'Learned', value: 1 },
         { name: 'Is Important', value: 4 },
-        { name: 'Easy', value: 2 },
-        { name: 'Difficult', value: 3 },
     ];
 
     const handleReport = (id) => {
@@ -214,14 +238,12 @@ export default function Learn() {
             setOpenReport(false);
         });
     };
-    const { searchText } = useSelector((state) => state.question);
 
     const handleChangeSearch = (event) => {
         debounceDropDown(event);
     };
 
     const fetchDropdownOptions = (value) => {
-        console.log(value);
         searchingGoogle(value).then(({ data }) => {
             setDataSearch(data);
             dispatch(getSearchSelected.getSearchSelectedSuccess(false));
@@ -305,18 +327,21 @@ export default function Learn() {
                     <label className={cx('label')} htmlFor="numberRound">
                         Number questions of round
                     </label>
-                    <input
-                        type="number"
-                        name=""
-                        id="numberRound"
-                        value={dataSetting.numberRound}
-                        className={cx('text-number')}
-                        onChange={handleChangeNumRound}
-                        onKeyDown={handleKeyPress}
-                        onBlur={handleBlurNumRound}
-                        min="1"
-                        step="1"
-                    />
+                    <div>
+                        <input
+                            type="number"
+                            name=""
+                            id="numberRound"
+                            value={dataSetting.numberRound}
+                            className={cx('text-number')}
+                            onChange={handleChangeNumRound}
+                            onKeyDown={handleKeyPress}
+                            onBlur={handleBlurNumRound}
+                            min="1"
+                            step="1"
+                        />
+                        <span className="normal-font"> / {totalQuestion} questions</span>
+                    </div>
                 </div>
 
                 <div className={cx('form-flex', 'flex-mobile')}>
@@ -354,7 +379,11 @@ export default function Learn() {
                         <label className={cx('label')}>Type of question</label>
                         <select className={cx('filter')} name="filter" onChange={handleChangeType}>
                             {typeOfQues.map((item, index) => (
-                                <option key={index} value={item.value}>
+                                <option
+                                    key={index}
+                                    value={item.value}
+                                    selected={dataSetting.type_of_question === item.value ? 'selected' : ''}
+                                >
                                     {item.name}
                                 </option>
                             ))}
@@ -367,7 +396,11 @@ export default function Learn() {
                         <label className={cx('label')}>Chapter</label>
                         <select className={cx('filter')} name="filter" onChange={handleChange}>
                             {terms.map((item, index) => (
-                                <option key={index} value={item.term_id}>
+                                <option
+                                    key={index}
+                                    value={item.term_id}
+                                    selected={dataSetting.chapter === item.term_id ? 'selected' : ''}
+                                >
                                     {item.term_name}
                                 </option>
                             ))}
@@ -380,7 +413,11 @@ export default function Learn() {
                         <label className={cx('label')}>Level</label>
                         <select className={cx('filter')} name="filter" onChange={handleChangeLevel}>
                             {levels.map((item, index) => (
-                                <option key={index} value={item.value}>
+                                <option
+                                    key={index}
+                                    value={item.value}
+                                    selected={dataSetting.level === item.value ? 'selected' : ''}
+                                >
                                     {item.name}
                                 </option>
                             ))}
@@ -394,6 +431,7 @@ export default function Learn() {
                     fullWidth
                     colorButton="primary"
                     handleClick={handleSubmitForm}
+                    disabled={!totalQuestion > 0}
                 />
             </CustomDialog>
 

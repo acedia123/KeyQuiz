@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Check, FormatBold, FormatColorText, FormatItalic, FormatUnderlined } from '@mui/icons-material';
 import sanitizeHtml from 'sanitize-html';
 import ContentEditable from 'react-contenteditable';
@@ -13,26 +13,32 @@ const EMPTY_VALUE = `<p><br></p>`;
 const INITIAL_VALUE = `<p>Enter your note here</p>`;
 const colors = ['red', 'white', 'black', 'blue', 'pink', 'green'];
 
-export default function TextEditor() {
+export default function TextEditor({ data, handleBlurText }) {
     const [html, setHTML] = useState(INITIAL_VALUE);
+    const textRef = useRef();
     const [activeButton, setActiveButton] = useState({ bold: 0, italic: 0, underline: 0 });
     const [colorSetting, setColorSetting] = useState({ foreBg: 'black', backBg: 'white' });
     const [popper, setPopper] = useState(false);
 
+    useEffect(() => {
+        setHTML(data === EMPTY_VALUE || !data ? INITIAL_VALUE : data);
+    }, []);
+
     const handleChange = (evt) => {
-        setHTML(evt.target.value);
+        setHTML(() => evt.target.value);
     };
 
     const handleFocus = () => {
-        if (html === INITIAL_VALUE) {
+        if (textRef.current.lastHtml === INITIAL_VALUE) {
             setHTML(EMPTY_VALUE);
         }
     };
 
     const handleBlur = () => {
-        if (html === EMPTY_VALUE) {
+        if (textRef.current.lastHtml === EMPTY_VALUE) {
             setHTML(INITIAL_VALUE);
         }
+        handleBlurText(textRef.current.lastHtml);
     };
 
     const handleClickIcon = (name) => {
@@ -153,6 +159,7 @@ export default function TextEditor() {
                     </CustomTippyPopper>
                 </div>
                 <ContentEditable
+                    ref={textRef}
                     className={cx('container')}
                     tagName="pre"
                     html={html}

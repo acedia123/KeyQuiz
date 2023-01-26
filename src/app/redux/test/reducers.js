@@ -1,4 +1,5 @@
 import {
+    getListTest,
     getQuestionByTest,
     getSelected,
     getTerm,
@@ -15,6 +16,7 @@ const initialState = {
     questions: [],
     terms: [],
     totalQues: 0,
+    tests: [],
 };
 
 const TestReducer = (state = initialState, action) => {
@@ -42,6 +44,22 @@ const TestReducer = (state = initialState, action) => {
                 loading: false,
             };
         }
+
+        // List Test
+        case getType(getListTest.getListTestRequest): {
+            return { ...state, loading: true };
+        }
+        case getType(getListTest.getListTestSuccess): {
+            return { ...state, tests: action.payload, loading: false, error: null };
+        }
+        case getType(getListTest.getListTestFailure): {
+            return {
+                ...state,
+                error: action.payload,
+                loading: false,
+            };
+        }
+
         // Term
         case getType(getTerm.getTermRequest): {
             return { ...state, loading: true };
