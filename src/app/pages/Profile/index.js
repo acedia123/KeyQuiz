@@ -14,6 +14,8 @@ import CustomInputAdornment from '../../components/TextField/CustomInputAdornmen
 import { getCourseLearned, getCourseLearning, getTopCourseByUser } from '../../services/home';
 import TabMyCourse from './TabMyCourse';
 import { checkPasswordService } from '../../services/auth';
+import { getChangeAvatar } from '../../redux/auth/actions';
+import { useDispatch, useSelector } from 'react-redux';
 
 import classNames from 'classnames/bind';
 import styles from './Profile.module.scss';
@@ -28,6 +30,7 @@ function a11yProps(index) {
 }
 
 export default function UserProfile() {
+    const dispatch = useDispatch();
     const context = useContext(ToastContext);
     const [myCourse, setMyCourse] = useState([]);
     const [value, setValue] = useState(0);
@@ -36,6 +39,7 @@ export default function UserProfile() {
     const [learningCourse, setLearningCourse] = useState([]);
     const [learnedCourse, setLearnedCourse] = useState([]);
     const [dataLoading, setDataLoading] = useState({ avatar: '', user_name: '' });
+    const { isChangeAvatar } = useSelector((state) => state.login);
 
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
@@ -115,6 +119,7 @@ export default function UserProfile() {
                 return { ...preState, ...data };
             });
         });
+        dispatch(getChangeAvatar.getChangeAvatarSuccess({ isChangeAvatar: !isChangeAvatar }));
     };
 
     const handleChange = (event) => {

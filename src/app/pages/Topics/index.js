@@ -10,7 +10,6 @@ import { Link } from 'react-router-dom';
 import { Category } from '@mui/icons-material';
 import { searchOrFilterCategories } from '../../services/category';
 import TopicSearch from '../../components/Search/TopicSearch';
-import { routes } from '../../configs';
 
 import classNames from 'classnames/bind';
 import styles from './Topics.module.scss';
@@ -100,18 +99,6 @@ export default function Topics() {
         active();
     };
 
-    const filters = [
-        {
-            name: 'Latest Courses',
-            value: 0,
-        },
-        {
-            name: 'Oldest Courses',
-            value: 1,
-        },
-        { name: 'Most View', value: 2 },
-    ];
-
     return (
         <div className="inner" id="listTopics">
             <div className={cx('header')}>
@@ -126,16 +113,20 @@ export default function Topics() {
                         popperRender={
                             <ul>
                                 {dataSearch &&
-                                    dataSearch.map((cate) => (
-                                        <li key={cate.name}>
-                                            <Link
-                                                className="popper-link"
-                                                onClick={() => handleClickChangeTopic(cate.category_id)}
-                                            >
-                                                <Category className="icon mr-2" />
-                                                {cate.name}
-                                            </Link>
-                                        </li>
+                                    (dataSearch.length ? (
+                                        dataSearch.map((cate) => (
+                                            <li key={cate.name}>
+                                                <Link
+                                                    className="popper-link"
+                                                    onClick={() => handleClickChangeTopic(cate.category_id)}
+                                                >
+                                                    <Category className="icon mr-2" />
+                                                    {cate.name}
+                                                </Link>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li className="popper-link">No topics found</li>
                                     ))}
                             </ul>
                         }

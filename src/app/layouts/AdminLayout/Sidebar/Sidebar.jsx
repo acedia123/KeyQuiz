@@ -18,6 +18,8 @@ export default function Sidebar({ shrink }) {
 
     useEffect(() => {
         const url = window.location.pathname;
+        let indexA = navigation.findIndex((item) => item.path === url);
+        console.log(indexA, url);
         let newArr = navigation.map((item, index) => {
             if (item.children != null) {
                 const searchIndex = item.children.findIndex((child) => child.path === url);
@@ -27,10 +29,14 @@ export default function Sidebar({ shrink }) {
             }
             return { index, active: false };
         });
+
         handleSuppressScrollY();
         if (navigation.length > 20) {
             setSuppressScrollY(false);
         }
+
+        console.log(newArr);
+
         setIndex(newArr);
     }, []);
 
@@ -64,7 +70,7 @@ export default function Sidebar({ shrink }) {
                             <NavLink
                                 to={item.children ? '' : item.path}
                                 className={({ isActive }) =>
-                                    cx('item-link', 'item--dropdown', isActive ? 'link--active' : '')
+                                    cx('item-link', 'item--dropdown', !item.children && isActive ? 'link--active' : '')
                                 }
                                 onClick={() => handleClickLink(index)}
                             >

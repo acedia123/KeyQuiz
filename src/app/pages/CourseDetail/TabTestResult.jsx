@@ -50,7 +50,7 @@ export default function TabTestResult({}) {
                     </div>
                 ))
             ) : (
-                <CardNoData text="test" />
+                <CardNoData text="test result" />
             )}
         </div>
     );

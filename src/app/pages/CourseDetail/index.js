@@ -25,7 +25,6 @@ import { getRate } from '../../redux/rate/actions';
 import { getListTest } from '../../redux/test/actions';
 //Redux
 import { useDispatch, useSelector } from 'react-redux';
-
 // Other
 import { getUserFromLocalStorage } from '../../constants/functions';
 import { IMAGE_PATH } from '../../appConfig';
@@ -34,12 +33,12 @@ import ConfirmLearnAgainDialog from '../../components/Dialog/ConfirmLearnAgainDi
 import { ToastContext } from '../../context/ToastContextProvider';
 import { reportCourse } from '../../services/report';
 import ReportDialog from '../../components/Dialog/ReportDialog';
-
-import classNames from 'classnames/bind';
-import styles from './CourseDetail.module.scss';
 import { getTerm } from '../../redux/test/actions';
 import TabTestResult from './TabTestResult';
 import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
+
+import classNames from 'classnames/bind';
+import styles from './CourseDetail.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -138,6 +137,7 @@ export default function CourseDetail() {
                     ...dataSearch,
                 }),
             );
+            window.location.reload();
         });
     };
 
@@ -155,7 +155,7 @@ export default function CourseDetail() {
                     newTerm.push(item.term_id);
                     otherData.push({
                         term_id: item.term_id,
-                        term_name: 'abc',
+                        term_name: item.term_name,
                         questions: questions
                             .filter((ques) => ques.term_id === item.term_id)
                             .map((quesMap) => {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Box } from '@mui/system';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Grid, IconButton, LinearProgress, Tooltip, Typography } from '@mui/material';
 import { SettingsOutlined, CloseOutlined, FilterList } from '@mui/icons-material';
@@ -10,39 +11,49 @@ import { routes } from '../../configs';
 import CustomButton from '../../components/Share/CustomButton';
 import { useDispatch, useSelector } from 'react-redux';
 import TestResult from './TestResult';
-import { getSelected, getTerm, getTestResult, getQuestionByTest } from '../../redux/test/actions';
+import {
+    getSelected,
+    getTerm,
+    getTestResult,
+    getQuestionByTest,
+    getTotalQues,
+    getTestReset,
+} from '../../redux/test/actions';
 import { getCourseDetail } from '../../redux/course/actions';
 import { getUserFromLocalStorage } from '../../constants/functions';
 import ConfirmSubmitTest from '../../components/Dialog/ConfirmSubmitTest';
 import CustomDialog from '../../components/Share/CustomDialog';
 import { useTimer } from 'react-timer-hook';
-import { Box } from '@mui/system';
-import { createTest, testResultApi } from '../../services/test';
+import { testResultApi } from '../../services/test';
+import { levels, typeOfQues } from '../../constants/constObject';
+import LoadingSpinier from '../../components/Share/LoadingSpinier';
 
 import classNames from 'classnames/bind';
 import styles from './Test.module.scss';
 
 const cx = classNames.bind(styles);
 
-const ProgressLabel = ({ value }) => {
+const ProgressLabel = ({ value, time }) => {
     const [initialValue, setInitialValue] = useState(100);
 
     useEffect(() => {
-        setInitialValue(value);
-    }, []);
+        const { h, m, s } = time;
+        const initial = h * 3600 + m * 60 + s;
+        setInitialValue((value * 100) / initial);
+    }, [value]);
 
     return (
         <Box sx={{ width: '100%', position: 'absolute', bottom: '-4px', right: 0, left: 0 }}>
             <LinearProgress
                 variant="determinate"
-                value={value}
-                className={cx(
-                    value <= (initialValue * 2) / 3 && value > (initialValue * 1) / 3
-                        ? 'progress-warning'
-                        : value <= (initialValue * 1) / 3 && value > 0
-                        ? 'progress-danger'
-                        : '',
-                )}
+                value={initialValue}
+                // className={cx(
+                //     value <= (initialValue * 2) / 3 && value > (initialValue * 1) / 3
+                //         ? 'progress-warning'
+                //         : value <= (initialValue * 1) / 3 && value > 0
+                //         ? 'progress-danger'
+                //         : '',
+                // )}
             />
         </Box>
     );
@@ -61,10 +72,10 @@ export default function Test() {
     const { questions } = useSelector((state) => state.test);
     const { terms } = useSelector((state) => state.test);
     const { totalQues } = useSelector((state) => state.test);
-
-    const [testId, setTestId] = useState('');
+    const { loading } = useSelector((state) => state.test);
 
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [isTest, setIsTest] = useState(false);
     const [refs, setRefs] = useState([]);
     const [refs2, setRefs2] = useState([]);
 
@@ -75,14 +86,15 @@ export default function Test() {
         numberRound: 10,
         timer: { h: 0, m: 0, s: 30 },
         type_of_question: 0,
+        level: 0,
     });
 
     const time = new Date();
-    time.setSeconds(time.getSeconds() + 90);
+    time.setSeconds(time.getSeconds() + 30);
 
     const { seconds, minutes, hours, isRunning, start, pause, resume, restart } = useTimer({
         expiryTimestamp: time,
-        onExpire: () => handleSubmitTest(),
+        // onExpire: () => handleSubmitTest(),
     });
 
     useEffect(() => {
@@ -90,48 +102,70 @@ export default function Test() {
             top: 0,
             behavior: 'smooth',
         });
+        pause();
         dispatch(
             getCourseDetail.getCourseDetailRequest({
                 course_id: id,
             }),
         );
+        const { h, s, m } = dataSetting.timer;
+        dispatch(getTestResult.getTestResultReset({}));
         dispatch(
             getQuestionByTest.getQuestionByTestRequest({
                 course_id: id,
                 user_id: getUserFromLocalStorage().user_id,
-                type_of_question: 0,
-                totalQues: 10,
-                type: 0,
+                ...dataSetting,
+                time: `${h}:${m}:${s}`,
+                totalQues: dataSetting.numberRound,
+            }),
+        );
+        dispatch(
+            getTotalQues.getTotalQuesRequest({
+                user_id: getUserFromLocalStorage().user_id,
+                course_id: id,
+                ...dataSetting,
             }),
         );
         dispatch(getTerm.getTermRequest({ course_id: id }));
-        createTestApi();
+
+        return () => {
+            dispatch(getTestReset.getTestResetSuccess({}));
+        };
     }, []);
 
     useEffect(() => {
-        if (courseDetail) {
-            const refsResult = questions.reduce((acc, value) => {
+        if (courseDetail && questions) {
+            const refsResult = questions.questions.reduce((acc, value) => {
                 acc[value.question_practice_id] = React.createRef();
                 return acc;
             }, {});
-            console.log(questions);
             setRefs2(refsResult);
-            const refs1 = questions.reduce((acc, value) => {
+            const refs1 = questions.questions.reduce((acc, value) => {
                 acc[value.question_practice_id] = React.createRef();
                 return acc;
             }, {});
             setRefs(refs1);
         }
-    }, [courseDetail]);
+    }, [courseDetail, questions]);
+
+    useEffect(() => {
+        setDataSetting({ ...dataSetting, numberRound: totalQues });
+    }, [totalQues]);
 
     const show = () => setPopper(true);
     const hide = () => setPopper(false);
 
     const handleCloseTest = () => {
-        navigate(routes.courseDetail + '/' + id);
+        if (testResult?.openResult) {
+            navigate(routes.courseDetail + '/' + id + '&tab=0');
+        } else {
+            setIsTest(true);
+            handleConfirmTest();
+        }
     };
 
-    const handleClick = (id) => {
+    const handleClick = (event, id) => {
+        event.preventDefault();
         dispatch(getSelected.getSelectedSuccess(id));
         refs[id].current.scrollIntoView({
             behavior: 'smooth',
@@ -155,62 +189,30 @@ export default function Test() {
         }
     };
 
-    const createTestApi = () => {
-        let { h, s, m } = dataSetting.timer;
-        createTest({
-            user_id: getUserFromLocalStorage().user_id,
-            course_id: id,
-            time: `${h}:${m}:${s}`,
-            total_question: dataSetting.numberRound,
-            wrong_count: 0,
-            correct_count: 0,
-            status: 1,
-        }).then(({ data }) => {
-            setTestId(data.data);
-        });
-    };
-
     const handleSubmitTest = () => {
-        let correctTimes = 0;
-        let wrongTimes = 0;
         pause();
-        let dataSend = [];
-        testProcessing.forEach((process) => {
-            const newArr = process.userChoose.map((item) => {
-                return { ...item, status: process.correct_answers.includes(item.answer) };
-            });
-            let checkData = newArr.every((item) => item.status);
-            if (checkData && process.userChoose.length > 0) {
-                correctTimes += 1;
-            } else {
-                wrongTimes += 1;
-            }
-            dataSend.push({
-                question_practice_id: process.question_practice_id,
-                question_id: process.question_id,
-                isCorrect: checkData && process.userChoose.length > 0,
-            });
-        });
-        dispatch(
-            getTestResult.getTestResultSuccess({ successTime: correctTimes, wrongTime: wrongTimes, openResult: true }),
-        );
-        setOpenConfirmDialog(false);
+        // question_practice_id, question_id, userChoose
         let questionsData = testProcessing.map((item) => {
             return {
+                test_id: questions.test_id,
                 question_id: item.question_id,
+                question_practice_id: item.question_practice_id,
                 user_answers: item.userChoose.length > 0 ? item.userChoose.map((choose) => choose.answer) : [],
             };
         });
-
-        createTest({
-            test_id: testId,
-            questions: questionsData,
-            correct_count: correctTimes,
-            wrong_count: wrongTimes,
+        testResultApi(questionsData).then(({ data }) => {
+            dispatch(
+                getTestResult.getTestResultSuccess({
+                    successTime: data.data.correctTimes,
+                    wrongTime: data.data.wrongTimes,
+                    openResult: true,
+                }),
+            );
+            setOpenConfirmDialog(false);
         });
-        testResultApi(dataSend).then(({ data }) => {
-            console.log(data);
-        });
+        if (isTest) {
+            navigate(routes.courseDetail + '/' + id + '&tab=0');
+        }
     };
 
     const handleReview = () => {
@@ -226,27 +228,47 @@ export default function Test() {
         let convertTime = h * 60 * 60 + m * 60 + s - 30;
         time.setSeconds(time.getSeconds() + convertTime);
         restart(time);
+        dispatch(getTestResult.getTestResultReset({}));
         dispatch(
             getQuestionByTest.getQuestionByTestRequest({
                 course_id: id,
                 user_id: getUserFromLocalStorage().user_id,
-                type_of_question: dataSetting.type_of_question,
+                ...dataSetting,
+                time: `${h}:${m}:${s}`,
                 totalQues: dataSetting.numberRound,
-                chapter: dataSetting.chapter,
-                type: dataSetting.type,
             }),
         );
         handleCloseSettingDialog();
     };
 
-    const handleChange = (e) => setDataSetting({ ...dataSetting, chapter: e.target.value });
+    const handleChange = (e) => {
+        setDataSetting({ ...dataSetting, chapter: e.target.value });
+        dispatch(
+            getTotalQues.getTotalQuesRequest({
+                user_id: getUserFromLocalStorage().user_id,
+                course_id: id,
+                ...dataSetting,
+            }),
+        );
+    };
 
     const handleChooseTypeQues = (type) => {
-        if (type === 2) {
-            setDataSetting({ ...dataSetting, type, chapter: terms[0].term_id });
-        } else {
-            setDataSetting({ ...dataSetting, type, numberRound: 1 });
+        let newObj = { ...dataSetting, type };
+        if (type === 1) {
+            newObj = { ...dataSetting, type, type_of_question: 0 };
+        } else if (type === 2) {
+            newObj = { ...dataSetting, type, chapter: terms[0].term_id };
+        } else if (type === 3) {
+            newObj = { ...dataSetting, type, level: 0 };
         }
+        setDataSetting(newObj);
+        dispatch(
+            getTotalQues.getTotalQuesRequest({
+                user_id: getUserFromLocalStorage().user_id,
+                course_id: id,
+                ...newObj,
+            }),
+        );
     };
 
     const handleOpenSettingDialog = () => setOpenDialogSetting(true);
@@ -298,13 +320,15 @@ export default function Test() {
         setDataSetting((preState) => {
             return { ...preState, type_of_question: +event.target.value };
         });
+        dispatch(
+            getTotalQues.getTotalQuesRequest({
+                user_id: getUserFromLocalStorage().user_id,
+                course_id: id,
+                ...dataSetting,
+                type_of_question: +event.target.value,
+            }),
+        );
     };
-
-    const typeOfQues = [
-        { name: 'Not Learned', value: 0 },
-        { name: 'Learned', value: 1 },
-        { name: 'Is Important', value: 2 },
-    ];
 
     const handleBlurTimer = (event, type) => {
         if (type === 'h') {
@@ -338,6 +362,18 @@ export default function Test() {
                 });
             }
         }
+    };
+
+    const handleChangeLevel = (e) => {
+        setDataSetting({ ...dataSetting, level: +e.target.value });
+        dispatch(
+            getTotalQues.getTotalQuesRequest({
+                user_id: getUserFromLocalStorage().user_id,
+                course_id: id,
+                ...dataSetting,
+                level: +e.target.value,
+            }),
+        );
     };
 
     return (
@@ -375,10 +411,17 @@ export default function Test() {
                                         <ul className={cx('questions-wrapper')}>
                                             {testProcessing.map((test, index) => {
                                                 let checkStatus = '--is-wrong';
-                                                if (test.userChoose[index]) {
-                                                    checkStatus = test.userChoose.every((item) =>
-                                                        test.correct_answers.includes(item.answer),
-                                                    )
+                                                if (test.correct_answers.length > test.userChoose.length) {
+                                                    checkStatus = test.correct_answers.every((item) => {
+                                                        return test.userChoose.includes(item.answer);
+                                                    })
+                                                        ? '--is-correct'
+                                                        : '--is-wrong';
+                                                } else {
+                                                    checkStatus = test.userChoose.every((item) => {
+                                                        console.log(test.correct_answers.includes(item.answer));
+                                                        return test.correct_answers.includes(item.answer);
+                                                    })
                                                         ? '--is-correct'
                                                         : '--is-wrong';
                                                 }
@@ -398,31 +441,34 @@ export default function Test() {
                                     ) : (
                                         <div>
                                             <ul className={cx('questions-wrapper')}>
-                                                {questions.map((item, index) => {
-                                                    let checkSelected = '';
-                                                    if (testProcessing.length > 0) {
-                                                        checkSelected =
-                                                            testProcessing[index].userChoose.length > 0
-                                                                ? '--is-selected'
-                                                                : '';
-                                                    }
-                                                    return (
-                                                        <li>
-                                                            <Link
-                                                                onClick={() => handleClick(item.question_practice_id)}
-                                                                className={cx(
-                                                                    'btn-question',
-                                                                    selected === item.question_practice_id
-                                                                        ? '--is-choose'
-                                                                        : '',
-                                                                    checkSelected,
-                                                                )}
-                                                            >
-                                                                {index + 1}
-                                                            </Link>
-                                                        </li>
-                                                    );
-                                                })}
+                                                {questions &&
+                                                    questions.questions.map((item, index) => {
+                                                        let checkSelected = '';
+                                                        if (testProcessing.length > 0) {
+                                                            checkSelected =
+                                                                testProcessing[index].userChoose.length > 0
+                                                                    ? '--is-selected'
+                                                                    : '';
+                                                        }
+                                                        return (
+                                                            <li>
+                                                                <Link
+                                                                    onClick={(event) =>
+                                                                        handleClick(event, item.question_practice_id)
+                                                                    }
+                                                                    className={cx(
+                                                                        'btn-question',
+                                                                        selected === item.question_practice_id
+                                                                            ? '--is-choose'
+                                                                            : '',
+                                                                        checkSelected,
+                                                                    )}
+                                                                >
+                                                                    {index + 1}
+                                                                </Link>
+                                                            </li>
+                                                        );
+                                                    })}
                                             </ul>
                                             <div className={cx('questions-footer', 'popper-link')}>
                                                 <button className={cx('btn-submit')} onClick={handleConfirmTest}>
@@ -458,7 +504,7 @@ export default function Test() {
                                 icon={<CloseOutlined className={cx('icon')} />}
                             />
                         </div>
-                        <ProgressLabel value={hours * 3600 + minutes * 60 + seconds} />
+                        <ProgressLabel value={hours * 3600 + minutes * 60 + seconds} time={dataSetting.timer} />
                     </Grid>
 
                     <CustomDialog
@@ -466,7 +512,8 @@ export default function Test() {
                         handleClose={handleCloseSettingDialog}
                         title={'Setting'}
                         noButton={false}
-                        size="sm"
+                        size="md"
+                        // noClose={false}
                     >
                         <div className={cx('form-flex')}>
                             <label className={cx('label')} htmlFor="numberRound">
@@ -564,6 +611,12 @@ export default function Test() {
                                 >
                                     Chapter
                                 </button>
+                                <button
+                                    onClick={() => handleChooseTypeQues(3)}
+                                    className={cx(dataSetting.type === 3 ? 'button--active' : '', 'ml-3')}
+                                >
+                                    Level
+                                </button>
                             </div>
                         </div>
 
@@ -592,13 +645,30 @@ export default function Test() {
                                 </select>
                             </div>
                         )}
+                        {dataSetting.type === 3 && (
+                            <div className={cx('form-flex')}>
+                                <label className={cx('label')}>Level</label>
+                                <select className={cx('filter')} name="filter" onChange={handleChangeLevel}>
+                                    {levels.map((item, index) => (
+                                        <option
+                                            key={index}
+                                            value={item.value}
+                                            selected={dataSetting.level === item.value ? 'selected' : ''}
+                                        >
+                                            {item.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         <CustomButton
                             className="mt-5"
-                            title="Start again"
+                            title={loading ? <LoadingSpinier className={cx('spinner')} /> : 'Start again'}
                             fullWidth
                             colorButton="primary"
                             handleClick={handleSubmitForm}
+                            disabled={totalQues === 0}
                         />
                     </CustomDialog>
 
@@ -614,14 +684,14 @@ export default function Test() {
                     ) : (
                         <div className={cx('main', 'questions', 'd-flex')}>
                             {questions &&
-                                questions.map((item, index) => {
+                                questions.questions.map((item, index) => {
                                     return (
                                         <TestAnswers
                                             refs={refs[item.question_practice_id]}
                                             isNew={isNew}
                                             data={item}
                                             indexData={index}
-                                            totalLength={questions.length}
+                                            totalLength={questions.questions.length}
                                         />
                                     );
                                 })}

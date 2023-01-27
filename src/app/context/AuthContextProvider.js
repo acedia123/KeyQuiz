@@ -1,9 +1,10 @@
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import { loginWithGoogle } from '../services/auth';
 import { routes } from '../configs';
+import { getUserFromLocalStorage } from '../constants/functions';
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
@@ -15,11 +16,11 @@ export const AuthContextProvider = ({ children }) => {
         signInWithPopup(auth, provider);
     };
 
-    const googleLogin = () => {
+    const googleLogin = async () => {
         const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider);
+        await signInWithPopup(auth, provider);
         onAuthStateChanged(auth, (user) => {
-            if (user) {
+            if (getUserFromLocalStorage() == null) {
                 const { displayName, email, photoURL } = user;
                 setUser({
                     displayName,

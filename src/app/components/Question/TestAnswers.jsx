@@ -53,7 +53,7 @@ export default function TestAnswers({ data, indexData, totalLength, isNew, refs 
     };
 
     const responsiveCal = useMemo(
-        () => (data.answers.filter((answer) => answer.length > 100).length > 1 ? 12 : 6),
+        () => (data.answers.filter((answer) => answer.length > 50).length > 0 ? 12 : 6),
         [data.answers],
     );
 

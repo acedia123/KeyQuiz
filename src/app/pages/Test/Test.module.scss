@@ -15,6 +15,12 @@ $height-input: 40px;
     justify-content: space-between;
 }
 
+.spinner {
+    width: 25px !important;
+    height: 25px !important;
+    color: white;
+}
+
 .user-avatar-popper {
     .questions-wrapper {
         padding: 15px;
@@ -107,6 +113,7 @@ $height-input: 40px;
 .header-title {
     font-size: 16px;
     font-weight: 600;
+    min-width: 70px;
 }
 
 .filter {

@@ -42,6 +42,18 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
     const [isImportant, setIsImportant] = useState(data.is_important);
 
     useEffect(() => {
+        return () => {
+            setShowHint(false);
+            dispatch(userAnswer.getUserAnswerSuccess([]));
+            dispatch(getIsAnswer.getIsAnswerSuccess(false));
+            dispatch(getCheckQuestion.getCheckQuestionSuccess(null));
+            dispatch(getNewQuestion.getNewQuestionSuccess(true));
+            dispatch(getNotification.getNotificationSuccess(false));
+        };
+    }, []);
+
+    useEffect(() => {
+        setShowHint(false);
         dispatch(userAnswer.getUserAnswerSuccess([]));
         dispatch(getIsAnswer.getIsAnswerSuccess(false));
         dispatch(getCheckQuestion.getCheckQuestionSuccess(null));
@@ -106,10 +118,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
     };
 
     const handleSkipQuestion = () => {
-        let newArr = data.answers.map((item, index) => {
-            return { index, answer: item, status: false };
-        });
-        dispatch(userAnswer.getUserAnswerSuccess(newArr));
+        dispatch(userAnswer.getUserAnswerSuccess([]));
         dispatch(getIsCheck.getIsCheckSuccess(false));
         dispatch(getCheckQuestion.getCheckQuestionSuccess(false));
         dispatch(getIsAnswer.getIsAnswerSuccess(true));
@@ -118,7 +127,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
         // Process
 
         roundProcess.totalWrong = roundProcess.totalWrong + 1;
-        roundProcess.userAnswers.push({ ...data, userChoose: newArr });
+        roundProcess.userAnswers.push({ ...data, userChoose: [] });
         dispatch(addRoundProcess.addRoundProcessSuccess({ ...roundProcess }));
         //End Process
     };
@@ -174,7 +183,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
                         This is a question with multiple answers
                     </Typography>
                     <div className={cx('card-header-action')}>
-                        {userAnswers.length > 1 && (
+                        {userAnswers.length > 1 && !isAnswer && (
                             <button onClick={handleCheckQuestion} className={cx('btn')}>
                                 <Check className={cx('icon')} />
                             </button>
@@ -231,16 +240,11 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
                                         >
                                             {String.fromCharCode(97 + index).toUpperCase() + '. ' + answer}
 
-                                            {isAnswer &&
-                                                (data.correct_answers.includes(answer) ? (
-                                                    <div>
-                                                        <Check className={cx('icon-check')} />
-                                                    </div>
-                                                ) : (
-                                                    <div>
-                                                        <Close className={cx('icon-wrong')} />
-                                                    </div>
-                                                ))}
+                                            {isAnswer && data.correct_answers.includes(answer) && (
+                                                <div>
+                                                    <Check className={cx('icon-check')} />
+                                                </div>
+                                            )}
                                         </button>
                                     </Grid>
                                 );

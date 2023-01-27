@@ -57,10 +57,8 @@ export const publicRoutes = [
     { path: routes.activePage + '/:id', component: LoginFake, layout: Auth },
 
     { path: routes.authorProfile + '/:id', component: AuthorProfile, layout: DefaultLayout },
-];
 
-export const privateRoutes = [
-    // private
+    // ABC
     { path: routes.learn + '/:courseId', component: Learn, layout: null },
 
     { path: routes.test + '/:id', component: Test, layout: null },
@@ -83,5 +81,10 @@ export const privateRoutes = [
     { path: routes.admin.reportCourse, component: ReportCourse, layout: Admin },
     { path: routes.admin.reportQuestion, component: ReportQuestion, layout: Admin },
     { path: routes.admin.reportRate, component: ReportRate, layout: Admin },
+];
+
+export const privateRoutes = [
+    // private
+
     { path: '/abc', component: TextEditor, layout: DefaultLayout },
 ];

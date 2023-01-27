@@ -4,6 +4,7 @@ import {
     getSelected,
     getTerm,
     getTestProcessing,
+    getTestReset,
     getTestResult,
     getTotalQues,
     getType,
@@ -13,7 +14,7 @@ const initialState = {
     testProcessing: [],
     testResult: { wrongTime: 0, successTime: 0, openResult: false },
     selected: 1,
-    questions: [],
+    questions: null,
     terms: [],
     totalQues: 0,
     tests: [],
@@ -24,11 +25,30 @@ const TestReducer = (state = initialState, action) => {
         case getType(getTestProcessing.getTestProcessingSuccess): {
             return { ...state, testProcessing: action.payload };
         }
+
         case getType(getTestResult.getTestResultSuccess): {
             return { ...state, testResult: action.payload };
         }
+
+        case getType(getTestResult.getTestResultReset): {
+            return { ...state, testResult: { wrongTime: 0, successTime: 0, openResult: false } };
+        }
+
+        case getType(getTestReset.getTestResetSuccess): {
+            return {
+                ...state,
+                testProcessing: [],
+                testResult: { wrongTime: 0, successTime: 0, openResult: false },
+                selected: 1,
+                questions: null,
+                terms: [],
+                totalQues: 0,
+                tests: [],
+            };
+        }
+
         case getType(getSelected.getSelectedSuccess): {
-            return { ...state, testResult: action.payload };
+            return { ...state, selected: action.payload };
         }
         // Question
         case getType(getQuestionByTest.getQuestionByTestRequest): {

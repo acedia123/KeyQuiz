@@ -29,6 +29,7 @@ export default function CustomizationSearch({ placeholder, handleChangeSearch = 
 
     const handleClearSearchText = () => {
         setSearchText('');
+        handleChangeSearch('');
         inputSearch.current.focus();
         handleClear();
     };

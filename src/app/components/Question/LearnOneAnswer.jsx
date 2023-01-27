@@ -9,7 +9,6 @@ import {
     StarRounded,
     StarOutline,
     Search,
-    SaveOutlined,
 } from '@mui/icons-material';
 import {
     addRoundProcess,
@@ -40,6 +39,17 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
     const { checkQuestion } = useSelector((state) => state.question);
     const { roundProcess } = useSelector((state) => state.question);
     const [isImportant, setIsImportant] = useState(data.is_important);
+
+    useEffect(() => {
+        return () => {
+            setShowHint(false);
+            dispatch(userAnswer.getUserAnswerSuccess([]));
+            dispatch(getIsAnswer.getIsAnswerSuccess(false));
+            dispatch(getCheckQuestion.getCheckQuestionSuccess(null));
+            dispatch(getNewQuestion.getNewQuestionSuccess(true));
+            dispatch(getNotification.getNotificationSuccess(false));
+        };
+    }, []);
 
     useEffect(() => {
         setShowHint(false);
@@ -76,7 +86,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
     };
 
     const responsiveCal = useMemo(
-        () => (data.answers.filter((answer) => answer.length > 50).length > 1 ? 12 : 6),
+        () => (data.answers.filter((answer) => answer.length > 50).length > 0 ? 12 : 6),
         [data.answers],
     );
 
@@ -88,9 +98,18 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
 
     const handleSkipQuestion = () => {
         dispatch(getIsAnswer.getIsAnswerSuccess(true));
-        dispatch(userAnswer.getUserAnswerSuccess([{ index: 0, answer: data.answers[0] }]));
+        dispatch(userAnswer.getUserAnswerSuccess([]));
         dispatch(getCheckQuestion.getCheckQuestionSuccess(false));
-        generalFunction(0, data.answers[0], false);
+        // generalFunction(0, data.answers[0], false);
+
+        changeTypeOfQuestion({ question_practice_id: data.question_practice_id, isCorrect: false });
+        dispatch(getNotification.getNotificationSuccess(true));
+        if (data.hint) {
+            setShowHint(true);
+        }
+        roundProcess.totalWrong = roundProcess.totalWrong + 1;
+        roundProcess.userAnswers.push({ ...data, userChoose: [] });
+        dispatch(addRoundProcess.addRoundProcessSuccess({ ...roundProcess }));
     };
 
     const handleCheck = (index) => {
@@ -136,10 +155,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
     };
 
     return (
-        <Card
-            className={cx('card', isNewQuestion ? cx('--animation-slide') : '', 'position-relative')}
-            style={{ overflow: 'visible' }}
-        >
+        <Card className={cx('card', isNewQuestion ? '--animation-slide' : '')}>
             <CardContent className={cx('card-content')}>
                 <Grid className={cx('card__header')}>
                     <Typography className="normal-font font-weight-bold">

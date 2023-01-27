@@ -162,16 +162,16 @@ export default function AdminCourses() {
                 <div className="normal-font row-center">
                     <CustomChip
                         label={
-                            params.row.public_status === 0
+                            params.row.public_status == 0
                                 ? 'Only Me'
-                                : params.row.public_status === 1
+                                : params.row.public_status == 1
                                 ? 'Private'
                                 : 'Public'
                         }
                         color={
-                            params.row.public_status === 0
+                            params.row.public_status == 0
                                 ? 'default'
-                                : params.row.public_status === 1
+                                : params.row.public_status == 1
                                 ? 'error'
                                 : 'primary'
                         }

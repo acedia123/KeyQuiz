@@ -16,18 +16,21 @@ function CustomDialog(props) {
         noButton = true,
         handleSubmit,
         handleClear,
+        noClose = true,
     } = props;
 
     return (
         <Dialog fullWidth={fullWidth ? fullWidth : true} maxWidth={size} open={open} onClose={handleClose}>
             <DialogTitle className="position-relative">
                 <h1 className="m-0 d-flex-align-center">{title}</h1>
-                <CustomIconAction
-                    className="close-icon"
-                    icon={<CloseIcon />}
-                    handleClick={handleClose}
-                    label={'Close'}
-                />
+                {noClose && (
+                    <CustomIconAction
+                        className="close-icon"
+                        icon={<CloseIcon />}
+                        handleClick={handleClose}
+                        label={'Close'}
+                    />
+                )}
             </DialogTitle>
             <DialogContent>{children}</DialogContent>
             {noButton && (

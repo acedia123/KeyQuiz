@@ -54,7 +54,10 @@ export default function HeaderSearch({ children, searchText, searchData, showSea
                                 ))}
                                 {searchData?.courses?.map((item) => (
                                     <li className={cx('suggest__item')} key={item.id}>
-                                        <Link to={routes.courseDetail + '/' + item.course_id} className="popper-link">
+                                        <Link
+                                            to={routes.courseDetail + '/' + item.course_id + '&tab=0'}
+                                            className="popper-link"
+                                        >
                                             <div className={'mr-2 ' + cx('img-wrapper')}>
                                                 <BookOutlined className={cx('logo-play')} />
                                             </div>

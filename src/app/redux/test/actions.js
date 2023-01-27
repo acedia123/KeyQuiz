@@ -10,6 +10,11 @@ export const getTestProcessing = createActions({
 
 export const getTestResult = createActions({
     getTestResultSuccess: (payload) => payload,
+    getTestResultReset: (payload) => payload,
+});
+
+export const getTestReset = createActions({
+    getTestResetSuccess: (payload) => payload,
 });
 
 export const getSelected = createActions({

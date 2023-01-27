@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Grid } from '@mui/material';
+import { debounce, Grid } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../../redux/course/actions';
 import CustomizationSearch from '../../components/Search/CustomizationSearch';
@@ -74,11 +74,19 @@ export default function Courses() {
     };
 
     const handleChangeSearch = (value) => {
+        debounceDropDown(value);
+    };
+
+    const fetchDropdownOptions = (value) => {
         setDataSearch((preState) => {
             return { ...preState, searchText: value };
         });
     };
 
+    const debounceDropDown = useCallback(
+        debounce((nextValue) => fetchDropdownOptions(nextValue), 500),
+        [],
+    );
     const filters = [
         {
             name: 'Latest Courses',

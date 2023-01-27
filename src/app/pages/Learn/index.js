@@ -39,7 +39,7 @@ import { routes } from '../../configs';
 import { IMAGE_PATH } from '../../appConfig';
 import { getUserFromLocalStorage } from '../../constants/functions';
 import { getTerm } from '../../redux/test/actions';
-import { levels } from '../../constants/constObject';
+import { levels, typeOfQues } from '../../constants/constObject';
 
 import classNames from 'classnames/bind';
 import styles from './Learn.module.scss';
@@ -139,6 +139,8 @@ export default function Learn() {
             newObj = { ...dataSetting, type, type_of_question: 0 };
         } else if (type === 2) {
             newObj = { ...dataSetting, type, chapter: terms[0].term_id };
+        } else if (type === 3) {
+            newObj = { ...dataSetting, type, level: 0 };
         }
         setDataSetting(newObj);
         fetchTotalQuestion(newObj);
@@ -161,6 +163,10 @@ export default function Learn() {
         }).then(({ data }) => {
             setRounds(data);
             dispatch(getIsAnswer.getIsAnswerSuccess(false));
+            dispatch(userAnswer.getUserAnswerSuccess([]));
+            dispatch(getCheckQuestion.getCheckQuestionSuccess(null));
+            dispatch(getNewQuestion.getNewQuestionSuccess(true));
+            dispatch(getNotification.getNotificationSuccess(false));
         });
         setOpenDialogSetting(false);
     };
@@ -192,22 +198,17 @@ export default function Learn() {
     };
 
     const handleBlurNumRound = (event) => {
+        let value = +event.target.value;
         if (event.target.value > totalQuestion) {
-            setDataSetting((preState) => {
-                return { ...preState, numberRound: totalQuestion };
-            });
-            localStorage.setItem('learnRound', JSON.stringify(totalQuestion));
+            value = totalQuestion;
         } else if (event.target.value <= 0) {
-            setDataSetting((preState) => {
-                return { ...preState, numberRound: 1 };
-            });
-            localStorage.setItem('learnRound', JSON.stringify(1));
-        } else {
-            setDataSetting((preState) => {
-                return { ...preState, numberRound: event.target.value };
-            });
-            localStorage.setItem('learnRound', JSON.stringify(event.target.value));
+            value = 1;
         }
+
+        setDataSetting((preState) => {
+            return { ...preState, numberRound: value };
+        });
+        localStorage.setItem('learnRound', JSON.stringify(value));
     };
 
     const handleChangeType = (event) => {
@@ -216,12 +217,6 @@ export default function Learn() {
         });
         fetchTotalQuestion({ ...dataSetting, type_of_question: +event.target.value });
     };
-
-    const typeOfQues = [
-        { name: 'Not Learned', value: 0 },
-        { name: 'Learned', value: 1 },
-        { name: 'Is Important', value: 4 },
-    ];
 
     const handleReport = (id) => {
         setQuestionId(id);
@@ -288,7 +283,7 @@ export default function Learn() {
                         label={'Close'}
                         arrow={true}
                         className={cx('kq-btn')}
-                        handleClick={() => navigate(routes.courseDetail + '/' + courseId)}
+                        handleClick={() => navigate(routes.courseDetail + '/' + courseId + '&tab=0')}
                         icon={<CloseOutlined className={cx('icon')} />}
                     />
                 </div>

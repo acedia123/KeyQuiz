@@ -53,7 +53,11 @@ export default function HomePage() {
                 setLearnedCourse(data);
             });
             getTopSuggest({ user_id: user.user_id }).then(({ data }) => {
-                setSuggestCourse([...data.byAuthor, ...data.byCategory]);
+                if (data.byAuthor && data.byCategory) {
+                    setSuggestCourse([...data.byAuthor, ...data.byCategory]);
+                } else {
+                    setSuggestCourse(data);
+                }
             });
         } else {
             getTopPopularCourse().then(({ data }) => {

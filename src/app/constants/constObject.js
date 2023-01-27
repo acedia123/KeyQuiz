@@ -20,3 +20,9 @@ export const statusCourse = [
     },
     { name: 'Only me', value: 0 },
 ];
+
+export const typeOfQues = [
+    { name: 'Not Learned', value: 0 },
+    { name: 'Learned', value: 1 },
+    { name: 'Is Important', value: 4 },
+];

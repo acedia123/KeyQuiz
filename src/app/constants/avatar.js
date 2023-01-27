@@ -20,4 +20,5 @@ export const noData = {
     rate: 'no-data-rate.png',
     question: 'no-question.png',
     test: 'no-data-test.png',
+    'test result': 'no-data-test.png',
 };

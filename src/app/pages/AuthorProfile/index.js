@@ -7,6 +7,7 @@ import { getAccountById } from '../../services/account';
 import { useParams } from 'react-router-dom';
 import { IMAGE_PATH } from '../../appConfig';
 import { getTopCourseByUser } from '../../services/home';
+import CardNoData from '../../components/Card/CardNoData';
 
 import classNames from 'classnames/bind';
 import styles from './AuthorProfile.module.scss';
@@ -51,7 +52,7 @@ export default function AuthorProfile() {
     useEffect(() => {
         document.title = 'Auth Profile | Key Quiz';
         getAccountById({ user_id: id }).then(({ data }) => {
-            setUser(data[0]);
+            setUser(data);
         });
         fetchData();
     }, []);
@@ -103,11 +104,15 @@ export default function AuthorProfile() {
                         handleClear={handleClear}
                     />
                 </div>
-                <Grid container spacing={2}>
-                    {data.map((item) => (
-                        <CardCourse key={item.id} data={item} />
-                    ))}
-                </Grid>
+                {data.length ? (
+                    <Grid container spacing={2}>
+                        {data.map((item) => (
+                            <CardCourse key={item.id} data={item} />
+                        ))}
+                    </Grid>
+                ) : (
+                    <CardNoData text="course" />
+                )}
             </TabPanel>
         </div>
     );

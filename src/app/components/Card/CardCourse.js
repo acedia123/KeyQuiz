@@ -200,7 +200,10 @@ const CardCourse = ({ data, topic = true }, ref) => {
                     <CardContent className="d-flex justify-content-around pt-0">
                         <Grid className="d-flex-align-center flex-column justify-content-center">
                             <Typography component="legend" className="text-center small-font" gutterBottom>
-                                {data.rate.value} Reviews
+                                {Number(data.rate.value) === data.rate.value && data.rate.value % 1 !== 0
+                                    ? data.rate.value.toFixed(1)
+                                    : data.rate.value}{' '}
+                                Reviews
                             </Typography>
                             <Rating name="read-only" value={data.rate.value} readOnly size="medium" />
                         </Grid>

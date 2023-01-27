@@ -8,15 +8,18 @@ import { getLogout } from '../../redux/auth/actions';
 import { homeUserPopper } from '../../navigations';
 import { IMAGE_PATH } from '../../appConfig';
 import { AuthContext } from '../../context/AuthContextProvider';
-
+import { getAccountById } from '../../services/account';
 import classNames from 'classnames/bind';
 import styles from './Popper.module.scss';
+import { getUserFromLocalStorage } from '../../constants/functions';
+import { useSelector } from 'react-redux';
 
 const cx = classNames.bind(styles);
 
 export default function UserAvatarPopper() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { isChangeAvatar } = useSelector((state) => state.login);
     const { signOutFirebase } = useContext(AuthContext);
 
     const [popper, setPopper] = useState(false);
@@ -32,8 +35,10 @@ export default function UserAvatarPopper() {
     };
 
     useEffect(() => {
-        setData(JSON.parse(localStorage.getItem('user')));
-    }, [localStorage.getItem('user')]);
+        getAccountById({ user_id: getUserFromLocalStorage().user_id }).then(({ data }) => {
+            setData(data);
+        });
+    }, [isChangeAvatar]);
 
     return (
         <CustomTippyPopper

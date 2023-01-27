@@ -32,7 +32,7 @@ export default function App() {
                                             </Suspense>
                                         </Layout>
                                     ) : (
-                                        <Navigate to={routes.login} replace={true} />
+                                        <Navigate to={routes.login} />
                                     )
                                 }
                             />

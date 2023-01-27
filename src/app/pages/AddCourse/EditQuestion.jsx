@@ -87,9 +87,10 @@ export default function EditCourse() {
                         ...ques,
                         answers: ques.answers,
                         correctAnswers: ques.correct_answers,
+                        isDelete: false,
                     };
                 });
-                return { ...item, questions: newQues };
+                return { ...item, questions: newQues, isDelete: false };
             });
             setData({
                 ...data.course[0],
@@ -195,6 +196,7 @@ export default function EditCourse() {
 
     const handleSubmitForm = async () => {
         handleCheckValidate();
+        console.log(data);
 
         const { course_name, password, terms } = JSON.parse(localStorage.getItem('addCourseForm'));
         let checkTerm = terms.every((item) => !item.status);
@@ -231,6 +233,7 @@ export default function EditCourse() {
             }),
             correctAnswers: correctAns,
             isExist: count > 0,
+            isDelete: false,
         };
 
         if (isEdit) {
@@ -250,6 +253,7 @@ export default function EditCourse() {
         data.data.push({
             term_name: '',
             questions: [],
+            isDelete: false,
         });
         setData((preState) => {
             return { ...preState, ...data.questions };
@@ -273,8 +277,19 @@ export default function EditCourse() {
     };
 
     const handleDeleteChapter = () => {
-        data.data.splice(termIndex, 1);
+        if (data.data[termIndex]['term_name'] == '') {
+            data.data.splice(termIndex, 1);
+        } else {
+            data.data[termIndex]['isDelete'] = true;
+        }
+        setData(data);
         setOpenDialog(false);
+        context.setDataAlert({
+            ...context.dataAlert,
+            isOpen: true,
+            message: 'Delete Successfully!',
+            status: 'success',
+        });
     };
 
     const handleConfirmDeleteQuestion = (questionIndex, termIndex) => {
@@ -284,8 +299,15 @@ export default function EditCourse() {
     };
 
     const handleDeleteQuestion = () => {
-        data.data[termIndex].questions.splice(questionIndex, 1);
+        data.data[termIndex].questions[questionIndex]['isDelete'] = true;
+        setData(data);
         setOpenConfirmQuestionDialog(false);
+        context.setDataAlert({
+            ...context.dataAlert,
+            isOpen: true,
+            message: 'Delete Successfully!',
+            status: 'success',
+        });
     };
 
     const handleClearForm = () => {
@@ -320,13 +342,13 @@ export default function EditCourse() {
             let newQues = item.questions.map((b) => {
                 let check = newArr.filter((a) => a.content === b.content).length > 0;
                 if (check) {
-                    return { ...b, isExist: check };
+                    return { ...b, isExist: check, isDelete: false };
                 } else {
                     newArr.push(b);
-                    return { ...b, isExist: false };
+                    return { ...b, isExist: false, isDelete: false };
                 }
             });
-            return { ...item, questions: newQues };
+            return { ...item, questions: newQues, isDelete: false };
         });
 
         if (data.data.length === 0) {
@@ -353,6 +375,12 @@ export default function EditCourse() {
 
         setDataError({ ...dataError, terms: newDataError });
         setExpand(newExpand);
+        context.setDataAlert({
+            ...context.dataAlert,
+            isOpen: true,
+            message: 'Import Successfully!',
+            status: 'success',
+        });
         setOpenImportExcel(false);
     };
 
@@ -478,100 +506,115 @@ export default function EditCourse() {
                         />
                     </div>
                 </div>
-                {data.data.map((term, termIndex) => (
-                    <div key={termIndex}>
-                        <div className={cx('form-group')}>
-                            <div className={cx('chapter__header')}>
-                                <span className={cx('form-title')}>
-                                    Chapter {termIndex + 1} <span className="text-danger">*</span>
-                                </span>
-                                <div className={cx('chapter__action--mobile')}>
-                                    <CustomIconAction
-                                        label="Add question to chapter"
-                                        handleClick={() => handleOpenDialog(termIndex)}
-                                        className="kq-btn-tooltip kq-btn"
-                                    >
-                                        <Add className={cx('icon', 'icon-edit')} />
-                                    </CustomIconAction>
-                                    <CustomIconAction
-                                        label="Remove chapter"
-                                        handleClick={() => handleOpenConfirmDialog(termIndex)}
-                                        className="kq-btn-tooltip kq-btn"
-                                    >
-                                        <DeleteRounded className={cx('icon', 'icon-delete')} />
-                                    </CustomIconAction>
-                                    {term.questions.length > 0 && (
+                {data.data.map(
+                    (term, termIndex) =>
+                        !term.isDelete && (
+                            <div key={termIndex}>
+                                <div className={cx('form-group')}>
+                                    <div className={cx('chapter__header')}>
+                                        <span className={cx('form-title')}>
+                                            Chapter {termIndex + 1} <span className="text-danger">*</span>
+                                        </span>
+                                        <div className={cx('chapter__action--mobile')}>
+                                            <CustomIconAction
+                                                label="Add question to chapter"
+                                                handleClick={() => handleOpenDialog(termIndex)}
+                                                className="kq-btn-tooltip kq-btn"
+                                            >
+                                                <Add className={cx('icon', 'icon-edit')} />
+                                            </CustomIconAction>
+                                            <CustomIconAction
+                                                label="Remove chapter"
+                                                handleClick={() => handleOpenConfirmDialog(termIndex)}
+                                                className="kq-btn-tooltip kq-btn"
+                                            >
+                                                <DeleteRounded className={cx('icon', 'icon-delete')} />
+                                            </CustomIconAction>
+                                            {term.questions.length > 0 && (
+                                                <CustomIconAction
+                                                    label="Expand chapter"
+                                                    handleClick={() => handleExpandRow(termIndex)}
+                                                    className="kq-btn-tooltip kq-btn"
+                                                >
+                                                    <ExpandLess
+                                                        className={cx(
+                                                            'icon',
+                                                            expand[termIndex] ? 'rotate' : 'un-rotate',
+                                                        )}
+                                                    />
+                                                </CustomIconAction>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="w-100 mr-2 d-flex flex-column">
+                                        <input
+                                            className={cx('form-input', 'w-100')}
+                                            placeholder="Enter chapter title"
+                                            value={term.term_name}
+                                            onChange={(event) => handleChangeTextTerm(event, 'termName', termIndex)}
+                                            onBlur={() => handleBlurTermText(termIndex)}
+                                        />
+                                        {dataError?.terms[termIndex]?.status && (
+                                            <span className={cx('error-message')}>
+                                                {dataError.terms[termIndex].error}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {/* {error && <span  className={cx('error-text')}>{helperText}</span>} */}
+                                    <div className={cx('chapter__action', 'd-flex-center')}>
                                         <CustomIconAction
-                                            label="Expand chapter"
-                                            handleClick={() => handleExpandRow(termIndex)}
+                                            label="Add question to chapter"
+                                            handleClick={() => handleOpenDialog(termIndex)}
                                             className="kq-btn-tooltip kq-btn"
                                         >
-                                            <ExpandLess
-                                                className={cx('icon', expand[termIndex] ? 'rotate' : 'un-rotate')}
-                                            />
+                                            <Add className={cx('icon', 'icon-edit')} />
                                         </CustomIconAction>
-                                    )}
+                                        <CustomIconAction
+                                            label="Remove chapter"
+                                            handleClick={() => handleOpenConfirmDialog(termIndex)}
+                                            className="kq-btn-tooltip kq-btn"
+                                        >
+                                            <DeleteRounded className={cx('icon', 'icon-delete')} />
+                                        </CustomIconAction>
+                                        {term.questions.length > 0 && (
+                                            <CustomIconAction
+                                                label="Expand chapter"
+                                                handleClick={() => handleExpandRow(termIndex)}
+                                                className="kq-btn-tooltip kq-btn"
+                                            >
+                                                <ExpandLess
+                                                    className={cx('icon', expand[termIndex] ? 'rotate' : 'un-rotate')}
+                                                />
+                                            </CustomIconAction>
+                                        )}
+                                    </div>
                                 </div>
+                                <Grid container spacing={2} className="mt-2">
+                                    {expand[termIndex] &&
+                                        term.questions.map(
+                                            (item, index) =>
+                                                !item.isDelete && (
+                                                    <Grid item md={12} xs={12} key={item.id}>
+                                                        <CardQuestion
+                                                            term={term}
+                                                            data={item}
+                                                            index={index + 1}
+                                                            isForm={true}
+                                                            handleEditQuestion={() =>
+                                                                handleEditQuestion(item, termIndex, index)
+                                                            }
+                                                            handleDeleteQuestion={() =>
+                                                                handleConfirmDeleteQuestion(index, termIndex)
+                                                            }
+                                                        />
+                                                    </Grid>
+                                                ),
+                                        )}
+                                </Grid>
                             </div>
-
-                            <div className="w-100 mr-2 d-flex flex-column">
-                                <input
-                                    className={cx('form-input', 'w-100')}
-                                    placeholder="Enter chapter title"
-                                    value={term.term_name}
-                                    onChange={(event) => handleChangeTextTerm(event, 'termName', termIndex)}
-                                    onBlur={() => handleBlurTermText(termIndex)}
-                                />
-                                {dataError?.terms[termIndex]?.status && (
-                                    <span className={cx('error-message')}>{dataError.terms[termIndex].error}</span>
-                                )}
-                            </div>
-                            {/* {error && <span  className={cx('error-text')}>{helperText}</span>} */}
-                            <div className={cx('chapter__action', 'd-flex-center')}>
-                                <CustomIconAction
-                                    label="Add question to chapter"
-                                    handleClick={() => handleOpenDialog(termIndex)}
-                                    className="kq-btn-tooltip kq-btn"
-                                >
-                                    <Add className={cx('icon', 'icon-edit')} />
-                                </CustomIconAction>
-                                <CustomIconAction
-                                    label="Remove chapter"
-                                    handleClick={() => handleOpenConfirmDialog(termIndex)}
-                                    className="kq-btn-tooltip kq-btn"
-                                >
-                                    <DeleteRounded className={cx('icon', 'icon-delete')} />
-                                </CustomIconAction>
-                                {term.questions.length > 0 && (
-                                    <CustomIconAction
-                                        label="Expand chapter"
-                                        handleClick={() => handleExpandRow(termIndex)}
-                                        className="kq-btn-tooltip kq-btn"
-                                    >
-                                        <ExpandLess
-                                            className={cx('icon', expand[termIndex] ? 'rotate' : 'un-rotate')}
-                                        />
-                                    </CustomIconAction>
-                                )}
-                            </div>
-                        </div>
-                        <Grid container spacing={2} className="mt-2">
-                            {expand[termIndex] &&
-                                term.questions.map((item, index) => (
-                                    <Grid item md={12} xs={12} key={item.id}>
-                                        <CardQuestion
-                                            term={term}
-                                            data={item}
-                                            index={index + 1}
-                                            isForm={true}
-                                            handleEditQuestion={() => handleEditQuestion(item, termIndex, index)}
-                                            handleDeleteQuestion={() => handleConfirmDeleteQuestion(index, termIndex)}
-                                        />
-                                    </Grid>
-                                ))}
-                        </Grid>
-                    </div>
-                ))}
+                        ),
+                )}
             </div>
 
             <ImportCourseDialog

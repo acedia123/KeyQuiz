@@ -84,11 +84,12 @@
         display: flex;
         align-items: center;
     }
-    .link--active {
-        background: rgba(0, 0, 0, 0.2);
-        color: $white-color;
-        border: none;
-    }
+}
+
+.link--active {
+    background: rgba(0, 0, 0, 0.2);
+    color: $white-color;
+    border: none;
 }
 
 .sidebar-item a:hover {

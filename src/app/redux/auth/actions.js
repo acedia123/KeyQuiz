@@ -24,3 +24,7 @@ export const getRegister = createActions({
 export const getLogout = createActions({
     getLogoutRequest: (payload) => payload,
 });
+
+export const getChangeAvatar = createActions({
+    getChangeAvatarSuccess: (payload) => payload,
+});

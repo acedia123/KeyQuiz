@@ -291,7 +291,7 @@ export default function AddCourse() {
         setData({
             course_name: '',
             course_description: '',
-            public_status: '1',
+            public_status: '2',
             password: null,
             category_id: 'cate1',
             user_id: JSON.parse(localStorage.getItem('user')).user_id,
@@ -343,6 +343,12 @@ export default function AddCourse() {
 
         setDataError({ ...dataError, terms: newDataError });
         setExpand(newExpand);
+        context.setDataAlert({
+            ...context.dataAlert,
+            isOpen: true,
+            message: 'Import Successfully!',
+            status: 'success',
+        });
         setOpenImportExcel(false);
     };
 

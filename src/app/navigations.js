@@ -135,11 +135,11 @@ export const homeUserPopper = [
         icon: AccountBoxOutlined,
         path: routes.userProfile,
     },
-    {
-        name: 'Support',
-        icon: HelpOutline,
-        path: '/support',
-    },
+    // {
+    //     name: 'Support',
+    //     icon: HelpOutline,
+    //     path: '/support',
+    // },
     {
         name: 'Go to dashboard',
         icon: HelpOutline,

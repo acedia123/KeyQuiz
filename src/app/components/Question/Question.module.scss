@@ -16,6 +16,7 @@
 .card {
     border-radius: 20px !important;
     overflow: visible;
+    position: relative;
 }
 
 .card-content {
@@ -99,6 +100,7 @@
     word-break: break-word;
     min-height: 62px;
     cursor: pointer;
+    text-align: left;
 }
 
 .icon-check {
@@ -147,6 +149,7 @@
     top: 0;
     border-radius: 20px !important;
     padding: 20px;
+    overflow: visible !important;
     .text-input {
         margin-top: 10px;
         font-size: 14px;

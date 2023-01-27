@@ -1,4 +1,4 @@
-import { getLogin, getLogout, getRegister, getType } from '../auth/actions';
+import { getChangeAvatar, getLogin, getLogout, getRegister, getType } from '../auth/actions';
 
 const initialState = {
     user: {},
@@ -6,6 +6,7 @@ const initialState = {
     dialog: false,
     isActive: false,
     banned: false,
+    isChangeAvatar: false,
 };
 
 const LoginReducers = (state = initialState, action) => {
@@ -52,6 +53,10 @@ const LoginReducers = (state = initialState, action) => {
                 loading: false,
                 dialog: false,
             };
+        }
+
+        case getType(getChangeAvatar.getChangeAvatarSuccess): {
+            return { ...state, isChangeAvatar: action.payload };
         }
 
         case getType(getLogout.getLogoutRequest): {
