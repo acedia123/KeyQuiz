@@ -191,7 +191,7 @@ export default function SignUps() {
                 {user.loading ? (
                     <CircularProgress style={{ width: '25px', height: '25px' }} sx={{ color: '#fff' }} />
                 ) : (
-                    'Sign in'
+                    'Sign up'
                 )}
             </button>
             <div className={cx('footer')}>

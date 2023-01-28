@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import moment from 'moment';
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
@@ -10,8 +10,9 @@ import CustomButton from '../../components/Share/CustomButton';
 import { useNavigate } from 'react-router-dom';
 import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
 import { routes } from '../../configs';
-import { getCourseAdmin } from '../../services/courses';
+import { deleteCourse, getCourseAdmin } from '../../services/courses';
 import CustomChip from '../../components/Share/CustomChip';
+import { ToastContext } from '../../context/ToastContextProvider';
 
 import classNames from 'classnames/bind';
 import styles from './Courses.module.scss';
@@ -21,9 +22,12 @@ const cx = classNames.bind(styles);
 export default function AdminCourses() {
     const navigate = useNavigate();
     let [dataForm, setDataForm] = useState(null);
+    const context = useContext(ToastContext);
     const [dataSelected, setDataSelected] = useState([]);
     const [dialog, setDialog] = useState(false);
+    const [dialogDeleteSingle, setDialogDeleteSingle] = useState(false);
     const [dataSearch, setDataSearch] = useState({ searchText: '', orderBy: 0 });
+    const [courseId, setCourseId] = useState(null);
 
     useEffect(() => {
         document.title = 'List Courses | Key Quiz';
@@ -31,14 +35,12 @@ export default function AdminCourses() {
 
     useEffect(() => {
         getCourseAdmin(dataSearch).then(({ data }) => {
-            console.log(data);
             setDataForm(data);
         });
     }, [dataSearch]);
 
     const handleChangeSelection = (data) => {
         setDataSelected(data);
-        console.log(data);
     };
 
     const handleChangeSearch = (value) => {
@@ -48,26 +50,41 @@ export default function AdminCourses() {
     };
 
     const handleRemoveRow = (id) => {
-        // const rows = [...dataForm.answers];
-        // const dataIndex = rows.findIndex((item) => item.id == id);
-        // if (dataIndex > -1) {
-        //     rows.splice(dataIndex, 1);
-        // }
-        // setDataForm({
-        //     ...dataForm,
-        //     answers: rows,
-        // });
+        setCourseId(id);
+        setDialogDeleteSingle(true);
+    };
+
+    const handleDeleteSingle = () => {
+        deleteCourse({ course_id: courseId }).then(({ data }) => {
+            setDialogDeleteSingle(false);
+            setCourseId(null);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Delete Successfully!',
+                status: 'success',
+            });
+            getCourseAdmin(dataSearch).then(({ data }) => {
+                setDataForm(data);
+            });
+        });
     };
 
     const handleDeleteAll = () => {
-        let newArr = dataForm.slice();
-        for (let i = dataSelected.length - 1; i >= 0; i--) {
-            const dataIndex = newArr.findIndex((item) => item.id == dataSelected[i]);
-            if (dataIndex > -1) {
-                newArr.splice(dataIndex, 1);
-            }
-        }
-        setDataForm(newArr);
+        console.log(dataSelected);
+        deleteCourse({ data: dataSelected, deleteAll: true }).then(({ data }) => {
+            setDialog(false);
+            setDataSelected([]);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Delete Successfully!',
+                status: 'success',
+            });
+            getCourseAdmin(dataSearch).then(({ data }) => {
+                setDataForm(data);
+            });
+        });
     };
 
     const handleChangeFilter = (e) => {
@@ -197,7 +214,7 @@ export default function AdminCourses() {
                     >
                         <RemoveRedEyeRounded className="text-primary icon" />
                     </CustomIconAction>
-                    <CustomIconAction label="Delete" arrow handleClick={() => handleRemoveRow(params.row.id)}>
+                    <CustomIconAction label="Delete" arrow handleClick={() => handleRemoveRow(params.id)}>
                         <DeleteRounded className="text-danger icon" />
                     </CustomIconAction>
                 </div>
@@ -240,11 +257,25 @@ export default function AdminCourses() {
                 handleClose={handleCloseDialog}
             />
 
+            <CustomConfirmDialog
+                label="course"
+                open={dialogDeleteSingle}
+                handleSubmit={handleDeleteSingle}
+                handleClose={() => setDialogDeleteSingle(false)}
+            />
+
             <Box sx={{ height: 640, width: '100%', marginTop: '20px' }}>
                 <DataGrid
                     className="quesTable"
                     rows={dataForm ? dataForm : []}
                     columns={columns}
+                    components={{
+                        NoRowsOverlay: () => (
+                            <Stack height="100%" alignItems="center" justifyContent="center">
+                                No course available now
+                            </Stack>
+                        ),
+                    }}
                     checkboxSelection
                     disableSelectionOnClick
                     disableColumnFilter

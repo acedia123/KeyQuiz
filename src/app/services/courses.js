@@ -95,3 +95,13 @@ export const createNote = (data) => {
     var url = API_PATH + '/create-note';
     return axios.post(url, data);
 };
+
+export const findQuestionById = (data) => {
+    var url = API_PATH + '/find-question-by-id';
+    return axios.post(url, data);
+};
+
+export const deleteQuestion = (data) => {
+    var url = API_PATH + '/delete-question';
+    return axios.post(url, data);
+};

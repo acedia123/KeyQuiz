@@ -19,7 +19,6 @@ export default function Sidebar({ shrink }) {
     useEffect(() => {
         const url = window.location.pathname;
         let indexA = navigation.findIndex((item) => item.path === url);
-        console.log(indexA, url);
         let newArr = navigation.map((item, index) => {
             if (item.children != null) {
                 const searchIndex = item.children.findIndex((child) => child.path === url);
@@ -34,9 +33,6 @@ export default function Sidebar({ shrink }) {
         if (navigation.length > 20) {
             setSuppressScrollY(false);
         }
-
-        console.log(newArr);
-
         setIndex(newArr);
     }, []);
 

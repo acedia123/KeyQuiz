@@ -333,7 +333,7 @@ export default function CourseDetail() {
                                             popperRender={
                                                 <ul>
                                                     {courseDetail.author[0].user_id ===
-                                                        getUserFromLocalStorage().user_id && (
+                                                    getUserFromLocalStorage().user_id ? (
                                                         <div>
                                                             <li>
                                                                 <Link
@@ -357,6 +357,13 @@ export default function CourseDetail() {
                                                                 </button>
                                                             </li>
                                                         </div>
+                                                    ) : (
+                                                        <li>
+                                                            <button className="popper-link" onClick={handleOpenReport}>
+                                                                <FlagOutlined className="icon mr-2" />
+                                                                Report Course
+                                                            </button>
+                                                        </li>
                                                     )}
                                                     <li>
                                                         <button
@@ -365,12 +372,6 @@ export default function CourseDetail() {
                                                         >
                                                             <RotateLeftOutlined className="icon mr-2" />
                                                             Learn Course Again
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button className="popper-link" onClick={handleOpenReport}>
-                                                            <FlagOutlined className="icon mr-2" />
-                                                            Report Course
                                                         </button>
                                                     </li>
                                                 </ul>

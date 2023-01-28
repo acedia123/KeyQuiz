@@ -92,7 +92,7 @@ export default function Dashboard() {
                             <div className="wc-item">
                                 <h4 className={cx('wc-title')}>New Users</h4>
                                 <span className={cx('wc-des')}>Joined New User</span>
-                                <span className={cx('wc-stats', 'counter')}>{state.totalCourses}</span>
+                                <span className={cx('wc-stats', 'counter')}>{state.totalAccounts}</span>
                                 <div className={cx('progress', 'wc-progress')}>
                                     <div
                                         className={cx('progress-bar')}
@@ -114,8 +114,8 @@ export default function Dashboard() {
                         <div className={cx('widget-card', 'widget-bg3')}>
                             <div className="wc-item">
                                 <h4 className={cx('wc-title')}>New Course</h4>
-                                <span className={cx('wc-des')}>Joined New User</span>
-                                <span className={cx('wc-stats', 'counter')}>{state.totalAccounts}</span>
+                                <span className={cx('wc-des')}>Joined New Course</span>
+                                <span className={cx('wc-stats', 'counter')}>{state.totalCourses}</span>
                                 <div className={cx('progress', 'wc-progress')}>
                                     <div
                                         className={cx('progress-bar')}

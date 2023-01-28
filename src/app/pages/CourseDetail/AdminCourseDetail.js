@@ -1,25 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Box, Grid, Tabs, Tab, Typography } from '@mui/material';
+import React, { useEffect, useState, useContext } from 'react';
+// Material UI
+import { Avatar, Box, Grid, Tabs, Tab, Typography, Stack } from '@mui/material';
 import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
+import { DataGrid } from '@mui/x-data-grid';
+// Component
 import CustomIconAction from '../../components/Share/CustomIconAction';
-import { fakeQuestion } from '../../constants/fakeData';
-import { useNavigate, useParams } from 'react-router-dom';
+import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
 import TabPanel from '../../components/Tab/TabPanel';
 import CustomizationSearch from '../../components/Search/CustomizationSearch';
 import CustomBreadcrumbs from '../../components/Share/CustomBreadcrumbs';
-import { routes } from '../../configs';
-import { DataGrid } from '@mui/x-data-grid';
-import moment from 'moment';
 import CustomChip from '../../components/Share/CustomChip';
-import { getQuestionByCourse, getQuestionDemo } from '../../services/courses';
 import CustomButton from '../../components/Share/CustomButton';
-import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
+import CustomDialog from '../../components/Share/CustomDialog';
+import CardQuestion from '../../components/Card/CardQuestion';
+import { ToastContext } from '../../context/ToastContextProvider';
+// Service
+import { deleteQuestion, findQuestionById, getQuestionDemo } from '../../services/courses';
+// Other
+import { routes } from '../../configs';
+import { useParams } from 'react-router-dom';
+import moment from 'moment';
 import * as actions from '../../redux/course/actions';
 import { useDispatch, useSelector } from 'react-redux';
+import { IMAGE_PATH } from '../../appConfig';
 
 import classNames from 'classnames/bind';
 import styles from './CourseDetail.module.scss';
-import { IMAGE_PATH } from '../../appConfig';
 
 const cx = classNames.bind(styles);
 
@@ -33,14 +39,16 @@ function a11yProps(index) {
 export default function AdminCourseDetail() {
     const { id } = useParams();
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [value, setValue] = React.useState(0);
-    const [focus, setFocus] = useState(false);
-    const [dataQuestion, setDataQuestion] = useState(fakeQuestion);
-    let [dataForm, setDataForm] = useState(null);
+    const context = useContext(ToastContext);
+    const [value, setValue] = useState(0);
+    const [dataQuestion, setDataQuestion] = useState(null);
+    const [dataForm, setDataForm] = useState(null);
     const [dataSelected, setDataSelected] = useState([]);
     const [dialog, setDialog] = useState(false);
     const { courseDetail } = useSelector((state) => state.course);
+    const [openQuestionDialog, setOpenQuestionDialog] = useState(false);
+    const [deleteOneDialog, setDeleteOneDialog] = useState(false);
+    const [questionId, setQuestionId] = useState(false);
 
     useEffect(() => {
         dispatch(
@@ -48,10 +56,14 @@ export default function AdminCourseDetail() {
                 course_id: id,
             }),
         );
+        fetchData();
+    }, []);
+
+    const fetchData = () => {
         getQuestionDemo({ course_id: id, top: '123' }).then(({ data }) => {
             setDataForm(data);
         });
-    }, []);
+    };
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -59,19 +71,11 @@ export default function AdminCourseDetail() {
 
     const handleChangeSelection = (data) => {
         setDataSelected(data);
-        console.log(data);
     };
 
-    const handleRemoveRow = () => {
-        // const rows = [...dataForm.answers];
-        // const dataIndex = rows.findIndex((item) => item.id == id);
-        // if (dataIndex > -1) {
-        //     rows.splice(dataIndex, 1);
-        // }
-        // setDataForm({
-        //     ...dataForm,
-        //     answers: rows,
-        // });
+    const handleRemoveRow = (id) => {
+        setQuestionId(id);
+        setDeleteOneDialog(true);
     };
 
     const handleDeleteAll = () => {
@@ -83,6 +87,28 @@ export default function AdminCourseDetail() {
             }
         }
         setDataForm(newArr);
+    };
+
+    const handleOpenQuestion = (id) => {
+        findQuestionById({ question_id: id }).then(({ data }) => {
+            setDataQuestion(data);
+        });
+        setQuestionId(id);
+        setOpenQuestionDialog(true);
+    };
+
+    const handleDeleteQuestion = () => {
+        deleteQuestion({ question_id: questionId }).then(({ data }) => {
+            setDeleteOneDialog(false);
+            setOpenQuestionDialog(false);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Delete Successfully!',
+                status: 'success',
+            });
+            fetchData();
+        });
     };
 
     const columns = [
@@ -161,16 +187,10 @@ export default function AdminCourseDetail() {
             renderHeader: () => <span className="header-table">Actions</span>,
             renderCell: (params) => (
                 <div>
-                    <CustomIconAction
-                        label="View"
-                        arrow
-                        handleClick={() => {
-                            navigate(routes.admin.courseDetail);
-                        }}
-                    >
+                    <CustomIconAction label="View" arrow handleClick={() => handleOpenQuestion(params.row.question_id)}>
                         <RemoveRedEyeRounded className="text-primary icon" />
                     </CustomIconAction>
-                    <CustomIconAction label="Delete" arrow handleClick={() => handleRemoveRow(params.row.id)}>
+                    <CustomIconAction label="Delete" arrow handleClick={() => handleRemoveRow(params.row.question_id)}>
                         <DeleteRounded className="text-danger icon" />
                     </CustomIconAction>
                 </div>
@@ -205,7 +225,6 @@ export default function AdminCourseDetail() {
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                             <Tab label="Questions" {...a11yProps(0)} className="normal-font font-weight-bold" />
-                            {/* <Tab label="Rate" {...a11yProps(1)} className="normal-font font-weight-bold" /> */}
                         </Tabs>
                     </Box>
                     <TabPanel value={value} index={0}>
@@ -228,6 +247,13 @@ export default function AdminCourseDetail() {
                                     className="quesTable"
                                     rows={dataForm ? dataForm : []}
                                     columns={columns}
+                                    components={{
+                                        NoRowsOverlay: () => (
+                                            <Stack height="100%" alignItems="center" justifyContent="center">
+                                                No question available now
+                                            </Stack>
+                                        ),
+                                    }}
                                     checkboxSelection
                                     disableSelectionOnClick
                                     disableColumnFilter
@@ -243,34 +269,38 @@ export default function AdminCourseDetail() {
                             </Box>
                         </Grid>
                     </TabPanel>
+
                     <CustomConfirmDialog
                         label="questions"
                         open={dialog}
                         handleSubmit={handleDeleteAll}
                         handleClose={() => setDialog(false)}
                     />
-                    {/* <TabPanel value={value} index={1}>
-                <div className={cx('rate-wrapper')}>
-                    <div className={cx('banner')}>
-                        <div className="d-flex-align-center">
-                            <Typography className={cx('title') + ' fs-16 font-weight-bold'}>
-                                {rate.totalRate}
-                            </Typography>
-                            <Rating className="ml-2" name="read-only" value={2} readOnly size="large" />
-                        </div>
-                    </div>
-                    <div className={cx('comment-wrapper')}>
-                        <Grid container spacing={2}>
-                            {console.log(rate)}
-                            {rate.comments.map((item) => (
-                                <Grid item md={12} key={item.id}>
-                                    <CardComment data={item} />
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </div>
-                </div>
-            </TabPanel> */}
+
+                    <CustomConfirmDialog
+                        label="question"
+                        open={deleteOneDialog}
+                        handleSubmit={handleDeleteQuestion}
+                        handleClose={() => setDeleteOneDialog(false)}
+                    />
+
+                    {dataQuestion && (
+                        <CustomDialog
+                            open={openQuestionDialog}
+                            handleClose={() => setOpenQuestionDialog(false)}
+                            title={'Question Detail'}
+                            noButton={false}
+                            size="md"
+                        >
+                            <CardQuestion
+                                term={dataQuestion.term}
+                                data={dataQuestion}
+                                isForm={true}
+                                role="abc"
+                                handleDeleteQuestion={() => setDeleteOneDialog(true)}
+                            />
+                        </CustomDialog>
+                    )}
                 </div>
             )}
         </div>

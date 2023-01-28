@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react';
 import moment from 'moment';
-import { useNavigate } from 'react-router-dom';
 // Material Library
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
+import { RemoveRedEyeRounded } from '@mui/icons-material';
 // Component
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import CustomizationSearch from '../../components/Search/CustomizationSearch';
 import CustomBreadcrumbs from '../../components/Share/CustomBreadcrumbs';
-import CustomButton from '../../components/Share/CustomButton';
+import CustomChipLabel from '../../components/Chip/CustomChipLabel';
+import CustomDialog from '../../components/Share/CustomDialog';
+import CardQuestion from '../../components/Card/CardQuestion';
+import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
 // Service
 import { getListQuestionReport } from '../../services/report';
-
+import { deleteQuestion, findQuestionById } from '../../services/courses';
 import { ToastContext } from '../../context/ToastContextProvider';
-import CustomChipLabel from '../../components/Chip/CustomChipLabel';
+import { reportReasons } from '../../constants/constObject';
 
 import classNames from 'classnames/bind';
 import styles from './Report.module.scss';
@@ -22,16 +24,13 @@ import styles from './Report.module.scss';
 const cx = classNames.bind(styles);
 
 export default function ReportQuestion() {
-    const navigate = useNavigate();
     const [dataForm, setDataForm] = useState([]);
     const [dataSearch, setDataSearch] = useState({ searchText: '' });
     const context = useContext(ToastContext);
-    const [dataSelected, setDataSelected] = useState([]);
-    const [dialog, setDialog] = useState(false);
-    const [dialogForm, setDialogForm] = useState(false);
-    const [dataSubmit, setDataSubmit] = useState(null);
-    const [notification, setNotification] = useState(null);
-
+    const [openQuestionDialog, setOpenQuestionDialog] = useState(false);
+    const [deleteOneDialog, setDeleteOneDialog] = useState(false);
+    const [questionId, setQuestionId] = useState(false);
+    const [dataQuestion, setDataQuestion] = useState(null);
     useEffect(() => {
         document.title = 'List Report Question | Key Quiz';
         getListQuestionReport().then(({ data }) => {
@@ -47,47 +46,36 @@ export default function ReportQuestion() {
     const fetchData = () => {
         getListQuestionReport().then(({ data }) => {
             let dataFind = data.filter((item) =>
-                item.author[0].user_name.toLowerCase().includes(dataSearch.searchText.toLowerCase()),
+                item.author.user_name.toLowerCase().includes(dataSearch.searchText.toLowerCase()),
             );
             setDataForm(dataFind);
         });
-    };
-
-    const handleChangeSelection = (data) => {
-        setDataSelected(data);
-    };
-
-    const handleRemoveRow = (id) => {
-        setDialog(true);
-        setDataSelected([id]);
-    };
-
-    const handleDeleteAll = () => {
-        console.log('hihi');
-    };
-
-    const handleCloseDialog = () => {
-        setDialog(false);
     };
 
     const handleChangeSearch = (value) => {
         setDataSearch({ searchText: value });
     };
 
-    const handleSubmitForm = () => {};
-
-    const handleClearForm = () => {
-        setDataSubmit(null);
-        setNotification(null);
+    const handleOpenEditDialog = (reportData) => {
+        findQuestionById({ question_id: reportData.question_id }).then(({ data }) => {
+            setDataQuestion({ ...data, ...reportData });
+        });
+        setQuestionId(reportData.question_id);
+        setOpenQuestionDialog(true);
     };
 
-    const handleCloseForm = () => {
-        handleClearForm();
-        setDialogForm(false);
-    };
-
-    const handleOpenEditDialog = (id) => {
-        setDialogForm(true);
+    const handleDeleteQuestion = () => {
+        deleteQuestion({ question_id: questionId }).then(({ data }) => {
+            setDeleteOneDialog(false);
+            setOpenQuestionDialog(false);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Delete Successfully!',
+                status: 'success',
+            });
+            fetchData();
+        });
     };
 
     const columns = [
@@ -110,7 +98,7 @@ export default function ReportQuestion() {
             sortable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Reported by</span>,
-            renderCell: (params) => <div className="normal-font row-center">{params.row.author[0].user_name}</div>,
+            renderCell: (params) => <div className="normal-font row-center">{params.row.author.user_name}</div>,
             editable: false,
         },
         {
@@ -142,7 +130,9 @@ export default function ReportQuestion() {
             editable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Detail of report</span>,
-            renderCell: (params) => <div className="normal-font">{params.row.other ? params.row.other : ''}</div>,
+            renderCell: (params) => (
+                <div className="normal-font row-center">{params.row.other ? params.row.other : ''}</div>
+            ),
         },
         {
             field: 'createdAt',
@@ -176,7 +166,7 @@ export default function ReportQuestion() {
             renderHeader: (params) => <span className="header-table">Actions</span>,
             renderCell: (params) => (
                 <div>
-                    <CustomIconAction label="Detail" arrow handleClick={() => handleOpenEditDialog(params.id)}>
+                    <CustomIconAction label="Detail" arrow handleClick={() => handleOpenEditDialog(params.row)}>
                         <RemoveRedEyeRounded className="text-primary icon" />
                     </CustomIconAction>
                 </div>
@@ -190,44 +180,68 @@ export default function ReportQuestion() {
             <CustomBreadcrumbs routeSegments={[{ name: 'List question report' }]} />
 
             <div className="d-flex-center-between mt-4">
-                <div className="d-flex-center-between">
-                    {dataSelected.length > 1 && (
-                        <CustomButton
-                            handleClick={() => setDialog(true)}
-                            title="Remove selected"
-                            startIcon={<DeleteRounded />}
-                            colorButton="danger"
-                        />
-                    )}
-                </div>
+                <div className="d-flex-center-between"></div>
                 <div className="d-flex-align-center">
                     <CustomizationSearch placeholder="Searching report..." handleChangeSearch={handleChangeSearch} />
                 </div>
             </div>
-            {/* <CustomDialog
-                title={'CourseDetail'}
-                open={dialogForm}
-                handleSubmit={handleSubmitForm}
-                handleClose={handleCloseForm}
-                handleClear={handleClearForm}
-            >
-                <CardQuestion term data index isForm={true} handleEditQuestion role="user" handleDeleteQuestion />
-            </CustomDialog> */}
 
             <Box sx={{ height: 640, width: '100%', marginTop: '20px' }}>
                 <DataGrid
                     className="quesTable"
                     rows={dataForm}
+                    components={{
+                        NoRowsOverlay: () => (
+                            <Stack height="100%" alignItems="center" justifyContent="center">
+                                No report available now
+                            </Stack>
+                        ),
+                    }}
                     columns={columns}
-                    checkboxSelection
                     getRowId={(row) => row.report_question_id}
                     disableSelectionOnClick
                     disableColumnFilter
                     disableColumnMenu
-                    onSelectionModelChange={handleChangeSelection}
                     getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row')}
                 />
             </Box>
+
+            <CustomConfirmDialog
+                label="question"
+                open={deleteOneDialog}
+                handleSubmit={handleDeleteQuestion}
+                handleClose={() => setDeleteOneDialog(false)}
+            />
+
+            {dataQuestion && (
+                <CustomDialog
+                    open={openQuestionDialog}
+                    handleClose={() => setOpenQuestionDialog(false)}
+                    title={'Report Detail'}
+                    noButton={false}
+                    size="md"
+                >
+                    <div className="mb-3">
+                        <h3 className="font-weight-bold">
+                            Reported content: {reportReasons[dataQuestion.type_of_report].name}
+                            {dataQuestion.type_of_report === 3 ? ` - ${dataQuestion.other}` : ''}
+                        </h3>
+                        <span className="normal-font font-weight-bold d-block">
+                            Reported by: {dataQuestion.author.user_name} - {dataQuestion.author.email}
+                        </span>
+                        <span className="normal-font font-weight-bold">
+                            Reported at: {moment(dataQuestion.created_at).format('DD-MM-YYYY HH:ss:mm')}
+                        </span>
+                    </div>
+                    <CardQuestion
+                        term={dataQuestion.term}
+                        data={dataQuestion}
+                        isForm={true}
+                        role="abc"
+                        handleDeleteQuestion={() => setDeleteOneDialog(true)}
+                    />
+                </CustomDialog>
+            )}
         </div>
     );
 }

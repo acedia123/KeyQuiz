@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 // Material
-import { Alert, Box, Chip } from '@mui/material';
+import { Alert, Box, Chip, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Add, DeleteRounded, Edit, RemoveRedEyeRounded } from '@mui/icons-material';
 // Component
@@ -129,7 +129,18 @@ export default function AdminCourses() {
                     handleClearForm();
                 })
                 .catch((err) => {
-                    setNotification({ name: "Name can't empty", status: 'error' });
+                    let message;
+                    switch (err.response.status) {
+                        case 500:
+                            message = "Name can't empty";
+                            break;
+                        case 403:
+                            message = 'Topic name already exist';
+                            break;
+                        default:
+                            message = err.message;
+                    }
+                    setNotification({ name: message, status: 'error' });
                 });
         }
     };
@@ -332,6 +343,13 @@ export default function AdminCourses() {
                     className="quesTable"
                     rows={dataForm ? dataForm : []}
                     columns={columns}
+                    components={{
+                        NoRowsOverlay: () => (
+                            <Stack height="100%" alignItems="center" justifyContent="center">
+                                No topic available now
+                            </Stack>
+                        ),
+                    }}
                     getRowId={(row) => row.category_id}
                     checkboxSelection
                     disableSelectionOnClick

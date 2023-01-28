@@ -118,14 +118,8 @@ export const navigation = [
     {
         title: 'Manage Account',
         icon: <Person />,
-        path: '/',
-        children: [
-            {
-                title: 'List Accounts',
-                icon: <ListAlt />,
-                path: routes.admin.accounts,
-            },
-        ],
+        path: routes.admin.accounts,
+        children: null,
     },
 ];
 

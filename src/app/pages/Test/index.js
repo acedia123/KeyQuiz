@@ -94,7 +94,7 @@ export default function Test() {
 
     const { seconds, minutes, hours, isRunning, start, pause, resume, restart } = useTimer({
         expiryTimestamp: time,
-        // onExpire: () => handleSubmitTest(),
+        onExpire: () => handleSubmitTest(),
     });
 
     useEffect(() => {
@@ -102,7 +102,7 @@ export default function Test() {
             top: 0,
             behavior: 'smooth',
         });
-        pause();
+        // pause();
         dispatch(
             getCourseDetail.getCourseDetailRequest({
                 course_id: id,

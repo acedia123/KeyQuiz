@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 // Material Library
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
 // Component
@@ -48,7 +48,7 @@ export default function ReportRate() {
     const fetchData = () => {
         getListRateReport().then(({ data }) => {
             let dataFind = data.filter((item) =>
-                item.author[0].user_name.toLowerCase().includes(dataSearch.searchText.toLowerCase()),
+                item.author.user_name.toLowerCase().includes(dataSearch.searchText.toLowerCase()),
             );
             setDataForm(dataFind);
         });
@@ -109,7 +109,7 @@ export default function ReportRate() {
             sortable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Reported by</span>,
-            renderCell: (params) => <div className="normal-font row-center">{params.row.author[0].user_name}</div>,
+            renderCell: (params) => <div className="normal-font row-center">{params.row.author.user_name}</div>,
             editable: false,
         },
         {
@@ -118,7 +118,7 @@ export default function ReportRate() {
             sortable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Reported rate</span>,
-            renderCell: (params) => <div className="normal-font row-center">{params.row.rate_id}</div>,
+            renderCell: (params) => <div className="normal-font row-center">{params.row.rate.content}</div>,
             editable: false,
         },
         {
@@ -167,21 +167,21 @@ export default function ReportRate() {
             ),
             editable: false,
         },
-        {
-            minWidth: 150,
-            sortable: false,
-            headerAlign: 'center',
-            type: 'actions',
-            renderHeader: (params) => <span className="header-table">Actions</span>,
-            renderCell: (params) => (
-                <div>
-                    <CustomIconAction label="Detail" arrow handleClick={() => handleOpenEditDialog(params.id)}>
-                        <RemoveRedEyeRounded className="text-primary icon" />
-                    </CustomIconAction>
-                </div>
-            ),
-            editable: false,
-        },
+        // {
+        //     minWidth: 150,
+        //     sortable: false,
+        //     headerAlign: 'center',
+        //     type: 'actions',
+        //     renderHeader: (params) => <span className="header-table">Actions</span>,
+        //     renderCell: (params) => (
+        //         <div>
+        //             <CustomIconAction label="Detail" arrow handleClick={() => handleOpenEditDialog(params.id)}>
+        //                 <RemoveRedEyeRounded className="text-primary icon" />
+        //             </CustomIconAction>
+        //         </div>
+        //     ),
+        //     editable: false,
+        // },
     ];
 
     return (
@@ -203,21 +203,19 @@ export default function ReportRate() {
                     <CustomizationSearch placeholder="Searching report..." handleChangeSearch={handleChangeSearch} />
                 </div>
             </div>
-            {/* <CustomDialog
-                title={'CourseDetail'}
-                open={dialogForm}
-                handleSubmit={handleSubmitForm}
-                handleClose={handleCloseForm}
-                handleClear={handleClearForm}
-            >
-                <CardQuestion term data index isForm={true} handleEditQuestion role="user" handleDeleteQuestion />
-            </CustomDialog> */}
 
             <Box sx={{ height: 640, width: '100%', marginTop: '20px' }}>
                 <DataGrid
                     className="quesTable"
                     rows={dataForm}
                     columns={columns}
+                    components={{
+                        NoRowsOverlay: () => (
+                            <Stack height="100%" alignItems="center" justifyContent="center">
+                                No report available now
+                            </Stack>
+                        ),
+                    }}
                     checkboxSelection
                     getRowId={(row) => row.report_rate_id}
                     disableSelectionOnClick

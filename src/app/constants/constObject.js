@@ -26,3 +26,26 @@ export const typeOfQues = [
     { name: 'Learned', value: 1 },
     { name: 'Is Important', value: 4 },
 ];
+
+export const reportReasons = [
+    {
+        name: 'Offensive content',
+        value: 0,
+        color: 'primary',
+    },
+    {
+        name: 'Violent words',
+        value: 1,
+        color: 'secondary',
+    },
+    {
+        name: 'Spam',
+        value: 2,
+        color: 'error',
+    },
+    {
+        name: 'Other',
+        value: 3,
+        color: 'default',
+    },
+];

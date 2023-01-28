@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, Box, Checkbox } from '@mui/material';
+import { Alert, Box, Checkbox, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Add, DeleteRounded } from '@mui/icons-material';
 import CustomDialog from '../../components/Share/CustomDialog';
@@ -321,6 +321,13 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
                         className="quesTable"
                         rows={dataForm.answers}
                         columns={columns}
+                        components={{
+                            NoRowsOverlay: () => (
+                                <Stack height="100%" alignItems="center" justifyContent="center">
+                                    No question available now
+                                </Stack>
+                            ),
+                        }}
                         getRowId={(row) => row.id}
                         checkboxSelection
                         hideFooterPagination

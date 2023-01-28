@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 // Material Library
-import { Alert, Avatar, Box } from '@mui/material';
+import { Alert, Avatar, Box, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
 // Component
@@ -335,6 +335,13 @@ export default function AdminListUsers() {
                     rows={dataForm}
                     columns={columns}
                     checkboxSelection
+                    components={{
+                        NoRowsOverlay: () => (
+                            <Stack height="100%" alignItems="center" justifyContent="center">
+                                No account available now
+                            </Stack>
+                        ),
+                    }}
                     getRowId={(row) => row.user_id}
                     disableSelectionOnClick
                     disableColumnFilter

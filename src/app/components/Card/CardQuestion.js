@@ -42,7 +42,7 @@ export default function CardQuestion({
         <Card className={cx('flash-card-item')}>
             <div className={cx('card-header')} style={{ backgroundColor: '#E7F2FF' }}>
                 <div className={cx('header-title')}>
-                    {index}.{' '}
+                    {index ? index + '.' : ''}{' '}
                     <span className={cx('text-content')}>
                         {data.content}
                         {data.isExist && (
