@@ -14,6 +14,7 @@ import {
     getSearchText,
     getTotalLearn,
     getType,
+    getWrongQuestion,
     userAnswer,
 } from './actions';
 
@@ -31,6 +32,7 @@ const initialState = {
     openEndingView: false,
     searchSelected: false,
     searchText: null,
+    wrongQuestions: [],
     // process
     roundProcess: {
         totalCorrect: 0,
@@ -85,6 +87,11 @@ const QuestionReducer = (state = initialState, action) => {
         }
         case getType(getSearchText.getSearchTextSuccess): {
             return { ...state, searchText: action.payload };
+        }
+        case getType(getWrongQuestion.getWrongQuestionSuccess): {
+            let data = state.wrongQuestions;
+            data.push(action.payload);
+            return { ...state, wrongQuestions: data };
         }
         default:
             return { ...state };

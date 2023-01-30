@@ -16,6 +16,7 @@ export const routes = {
     editCourse: '/edit-course',
     authorProfile: '/author',
     activePage: '/active',
+    adminLogin: '/admin-login',
     admin: {
         dashboard: ADMIN_PATH + '/dashboard',
         courses: ADMIN_PATH + '/courses',

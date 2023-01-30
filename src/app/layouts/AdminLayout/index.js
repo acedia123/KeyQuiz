@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import { Dehaze } from '@mui/icons-material';
-import Notification from '../../components/Notification';
 import UserPopper from '../../components/Popper/UserPopper';
 
 import classNames from 'classnames/bind';

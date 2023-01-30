@@ -23,7 +23,6 @@ import { reportRate } from '../../services/report';
 const cx = classNames.bind(styles);
 
 const labels = {
-    0: 'Not yet',
     1: 'Useless',
     2: 'Poor',
     3: 'Ok',
@@ -53,7 +52,7 @@ export default function TabComments({ courseId, courseDetail }) {
     const context = useContext(ToastContext);
     const [hover, setHover] = React.useState(-1);
     const [isOpenReviewDialog, setIsOpenReviewDialog] = useState(false);
-    const [dataForm, setDataForm] = useState({ rate_number: 0 });
+    const [dataForm, setDataForm] = useState({ rate_number: 1 });
     const [isComment, setIsComment] = useState(false);
     const [openConfirm, setOpenConfirm] = useState(false);
     const [rateId, setRateId] = useState(0);
@@ -198,9 +197,11 @@ export default function TabComments({ courseId, courseDetail }) {
                                     name="read-only"
                                     getLabelText={getLabelText}
                                     onChange={(event, newValue) => {
-                                        setDataForm((preState) => {
-                                            return { ...preState, rate_number: newValue };
-                                        });
+                                        if (newValue) {
+                                            setDataForm((preState) => {
+                                                return { ...preState, rate_number: newValue };
+                                            });
+                                        }
                                     }}
                                     onChangeActive={(event, newHover) => {
                                         setHover(newHover);

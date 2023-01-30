@@ -64,3 +64,7 @@ export const getSearchSelected = createActions({
 export const getSearchText = createActions({
     getSearchTextSuccess: (payload) => payload,
 });
+
+export const getWrongQuestion = createActions({
+    getWrongQuestionSuccess: (payload) => payload,
+});

@@ -21,6 +21,7 @@ import {
     getNotification,
     getSearchSelected,
     getSearchText,
+    getWrongQuestion,
     userAnswer,
 } from '../../redux/question/actions';
 import { changeTypeOfQuestion, createNote, toggleIsImportant } from '../../services/courses';
@@ -100,6 +101,7 @@ export default function LearnRound({ data = [], handleReport, handleClickSearch 
             roundProcess.totalCorrect = roundProcess.totalCorrect + 1;
         } else {
             roundProcess.totalWrong = roundProcess.totalWrong + 1;
+            dispatch(getWrongQuestion.getWrongQuestionSuccess(data));
         }
         roundProcess.userAnswers.push({ ...data, userChoose: newArr });
         dispatch(addRoundProcess.addRoundProcessSuccess({ ...roundProcess }));

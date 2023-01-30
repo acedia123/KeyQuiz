@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext, useRef } from 'react';
 // Router
 import { Link, useNavigate, useParams } from 'react-router-dom';
 // Redux
@@ -40,6 +40,7 @@ import { IMAGE_PATH } from '../../appConfig';
 import { getUserFromLocalStorage } from '../../constants/functions';
 import { getTerm } from '../../redux/test/actions';
 import { levels, typeOfQues } from '../../constants/constObject';
+import { ToastContext } from '../../context/ToastContextProvider';
 
 import classNames from 'classnames/bind';
 import styles from './Learn.module.scss';
@@ -47,6 +48,8 @@ import styles from './Learn.module.scss';
 const cx = classNames.bind(styles);
 
 export default function Learn() {
+    const notifiRef = useRef();
+    const context = useContext(ToastContext);
     const dispatch = useDispatch();
     let navigate = useNavigate();
     let { courseId } = useParams();
@@ -54,7 +57,9 @@ export default function Learn() {
     const { indexQuestion } = useSelector((state) => state.question);
     const { openOverview } = useSelector((state) => state.question);
     const { indexRound } = useSelector((state) => state.question);
+    const { wrongQuestions } = useSelector((state) => state.question);
     const { totalLearn } = useSelector((state) => state.question);
+
     const { terms } = useSelector((state) => state.test);
 
     const [totalQuestion, setTotalQues] = useState(0);
@@ -88,6 +93,7 @@ export default function Learn() {
     }, []);
 
     const handleNextQuestion = () => {
+        console.log(wrongQuestions);
         dispatch(getNotification.getNotificationSuccess(false));
 
         if (indexQuestion === rounds[indexRound].questions.length - 1) {
@@ -230,6 +236,12 @@ export default function Learn() {
             type_of_report,
             other,
         }).then(() => {
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Report Successfully!',
+                status: 'success',
+            });
             setOpenReport(false);
         });
     };
@@ -437,7 +449,7 @@ export default function Learn() {
             />
 
             {notification && (
-                <div className={cx('dialog')}>
+                <div ref={notifiRef} className={cx('dialog')}>
                     <div className={cx('dialog-content')}>
                         Press any keyboard to next question or
                         <button className={cx('dialog-btn')} onClick={handleNextQuestion}>

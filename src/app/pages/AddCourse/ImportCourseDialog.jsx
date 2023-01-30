@@ -1,10 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import CustomDialog from '../../components/Share/CustomDialog';
 import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
 import { importCourseExcel } from '../../services/excel';
 import { IMAGE_PATH } from '../../appConfig';
 import { downloadTemplate } from '../../services/ulti';
+import { ToastContext } from '../../context/ToastContextProvider';
+import CustomToast from '../../components/Toast/CustomToast';
 
 import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
@@ -13,9 +15,18 @@ const cx = classNames.bind(styles);
 
 export default function ImportCourseDialog({ open, handleClose, handleSubmit }) {
     const inputRef = useRef();
-    const [selectedFile, setSelectedFile] = useState();
+    const { context } = useContext(ToastContext);
     const [file, setFile] = useState();
     const [fileType, setFileType] = useState();
+    const [selectedFile, setSelectedFile] = useState();
+    const [dataAlert, setDataAlert] = useState({
+        vertical: 'top',
+        horizontal: 'right',
+        duration: 6000,
+        isOpen: false,
+        message: '',
+        status: 'info',
+    });
 
     const changeHandler = (e) => {
         e.preventDefault();
@@ -51,34 +62,52 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
     const importExcel = () => {
         const formData = new FormData();
         formData.append('sampledata', selectedFile);
-        importCourseExcel(formData).then(({ data }) => {
-            handleSubmit(convertData({ terms: data.terms, question: data.question }));
-            handleClear();
-        });
+        importCourseExcel(formData)
+            .then(({ data }) => {
+                handleSubmit(convertData({ terms: data.terms, question: data.question }));
+                handleClear();
+            })
+            .catch((err) => {
+                setDataAlert({
+                    ...dataAlert,
+                    isOpen: true,
+                    message: 'Data is not correct! Please try again',
+                    status: 'error',
+                });
+            });
     };
 
     const importWord = () => {
-        let newArr = file.split('--next-question--');
-        let questions = [];
-        let terms = [];
-        for (let i = 0; i < newArr.length; i++) {
-            let newObj = newArr[i].split('--next-line--');
-            let check = terms.find((item) => item === newObj[0].substring(14));
-            if (!check) {
-                terms.push(newObj[0].substring(14));
+        try {
+            let newArr = file.split('--next-question--');
+            let questions = [];
+            let terms = [];
+            for (let i = 0; i < newArr.length; i++) {
+                let newObj = newArr[i].split('--next-line--');
+                let check = terms.find((item) => item === newObj[0].substring(14));
+                if (!check) {
+                    terms.push(newObj[0].substring(14));
+                }
+                questions.push({
+                    term_name: newObj[0].substring(14),
+                    content: newObj[1].substring(9),
+                    answers: newObj[2].substring(9).split('\\n'),
+                    correct_answers: newObj[3].substring(17).trim().split('\\n'),
+                    level: newObj[4].substring(7).toLowerCase() === 'Easy'.toLowerCase() ? 0 : 1,
+                    hint: newObj[5].substring(6),
+                    explain: newObj[6].substring(9),
+                });
             }
-            questions.push({
-                term_name: newObj[0].substring(14),
-                content: newObj[1].substring(9),
-                answers: newObj[2].substring(9).split('\\n'),
-                correct_answers: newObj[3].substring(17).trim().split('\\n'),
-                level: newObj[4].substring(7).toLowerCase() === 'Easy'.toLowerCase() ? 0 : 1,
-                hint: newObj[5].substring(6),
-                explain: newObj[6].substring(9),
+            handleSubmit(convertData({ terms, question: questions }));
+            handleClear();
+        } catch (ex) {
+            setDataAlert({
+                ...dataAlert,
+                isOpen: true,
+                message: 'Data is not correct! Please try again',
+                status: 'error',
             });
         }
-        handleSubmit(convertData({ terms, question: questions }));
-        handleClear();
     };
 
     const convertData = (data) => {
@@ -105,6 +134,10 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
         inputRef.current.click();
     };
 
+    const handleCloseError = () => {
+        setDataAlert({ ...dataAlert, isOpen: false });
+    };
+
     return (
         <CustomDialog
             open={open}
@@ -113,6 +146,7 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
             handleClose={handleClose}
             handleClear={handleClear}
         >
+            <CustomToast data={dataAlert} handleClose={handleCloseError} />
             <div className={cx('import-file-dialog')}>
                 <div className={cx('center')}>
                     <div className={cx('title')}>

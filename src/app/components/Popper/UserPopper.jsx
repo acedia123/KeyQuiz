@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AccountBoxOutlined, ExitToAppOutlined } from '@mui/icons-material';
 import CustomTippyPopper from '../../components/Share/CustomTippyPopper';
 import { Avatar, Typography } from '@mui/material';
-import { getLogout } from '../../redux/auth/actions';
 import { IMAGE_PATH } from '../../appConfig';
+import { routes } from '../../configs/index.js';
 
 import classNames from 'classnames/bind';
 import styles from './Popper.module.scss';
@@ -19,7 +19,9 @@ export default function UserAvatarPopper() {
     const [popper, setPopper] = useState(false);
     const hide = () => setPopper(false);
     const show = () => setPopper(true);
-    const handleLogout = () => dispatch(getLogout.getLogoutRequest({ navigate }));
+    const handleLogout = () => {
+        navigate(routes.adminLogin);
+    };
 
     return (
         <CustomTippyPopper
@@ -45,12 +47,12 @@ export default function UserAvatarPopper() {
                             User Profile
                         </Link>
                     </li> */}
-                    <li>
+                    {/* <li>
                         <Link to="/" className="popper-link" onClick={hide}>
                             <AccountBoxOutlined className="icon mr-2" />
                             Go home
                         </Link>
-                    </li>
+                    </li> */}
                     <li>
                         <button className="popper-link" onClick={handleLogout}>
                             <ExitToAppOutlined className="icon mr-2" />

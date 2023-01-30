@@ -9,7 +9,7 @@ import { avatars } from '../../constants/avatar';
 import CustomButton from '../../components/Share/CustomButton';
 import { changeAvatar, changePassword, editName, getAccountById } from '../../services/account';
 import { ToastContext } from '../../context/ToastContextProvider';
-import { checkConfirmPassword, checkNewPassword, checkPassword } from '../../constants/validate';
+import { checkConfirmPassword, checkNewPassword, checkPassword, checkUsername } from '../../constants/validate';
 import CustomInputAdornment from '../../components/TextField/CustomInputAdornment';
 import { getCourseLearned, getCourseLearning, getTopCourseByUser } from '../../services/home';
 import TabMyCourse from './TabMyCourse';
@@ -145,7 +145,6 @@ export default function UserProfile() {
             checkPasswordService({ user_id: dataForm.user_id, password: dataForm.password })
                 .then(() => {
                     changePassword({ user_id: dataForm.user_id, password: dataForm.newPassword }).then(({ data }) => {
-                        console.log(data);
                         if (data) {
                             context.setDataAlert({
                                 ...context.dataAlert,
@@ -230,25 +229,29 @@ export default function UserProfile() {
     };
 
     const handleSubmitForm = () => {
-        editName({ user_name: dataForm.user_name, user_id: dataForm.user_id })
-            .then(({ data }) => {
-                context.setDataAlert({
-                    ...context.dataAlert,
-                    isOpen: true,
-                    message: 'Edit Profile Successfully!',
-                    status: 'success',
+        handleCheckData();
+        const { user_name } = JSON.parse(localStorage.getItem('changePassword'));
+        if (!user_name.status) {
+            editName({ user_name: dataForm.user_name, user_id: dataForm.user_id })
+                .then(({ data }) => {
+                    context.setDataAlert({
+                        ...context.dataAlert,
+                        isOpen: true,
+                        message: 'Edit Profile Successfully!',
+                        status: 'success',
+                    });
+                    fetchAccount();
+                    setAllowEdit(true);
+                })
+                .catch((error) => {
+                    context.setDataAlert({
+                        ...context.dataAlert,
+                        isOpen: true,
+                        message: 'Edit Profile Failure!',
+                        status: 'error',
+                    });
                 });
-                fetchAccount();
-                setAllowEdit(true);
-            })
-            .catch((error) => {
-                context.setDataAlert({
-                    ...context.dataAlert,
-                    isOpen: true,
-                    message: 'Edit Profile Failure!',
-                    status: 'error',
-                });
-            });
+        }
     };
 
     const handleAvatarSubmit = () => {
@@ -288,6 +291,12 @@ export default function UserProfile() {
                 setMyCourse(data);
             });
         }
+    };
+
+    const handleBlurText = () => {
+        setDataError((preState) => {
+            return { ...preState, user_name: checkUsername(dataForm) };
+        });
     };
 
     return (
@@ -367,6 +376,7 @@ export default function UserProfile() {
                                 label="Username"
                                 name="user_name"
                                 handleChange={handleChange}
+                                handleBlurText={() => handleBlurText()}
                                 value={dataForm.user_name}
                                 error={dataError.user_name.status}
                                 helperText={dataError.user_name.error}

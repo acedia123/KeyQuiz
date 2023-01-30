@@ -18,6 +18,7 @@ import {
     getNotification,
     getSearchSelected,
     getSearchText,
+    getWrongQuestion,
     userAnswer,
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -79,6 +80,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
             roundProcess.totalCorrect = roundProcess.totalCorrect + 1;
         } else {
             roundProcess.totalWrong = roundProcess.totalWrong + 1;
+            dispatch(getWrongQuestion.getWrongQuestionSuccess(data));
         }
         roundProcess.userAnswers.push({ ...data, userChoose: [{ answer, index }] });
         dispatch(addRoundProcess.addRoundProcessSuccess({ ...roundProcess }));

@@ -120,3 +120,15 @@ export const checkEmail = (data) => {
     }
     return dataText;
 };
+
+export const checkUsername = (data) => {
+    let dataText = {};
+    if (data.user_name == '') {
+        dataText = { status: true, error: "Username can't empty." };
+    } else if (data.user_name.length > 15) {
+        dataText = { status: true, error: 'Username no more than 15 character.' };
+    } else {
+        dataText = { status: false, error: '' };
+    }
+    return dataText;
+};

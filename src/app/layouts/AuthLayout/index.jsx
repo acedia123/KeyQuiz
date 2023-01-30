@@ -26,6 +26,8 @@ export default function Auth({ children }) {
                 break;
             case routes.forgotPass:
                 setBackground('background2.jpg');
+            case '/admin-login':
+                setBackground('background1.jpg');
                 break;
         }
     }, [window.location.pathname]);

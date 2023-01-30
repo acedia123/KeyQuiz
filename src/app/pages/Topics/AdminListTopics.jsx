@@ -207,7 +207,7 @@ export default function AdminCourses() {
             sortable: false,
             editable: false,
             headerAlign: 'center',
-            renderHeader: (params) => <span className="header-table">Courses Name</span>,
+            renderHeader: (params) => <span className="header-table">Topic Name</span>,
             renderCell: (params) => <div className="normal-font row-center">{params.row.name}</div>,
         },
         {

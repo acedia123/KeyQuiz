@@ -1,6 +1,7 @@
 import React from 'react';
 import { routes } from '../configs/index';
 import { DefaultLayout, Auth, Admin } from '../layouts/index';
+import LoginAdmin from '../pages/Auth/LoginAdmin';
 // Auth
 const Login = React.lazy(() => import('../pages/Auth/Login'));
 const LoginFake = React.lazy(() => import('../pages/Auth/LoginFake'));
@@ -81,6 +82,8 @@ export const publicRoutes = [
     { path: routes.admin.reportCourse, component: ReportCourse, layout: Admin },
     { path: routes.admin.reportQuestion, component: ReportQuestion, layout: Admin },
     { path: routes.admin.reportRate, component: ReportRate, layout: Admin },
+
+    { path: routes.adminLogin, component: LoginAdmin, layout: Auth },
 ];
 
 export const privateRoutes = [
