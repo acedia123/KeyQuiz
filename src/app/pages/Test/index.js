@@ -58,6 +58,7 @@ const ProgressLabel = ({ value, time }) => {
         </Box>
     );
 };
+const TIME_DEFAULT = 300;
 
 export default function Test() {
     let navigate = useNavigate();
@@ -75,22 +76,23 @@ export default function Test() {
     const { loading } = useSelector((state) => state.test);
 
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-    const [isTest, setIsTest] = useState(false);
+    const [isTesting, setIsTesting] = useState(false);
     const [refs, setRefs] = useState([]);
     const [refs2, setRefs2] = useState([]);
+    const [isTest, setIsTest] = useState(false);
 
     const [openDialogSetting, setOpenDialogSetting] = useState(false);
     const [dataSetting, setDataSetting] = useState({
         chapter: 0,
         type: 0,
         numberRound: 10,
-        timer: { h: 0, m: 0, s: 30 },
+        timer: { h: 0, m: 5, s: 0 },
         type_of_question: 0,
         level: 0,
     });
 
     const time = new Date();
-    time.setSeconds(time.getSeconds() + 30);
+    time.setSeconds(time.getSeconds() + TIME_DEFAULT);
 
     const { seconds, minutes, hours, isRunning, start, pause, resume, restart } = useTimer({
         expiryTimestamp: time,
@@ -102,23 +104,25 @@ export default function Test() {
             top: 0,
             behavior: 'smooth',
         });
-        // pause();
+        pause();
         dispatch(
             getCourseDetail.getCourseDetailRequest({
                 course_id: id,
             }),
         );
         const { h, s, m } = dataSetting.timer;
+        setOpenDialogSetting(true);
         dispatch(getTestResult.getTestResultReset({}));
-        dispatch(
-            getQuestionByTest.getQuestionByTestRequest({
-                course_id: id,
-                user_id: getUserFromLocalStorage().user_id,
-                ...dataSetting,
-                time: `${h}:${m}:${s}`,
-                totalQues: dataSetting.numberRound,
-            }),
-        );
+        // dispatch(
+        //     getQuestionByTest.getQuestionByTestRequest({
+        //         course_id: id,
+        //         user_id: getUserFromLocalStorage().user_id,
+        //         ...dataSetting,
+        //         time: `${h}:${m}:${s}`,
+        //         totalQues: dataSetting.numberRound,
+        //     }),
+        // );
+        setIsTest(false);
         dispatch(
             getTotalQues.getTotalQuesRequest({
                 user_id: getUserFromLocalStorage().user_id,
@@ -156,12 +160,7 @@ export default function Test() {
     const hide = () => setPopper(false);
 
     const handleCloseTest = () => {
-        if (testResult?.openResult) {
-            navigate(routes.courseDetail + '/' + id + '&tab=0');
-        } else {
-            setIsTest(true);
-            handleConfirmTest();
-        }
+        navigate(routes.courseDetail + '/' + id + '&tab=0');
     };
 
     const handleClick = (event, id) => {
@@ -208,11 +207,10 @@ export default function Test() {
                     openResult: true,
                 }),
             );
+            setIsTest(true);
+            setIsTesting(false);
             setOpenConfirmDialog(false);
         });
-        if (isTest) {
-            navigate(routes.courseDetail + '/' + id + '&tab=0');
-        }
     };
 
     const handleReview = () => {
@@ -225,7 +223,7 @@ export default function Test() {
 
     const handleSubmitForm = () => {
         const { h, s, m } = dataSetting.timer;
-        let convertTime = h * 60 * 60 + m * 60 + s - 30;
+        let convertTime = h * 60 * 60 + m * 60 + s - TIME_DEFAULT;
         time.setSeconds(time.getSeconds() + convertTime);
         restart(time);
         dispatch(getTestResult.getTestResultReset({}));
@@ -238,6 +236,7 @@ export default function Test() {
                 totalQues: dataSetting.numberRound,
             }),
         );
+        setIsTesting(true);
         handleCloseSettingDialog();
     };
 
@@ -483,37 +482,44 @@ export default function Test() {
                                     arrow={true}
                                     title={popper ? '' : <Typography className="small-font">List Questions</Typography>}
                                 >
-                                    <IconButton onClick={popper ? hide : show} className={cx('kq-btn')}>
+                                    <IconButton
+                                        onClick={popper ? hide : show}
+                                        className={cx('kq-btn', isTesting && 'mx-3')}
+                                    >
                                         <FilterList className={cx('icon')} />
                                     </IconButton>
                                 </Tooltip>
                             </CustomTippyPopper>
 
-                            <CustomIconAction
-                                label={'Setting'}
-                                arrow={true}
-                                className={cx('kq-btn', 'mx-3')}
-                                handleClick={() => handleOpenSettingDialog()}
-                                icon={<SettingsOutlined className={cx('icon')} />}
-                            />
-                            <CustomIconAction
-                                label={'Close'}
-                                arrow={true}
-                                className={cx('kq-btn')}
-                                handleClick={handleCloseTest}
-                                icon={<CloseOutlined className={cx('icon')} />}
-                            />
+                            {!isTesting && (
+                                <CustomIconAction
+                                    label={'Setting'}
+                                    arrow={true}
+                                    className={cx('kq-btn', 'mx-3')}
+                                    handleClick={() => handleOpenSettingDialog()}
+                                    icon={<SettingsOutlined className={cx('icon')} />}
+                                />
+                            )}
+                            {!isTesting && (
+                                <CustomIconAction
+                                    label={'Close'}
+                                    arrow={true}
+                                    className={cx('kq-btn')}
+                                    handleClick={handleCloseTest}
+                                    icon={<CloseOutlined className={cx('icon')} />}
+                                />
+                            )}
                         </div>
                         <ProgressLabel value={hours * 3600 + minutes * 60 + seconds} time={dataSetting.timer} />
                     </Grid>
 
                     <CustomDialog
                         open={openDialogSetting}
-                        handleClose={handleCloseSettingDialog}
+                        handleClose={isTest && handleCloseSettingDialog}
                         title={'Setting'}
                         noButton={false}
                         size="md"
-                        // noClose={false}
+                        noClose={isTest}
                     >
                         <div className={cx('form-flex')}>
                             <label className={cx('label')} htmlFor="numberRound">
@@ -695,14 +701,16 @@ export default function Test() {
                                         />
                                     );
                                 })}
-                            <div className={cx('ending')}>
-                                <CustomButton
-                                    className={cx('ending-btn-submit')}
-                                    handleClick={handleConfirmTest}
-                                    title="Submit your test"
-                                    colorButton="primary"
-                                />
-                            </div>
+                            {isTesting && (
+                                <div className={cx('ending')}>
+                                    <CustomButton
+                                        className={cx('ending-btn-submit')}
+                                        handleClick={handleConfirmTest}
+                                        title="Submit your test"
+                                        colorButton="primary"
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

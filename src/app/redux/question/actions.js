@@ -65,6 +65,6 @@ export const getSearchText = createActions({
     getSearchTextSuccess: (payload) => payload,
 });
 
-export const getWrongQuestion = createActions({
-    getWrongQuestionSuccess: (payload) => payload,
+export const getIsNote = createActions({
+    getIsNoteSuccess: (payload) => payload,
 });

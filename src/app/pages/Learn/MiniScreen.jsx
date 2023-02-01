@@ -2,13 +2,15 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Card } from '@material-ui/core';
 import { CardContent } from '@mui/material';
+import Close from '@mui/icons-material/Close';
 
 import classNames from 'classnames/bind';
 import styles from './Learn.module.scss';
+import CustomIconAction from '../../components/Share/CustomIconAction';
 
 const cx = classNames.bind(styles);
 
-export default function MiniScreen({ data, handleChangeSearch }) {
+export default function MiniScreen({ data, handleChangeSearch, handleCloseSearch }) {
     const { searchText } = useSelector((state) => state.question);
 
     const handleChange = (event) => {
@@ -25,6 +27,13 @@ export default function MiniScreen({ data, handleChangeSearch }) {
                         className={cx('input-search')}
                         placeholder="Enter your keyword here"
                         value={searchText}
+                    />
+                    <CustomIconAction
+                        handleClick={handleCloseSearch}
+                        className={cx('btn-close')}
+                        label="Close search"
+                        arrow={true}
+                        icon={<Close />}
                     />
                 </div>
 

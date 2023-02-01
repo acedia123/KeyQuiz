@@ -6,6 +6,7 @@ import {
     getIndexRoundQuestion,
     getIsAnswer,
     getIsCheck,
+    getIsNote,
     getNewQuestion,
     getNotification,
     getOpenEndingView,
@@ -14,7 +15,6 @@ import {
     getSearchText,
     getTotalLearn,
     getType,
-    getWrongQuestion,
     userAnswer,
 } from './actions';
 
@@ -32,7 +32,7 @@ const initialState = {
     openEndingView: false,
     searchSelected: false,
     searchText: null,
-    wrongQuestions: [],
+    isNote: false,
     // process
     roundProcess: {
         totalCorrect: 0,
@@ -88,10 +88,8 @@ const QuestionReducer = (state = initialState, action) => {
         case getType(getSearchText.getSearchTextSuccess): {
             return { ...state, searchText: action.payload };
         }
-        case getType(getWrongQuestion.getWrongQuestionSuccess): {
-            let data = state.wrongQuestions;
-            data.push(action.payload);
-            return { ...state, wrongQuestions: data };
+        case getType(getIsNote.getIsNoteSuccess): {
+            return { ...state, isNote: action.payload };
         }
         default:
             return { ...state };

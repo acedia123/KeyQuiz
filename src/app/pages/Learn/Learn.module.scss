@@ -188,6 +188,10 @@ $header-height: 56px;
     .search-wrapper {
         display: flex;
     }
+    .btn-close {
+        margin-right: -15px;
+        margin-left: 15px;
+    }
     .results {
         margin: 10px 0;
         .result-item {

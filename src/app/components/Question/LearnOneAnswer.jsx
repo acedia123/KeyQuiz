@@ -14,11 +14,11 @@ import {
     addRoundProcess,
     getCheckQuestion,
     getIsAnswer,
+    getIsNote,
     getNewQuestion,
     getNotification,
     getSearchSelected,
     getSearchText,
-    getWrongQuestion,
     userAnswer,
 } from '../../redux/question/actions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,6 +33,7 @@ const cx = classNames.bind(styles);
 
 export default function LearnOneAnswer({ data, handleReport, handleClickSearch }) {
     const dispatch = useDispatch();
+    const [note, setNote] = useState(null);
     const [showHint, setShowHint] = useState(false);
     const { userAnswers } = useSelector((state) => state.question);
     const { isNewQuestion } = useSelector((state) => state.question);
@@ -49,6 +50,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
             dispatch(getCheckQuestion.getCheckQuestionSuccess(null));
             dispatch(getNewQuestion.getNewQuestionSuccess(true));
             dispatch(getNotification.getNotificationSuccess(false));
+            setNote(null);
         };
     }, []);
 
@@ -58,6 +60,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
         dispatch(getIsAnswer.getIsAnswerSuccess(false));
         dispatch(getCheckQuestion.getCheckQuestionSuccess(null));
         dispatch(getNewQuestion.getNewQuestionSuccess(true));
+        setNote(data.note);
     }, [isNewQuestion]);
 
     const handleCheckQuestion = (event, answer, index) => {
@@ -80,7 +83,6 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
             roundProcess.totalCorrect = roundProcess.totalCorrect + 1;
         } else {
             roundProcess.totalWrong = roundProcess.totalWrong + 1;
-            dispatch(getWrongQuestion.getWrongQuestionSuccess(data));
         }
         roundProcess.userAnswers.push({ ...data, userChoose: [{ answer, index }] });
         dispatch(addRoundProcess.addRoundProcessSuccess({ ...roundProcess }));
@@ -102,7 +104,6 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
         dispatch(getIsAnswer.getIsAnswerSuccess(true));
         dispatch(userAnswer.getUserAnswerSuccess([]));
         dispatch(getCheckQuestion.getCheckQuestionSuccess(false));
-        // generalFunction(0, data.answers[0], false);
 
         changeTypeOfQuestion({ question_practice_id: data.question_practice_id, isCorrect: false });
         dispatch(getNotification.getNotificationSuccess(true));
@@ -142,7 +143,6 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
         let selection = window.getSelection().toString();
         if (selection !== '' && !searchSelected) {
             dispatch(getSearchSelected.getSearchSelectedSuccess(true));
-            dispatch(getSearchText.getSearchTextSuccess(selection));
             setPos({ left: event.clientX - 200 + 'px', right: event.clientY + 'px' });
         }
     };
@@ -152,12 +152,22 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
         handleClickSearch(data);
     };
 
+    const handleCheckSearch = () => {
+        let selection = window.getSelection().toString();
+        handleClickSearch(selection.trim());
+    };
+
     const handleBlurTextEditor = (value) => {
+        dispatch(getIsNote.getIsNoteSuccess(false));
         createNote({ question_practice_id: data.question_practice_id, note: value });
     };
 
+    const handleFocusText = () => {
+        dispatch(getIsNote.getIsNoteSuccess(true));
+    };
+
     return (
-        <Card className={cx('card', isNewQuestion ? '--animation-slide' : '')}>
+        <Card className={cx('card', isNewQuestion ? '--animation-slide' : '')} style={{ overflow: 'visible' }}>
             <CardContent className={cx('card-content')}>
                 <Grid className={cx('card__header')}>
                     <Typography className="normal-font font-weight-bold">
@@ -215,7 +225,7 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
                     <div className={cx('content', 'position-relative')} onMouseUp={handleMouseUp}>
                         {data.content}
                         {searchSelected && (
-                            <div className={cx('searchSelect')} onClick={handleClickSearch} style={{ ...pos }}>
+                            <div className={cx('searchSelect')} onClick={() => handleCheckSearch()} style={{ ...pos }}>
                                 <Search className={cx('icon')} />
                             </div>
                         )}
@@ -266,15 +276,8 @@ export default function LearnOneAnswer({ data, handleReport, handleClickSearch }
             <Card className={cx('note-wrapper')}>
                 <div className="d-flex-center-between">
                     <h2>Note</h2>
-                    {/* <CustomIconAction
-                        label={'Save'}
-                        arrow={true}
-                        className={cx('kq-btn', 'btn') + ' ml-3'}
-                        // handleClick={() => handleCopyCourse()}
-                        icon={<SaveOutlined fontSize="large" />}
-                    /> */}
                 </div>
-                <TextEditor data={data.note} handleBlurText={handleBlurTextEditor} />
+                <TextEditor data={note} handleFocusText={handleFocusText} handleBlurText={handleBlurTextEditor} />
             </Card>
         </Card>
     );

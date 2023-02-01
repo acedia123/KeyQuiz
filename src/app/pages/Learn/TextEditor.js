@@ -13,7 +13,7 @@ const EMPTY_VALUE = `<p><br></p>`;
 const INITIAL_VALUE = `<p>Enter your note here</p>`;
 const colors = ['red', 'white', 'black', 'blue', 'pink', 'green'];
 
-export default function TextEditor({ data, handleBlurText }) {
+export default function TextEditor({ data, handleBlurText, handleFocusText }) {
     const [html, setHTML] = useState(INITIAL_VALUE);
     const textRef = useRef();
     const [activeButton, setActiveButton] = useState({ bold: 0, italic: 0, underline: 0 });
@@ -22,7 +22,7 @@ export default function TextEditor({ data, handleBlurText }) {
 
     useEffect(() => {
         setHTML(data === EMPTY_VALUE || !data ? INITIAL_VALUE : data);
-    }, []);
+    }, [data]);
 
     const handleChange = (evt) => {
         setHTML(() => evt.target.value);
@@ -32,6 +32,7 @@ export default function TextEditor({ data, handleBlurText }) {
         if (textRef.current.lastHtml === INITIAL_VALUE) {
             setHTML(EMPTY_VALUE);
         }
+        handleFocusText();
     };
 
     const handleBlur = () => {
@@ -72,13 +73,11 @@ export default function TextEditor({ data, handleBlurText }) {
 
     const handleChangeColor = (index, type) => {
         if (type === 0) {
-            console.log('fore', colors[index]);
             setColorSetting((preState) => {
                 return { ...preState, foreBg: colors[index] };
             });
             document.execCommand('foreColor', false, colors[index]);
         } else {
-            console.log('back', colors[index]);
             setColorSetting((preState) => {
                 return { ...preState, backBg: colors[index] };
             });
@@ -123,6 +122,7 @@ export default function TextEditor({ data, handleBlurText }) {
                                     <div className="d-flex-center">
                                         {colors.map((item, index) => (
                                             <button
+                                                key={'foreBg' + index}
                                                 className={cx('color')}
                                                 style={{ background: item }}
                                                 onClick={() => handleChangeColor(index, 0)}
@@ -139,6 +139,7 @@ export default function TextEditor({ data, handleBlurText }) {
                                     <div className="d-flex-center">
                                         {colors.map((item, index) => (
                                             <button
+                                                key={'backBg' + index}
                                                 className={cx('color')}
                                                 style={{ background: item, borderColor: index === 1 ? 'orange' : item }}
                                                 onClick={() => handleChangeColor(index, 1)}

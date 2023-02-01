@@ -48,7 +48,6 @@ import styles from './Learn.module.scss';
 const cx = classNames.bind(styles);
 
 export default function Learn() {
-    const notifiRef = useRef();
     const context = useContext(ToastContext);
     const dispatch = useDispatch();
     let navigate = useNavigate();
@@ -57,11 +56,10 @@ export default function Learn() {
     const { indexQuestion } = useSelector((state) => state.question);
     const { openOverview } = useSelector((state) => state.question);
     const { indexRound } = useSelector((state) => state.question);
-    const { wrongQuestions } = useSelector((state) => state.question);
+    const { isNote } = useSelector((state) => state.question);
     const { totalLearn } = useSelector((state) => state.question);
 
     const { terms } = useSelector((state) => state.test);
-
     const [totalQuestion, setTotalQues] = useState(0);
     const [dataSearch, setDataSearch] = useState();
     const [isOpenSearch, setIsOpenSearch] = useState(false);
@@ -90,10 +88,12 @@ export default function Learn() {
         });
         fetchTotalQuestion({ ...dataSetting });
         dispatch(getTerm.getTermRequest({ course_id: courseId }));
+        return () => {
+            localStorage.removeItem('dataLocal');
+        };
     }, []);
 
     const handleNextQuestion = () => {
-        console.log(wrongQuestions);
         dispatch(getNotification.getNotificationSuccess(false));
 
         if (indexQuestion === rounds[indexRound].questions.length - 1) {
@@ -129,7 +129,7 @@ export default function Learn() {
     };
 
     window.onkeypress = () => {
-        if (notification) {
+        if (notification && !isNote) {
             handleNextQuestion();
         }
     };
@@ -264,12 +264,21 @@ export default function Learn() {
     );
 
     const handleClickSearch = (searchText) => {
-        if (!isOpenSearch) {
-            setIsOpenSearch(true);
-            fetchDropdownOptions(searchText);
+        setIsOpenSearch(true);
+        const dataLocal = localStorage.getItem('dataLocal');
+        if (dataLocal) {
+            if (searchText !== dataLocal) {
+                localStorage.setItem('dataLocal', searchText);
+                fetchDropdownOptions(searchText);
+            }
         } else {
-            setIsOpenSearch(false);
+            localStorage.setItem('dataLocal', searchText);
+            fetchDropdownOptions(searchText);
         }
+    };
+
+    const handleCloseSearch = () => {
+        setIsOpenSearch(false);
     };
 
     return (
@@ -319,7 +328,13 @@ export default function Learn() {
                             handleClickSearch={handleClickSearch}
                         />
                     )}
-                    {isOpenSearch && <MiniScreen data={dataSearch} handleChangeSearch={handleChangeSearch} />}
+                    {isOpenSearch && (
+                        <MiniScreen
+                            data={dataSearch}
+                            handleChangeSearch={handleChangeSearch}
+                            handleCloseSearch={handleCloseSearch}
+                        />
+                    )}
                 </div>
             )}
 
@@ -449,7 +464,7 @@ export default function Learn() {
             />
 
             {notification && (
-                <div ref={notifiRef} className={cx('dialog')}>
+                <div className={cx('dialog')}>
                     <div className={cx('dialog-content')}>
                         Press any keyboard to next question or
                         <button className={cx('dialog-btn')} onClick={handleNextQuestion}>

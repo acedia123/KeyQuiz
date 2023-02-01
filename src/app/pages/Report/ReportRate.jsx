@@ -156,17 +156,17 @@ export default function ReportRate() {
             ),
             editable: false,
         },
-        {
-            field: 'status',
-            minWidth: 200,
-            sortable: false,
-            headerAlign: 'center',
-            renderHeader: (params) => <span className="header-table">Status</span>,
-            renderCell: (params) => (
-                <div className="normal-font row-center">{params.row.status === 0 ? 'Deleted' : 'Processing'}</div>
-            ),
-            editable: false,
-        },
+        // {
+        //     field: 'status',
+        //     minWidth: 200,
+        //     sortable: false,
+        //     headerAlign: 'center',
+        //     renderHeader: (params) => <span className="header-table">Status</span>,
+        //     renderCell: (params) => (
+        //         <div className="normal-font row-center">{params.row.status === 0 ? 'Deleted' : 'Processing'}</div>
+        //     ),
+        //     editable: false,
+        // },
         // {
         //     minWidth: 150,
         //     sortable: false,

@@ -41,9 +41,6 @@ const TestReducer = (state = initialState, action) => {
                 testResult: { wrongTime: 0, successTime: 0, openResult: false },
                 selected: 1,
                 questions: null,
-                terms: [],
-                totalQues: 0,
-                tests: [],
             };
         }
 

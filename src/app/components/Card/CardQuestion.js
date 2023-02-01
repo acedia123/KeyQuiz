@@ -111,7 +111,7 @@ export default function CardQuestion({
                     <span className="normal-font">Chapter: {data.term_name ? data.term_name : term.term_name}</span>
                 </div>
 
-                {!isForm && (
+                {!isForm && getUserFromLocalStorage() && (
                     <>
                         <div className={cx('content')}>
                             <div className={cx('separate') + ' my-2'}></div>
