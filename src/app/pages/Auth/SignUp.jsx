@@ -97,9 +97,10 @@ export default function SignUps() {
     };
 
     const handleClearForm = () => {
-        setDataForm((preState) => {
-            return { ...preState, email: '', user_name: '', password: '', rePassword: '' };
-        });
+        // setDataForm((preState) => {
+        //     return { ...preState, email: '', user_name: '', password: '', rePassword: '' };
+        // });
+        navigate(routes.login);
         dispatch(getRegister.getCloseNotification());
     };
 

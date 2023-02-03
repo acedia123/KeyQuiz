@@ -17,7 +17,7 @@ import { getUserFromLocalStorage } from '../../constants/functions';
 
 const cx = classNames.bind(styles);
 
-export default function TabListCourses({ data, id }) {
+export default function TabListCourses({ data, id, authorId }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { dataSearch } = useSelector((state) => state.course);
@@ -211,6 +211,7 @@ export default function TabListCourses({ data, id }) {
                                     index={index + 1}
                                     isForm={false}
                                     toggleStarQuestion={toggleStarQuestion}
+                                    authorId={authorId}
                                 />
                             </Grid>
                         );

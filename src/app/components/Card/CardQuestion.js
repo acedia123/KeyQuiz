@@ -15,6 +15,7 @@ export default function CardQuestion({
     handleEditQuestion,
     role = 'user',
     handleDeleteQuestion,
+    authorId = 0,
     toggleStarQuestion = () => {},
 }) {
     const [answer, setAnswer] = useState([]);
@@ -22,7 +23,10 @@ export default function CardQuestion({
     useEffect(() => {
         let newArr = [];
         data.correctAnswers.forEach((item) => {
-            newArr.push(data.answers.findIndex((ans) => ans === item));
+            const indexAns = data.answers.findIndex((ans) => ans === item);
+            if (indexAns > -1) {
+                newArr.push(indexAns);
+            }
         });
         setAnswer(newArr);
     }, [data.answers, data.correctAnswers]);
@@ -41,9 +45,9 @@ export default function CardQuestion({
     return (
         <Card className={cx('flash-card-item')}>
             <div className={cx('card-header')} style={{ backgroundColor: '#E7F2FF' }}>
-                <div className={cx('header-title')}>
-                    {index ? index + '.' : ''}{' '}
-                    <span className={cx('text-content')}>
+                <div className={cx('header-title', 'd-flex-align-center')}>
+                    {index ? <span className="mr-1">{index + '.'}</span> : ''}
+                    <span className={cx('text-content', 'd-flex-align-center')}>
                         {data.content}
                         {data.isExist && (
                             <Chip
@@ -111,16 +115,18 @@ export default function CardQuestion({
                     <span className="normal-font">Chapter: {data.term_name ? data.term_name : term.term_name}</span>
                 </div>
 
-                {!isForm && getUserFromLocalStorage() && (
+                {!isForm && getUserFromLocalStorage() && getUserFromLocalStorage().user_id === authorId && (
                     <>
                         <div className={cx('content')}>
                             <div className={cx('separate') + ' my-2'}></div>
                         </div>
                         <div className={cx('content')}>
-                            <span className="normal-font text-success">Correct times: {data.correct_time}</span>
+                            <span className="normal-font text-success">
+                                Correct times: {data.question_correct_time}
+                            </span>
                         </div>
                         <div className={cx('content')}>
-                            <span className="normal-font text-danger">Wrong times: {data.wrong_times}</span>
+                            <span className="normal-font text-danger">Wrong times: {data.question_wrong_times}</span>
                         </div>
                     </>
                 )}

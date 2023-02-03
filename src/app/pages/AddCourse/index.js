@@ -9,7 +9,7 @@ import {
     DeleteRounded,
     ExpandLess,
     SaveOutlined,
-    SystemUpdateAltOutlined,
+    CloudUploadOutlined,
     Visibility,
     VisibilityOff,
 } from '@mui/icons-material';
@@ -179,7 +179,6 @@ export default function AddCourse() {
                 ...newState,
             }),
         );
-
         setDataError((preState) => {
             return {
                 ...preState,
@@ -194,24 +193,33 @@ export default function AddCourse() {
         const { course_name, password, terms } = JSON.parse(localStorage.getItem('addCourseForm'));
         let checkTerm = terms.every((item) => !item.status);
         if (!course_name.status && !password.status && checkTerm) {
-            await addCourse(data).then(({ data, status }) => {
-                if (status) {
-                    context.setDataAlert({
-                        ...context.dataAlert,
-                        isOpen: true,
-                        message: 'Add Course Successfully!',
-                        status: 'success',
-                    });
-                    navigate(routes.courses);
-                } else {
+            await addCourse(data)
+                .then(({ data, status }) => {
+                    if (status) {
+                        context.setDataAlert({
+                            ...context.dataAlert,
+                            isOpen: true,
+                            message: 'Add Course Successfully!',
+                            status: 'success',
+                        });
+                        navigate(routes.courses);
+                    } else {
+                        context.setDataAlert({
+                            ...context.dataAlert,
+                            isOpen: true,
+                            message: 'Add Course Failure!',
+                            status: 'error',
+                        });
+                    }
+                })
+                .catch((err) => {
                     context.setDataAlert({
                         ...context.dataAlert,
                         isOpen: true,
                         message: 'Add Course Failure!',
                         status: 'error',
                     });
-                }
-            });
+                });
         }
     };
 
@@ -299,16 +307,48 @@ export default function AddCourse() {
         });
     };
 
+    function combineQuestions(data) {
+        const questionMap = {};
+        for (let i = 0; i < data.length; i++) {
+            const termName = data[i].term_name;
+            if (!questionMap[termName]) {
+                questionMap[termName] = [];
+            }
+            for (let j = 0; j < data[i].questions.length; j++) {
+                const question = data[i].questions[j];
+                let isExist = false;
+
+                isExist = questionMap[termName].some(
+                    (ques) =>
+                        ques.content.trim().toLowerCase() === question.content.trim().toLowerCase() &&
+                        ques.answers.toString() === question.answers.toString(),
+                );
+
+                if (!isExist) {
+                    questionMap[termName].push(question);
+                }
+            }
+        }
+        const result = [];
+        for (const key in questionMap) {
+            result.push({
+                term_name: key,
+                questions: questionMap[key],
+            });
+        }
+        return result;
+    }
+
     const handleImportExcel = (newData) => {
         let newDataError = dataError.terms.slice();
         let newExpand = expand.slice();
-
         let handleData = newData.map((item) => {
             newDataError.push({ status: false, error: '' });
             newExpand.push(false);
             let newArr = [];
             let newQues = item.questions.map((b) => {
-                let check = newArr.filter((a) => a.content === b.content).length > 0;
+                let check =
+                    newArr.filter((a) => a.content.trim().toLowerCase() === b.content.trim().toLowerCase()).length > 0;
                 if (check) {
                     return { ...b, isExist: check };
                 } else {
@@ -319,27 +359,15 @@ export default function AddCourse() {
             return { ...item, questions: newQues };
         });
 
+        let result = [];
         if (data.data.length === 0) {
-            setData((preState) => {
-                return { ...preState, data: handleData };
-            });
+            result = combineQuestions(handleData);
         } else {
-            let ob = data.data.map((item) => {
-                let h = handleData.find((h) => item.term_name === h.term_name);
-                if (h) {
-                    let idss = new Set(item.questions.map((d) => d.content));
-                    let quess = [...item.questions, ...h.questions.filter((d) => !idss.has(d.content))];
-                    return { ...item, questions: quess };
-                } else {
-                    return { ...item };
-                }
-            });
-            let ids = new Set(ob.map((d) => d.term_name));
-            let merged = [...ob, ...handleData.filter((d) => !ids.has(d.term_name))];
-            setData((preState) => {
-                return { ...preState, data: merged };
-            });
+            result = combineQuestions([...data.data, ...handleData]);
         }
+        setData((preState) => {
+            return { ...preState, data: result };
+        });
 
         setDataError({ ...dataError, terms: newDataError });
         setExpand(newExpand);
@@ -467,7 +495,7 @@ export default function AddCourse() {
                         <CustomButton
                             handleClick={handleOpenImport}
                             status="outlined"
-                            icon={SystemUpdateAltOutlined}
+                            icon={CloudUploadOutlined}
                             label="Import"
                         />
                         <CustomButton

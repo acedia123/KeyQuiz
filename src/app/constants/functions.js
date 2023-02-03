@@ -37,7 +37,13 @@ export const convertRelativeTime = (time) => {
     }
 };
 
-export const convertLevel = (value) => levels.find((item) => item.value === value).name;
+export const convertLevel = (value) => {
+    if (!isNaN(value)) {
+        return levels.find((item) => item.value === value).name;
+    } else {
+        return levels.find((item) => item.name === value).name;
+    }
+};
 
 export const getUserFromLocalStorage = () => {
     return JSON.parse(localStorage.getItem('user'));

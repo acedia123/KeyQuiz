@@ -140,7 +140,7 @@ export default function AdminAccountDetail() {
                             <span className={cx('avatar-name')}>{data.user_name}</span>
                             <div>
                                 <span className={cx('avatar-detail')}>
-                                    Joined: <b>{moment(data.created_at).format('MMMM Do YYYY, hh:mm:ss')}</b>
+                                    Joined: <b>{moment(data.created_at).utc().format('MMMM Do YYYY, hh:mm:ss')}</b>
                                 </span>
                                 <span className={cx('avatar-detail')}>
                                     Status:{' '}

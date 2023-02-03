@@ -10,6 +10,7 @@ import CustomToast from '../../components/Toast/CustomToast';
 
 import classNames from 'classnames/bind';
 import styles from './AddCourse.module.scss';
+import { convertLevel } from '../../constants/functions';
 
 const cx = classNames.bind(styles);
 
@@ -68,6 +69,7 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
                 handleClear();
             })
             .catch((err) => {
+                console.log(err);
                 setDataAlert({
                     ...dataAlert,
                     isOpen: true,
@@ -119,6 +121,7 @@ export default function ImportCourseDialog({ open, handleClose, handleSubmit }) 
                         ...mapItem,
                         correctAnswers: mapItem.correct_answers,
                         answers: mapItem.answers.filter((el) => el != ''),
+                        level: isNaN(mapItem.level) ? (mapItem.level == 'Easy' ? 0 : 1) : mapItem.level,
                     };
                 });
             return { term_name: item, questions: newArr };

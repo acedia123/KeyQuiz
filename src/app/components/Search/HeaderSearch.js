@@ -32,12 +32,16 @@ export default function HeaderSearch({ children, searchText, searchData, showSea
                         <div>
                             <h4 className={cx('search-popper__title')}>Result</h4>
                             <ul>
-                                {searchData?.authors?.map((author) => (
+                                {searchData?.authors?.slice(0, 3).map((author) => (
                                     <li className={cx('suggest__item')} key={author.user_id}>
                                         <Link to={routes.authorProfile + '/' + author.user_id} className="popper-link">
                                             <Avatar
                                                 className="mr-2"
-                                                src={IMAGE_PATH + '/avatar/' + author.avatar}
+                                                src={
+                                                    author.avatar.length > 10
+                                                        ? author.avatar
+                                                        : IMAGE_PATH + '/avatar/' + author.avatar
+                                                }
                                                 alt={author.user_name}
                                             />
                                             <div className="d-flex justify-content-around flex-column">
@@ -52,7 +56,7 @@ export default function HeaderSearch({ children, searchText, searchData, showSea
                                         </Link>
                                     </li>
                                 ))}
-                                {searchData?.courses?.map((item) => (
+                                {searchData?.courses?.slice(0, 3).map((item) => (
                                     <li className={cx('suggest__item')} key={item.id}>
                                         <Link
                                             to={routes.courseDetail + '/' + item.course_id + '&tab=0'}

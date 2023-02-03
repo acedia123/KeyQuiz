@@ -135,7 +135,7 @@ const CardCourse = ({ data, topic = true }, ref) => {
                         <Grid className="d-flex-align-center">
                             <CalendarMonth fontSize="large" />
                             <Typography className="normal-font ml-1" noWrap>
-                                {moment(data.updated_at).format('DD/MM/YYYY')}
+                                {moment(data.updated_at).utc().format('DD/MM/YYYY')}
                             </Typography>
                         </Grid>
                     </Link>

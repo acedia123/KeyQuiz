@@ -11,6 +11,7 @@ import {
     getNotification,
     getOpenEndingView,
     getOpenOverview,
+    getResetDataLearn,
     getSearchSelected,
     getSearchText,
     getTotalLearn,
@@ -90,6 +91,31 @@ const QuestionReducer = (state = initialState, action) => {
         }
         case getType(getIsNote.getIsNoteSuccess): {
             return { ...state, isNote: action.payload };
+        }
+        case getType(getResetDataLearn.getResetDataLearnSuccess): {
+            return {
+                ...state,
+                userAnswers: [],
+                checkQuestion: null,
+                isAnswer: false,
+                notification: false,
+                isNewQuestion: false,
+                indexQuestion: 0,
+                indexRound: 0,
+                openOverview: false,
+                totalLearn: 0,
+                isCheck: false,
+                openEndingView: false,
+                searchSelected: false,
+                searchText: null,
+                isNote: false,
+                // process
+                roundProcess: {
+                    totalCorrect: 0,
+                    totalWrong: 0,
+                    userAnswers: [],
+                },
+            };
         }
         default:
             return { ...state };

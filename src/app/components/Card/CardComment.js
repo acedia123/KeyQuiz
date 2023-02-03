@@ -52,7 +52,7 @@ export default function CardComment({ data, handleDelete, handleReport }) {
                             size="medium"
                         />
                         <Typography className="ml-3 mt-3 normal-font">
-                            {moment(data.created_at).format('DD/MM/yyyy HH:mm')}
+                            {moment(data.created_at).utc().format('DD/MM/yyyy HH:mm')}
                         </Typography>
                         <Typography className="ml-3 mt-3 normal-font">{data.content}</Typography>
                     </div>

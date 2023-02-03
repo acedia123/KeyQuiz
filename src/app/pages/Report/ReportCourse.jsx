@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // Material Library
 import { Box, Stack } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { RemoveRedEyeRounded } from '@mui/icons-material';
+import { DeleteRounded, RemoveRedEyeRounded } from '@mui/icons-material';
 // Component
 import CustomIconAction from '../../components/Share/CustomIconAction';
 import CustomizationSearch from '../../components/Search/CustomizationSearch';
@@ -14,9 +14,12 @@ import CustomBreadcrumbs from '../../components/Share/CustomBreadcrumbs';
 import { ToastContext } from '../../context/ToastContextProvider';
 import { getListCourseReport } from '../../services/report';
 import CustomChipLabel from '../../components/Chip/CustomChipLabel';
+import { deleteCourse } from '../../services/courses';
+import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
 
 import classNames from 'classnames/bind';
 import styles from './Report.module.scss';
+import { routes } from '../../configs';
 
 const cx = classNames.bind(styles);
 
@@ -26,6 +29,8 @@ export default function ReportCourse() {
     const [dataForm, setDataForm] = useState([]);
     const [dataSearch, setDataSearch] = useState({ searchText: '' });
     const [dialogForm, setDialogForm] = useState(false);
+    const [courseId, setCourseId] = useState(null);
+    const [deleteOneDialog, setDeleteOneDialog] = useState(false);
 
     useEffect(() => {
         document.title = 'List Report Course | Key Quiz';
@@ -52,7 +57,25 @@ export default function ReportCourse() {
     };
 
     const handleOpenEditDialog = (id) => {
-        setDialogForm(true);
+        navigate(routes.admin.courseDetail + '/' + id);
+    };
+
+    const handleRemoveCourse = (id) => {
+        setCourseId(id);
+        setDeleteOneDialog(true);
+    };
+
+    const handleDeleteQuestion = () => {
+        deleteCourse({ course_id: courseId }).then(({ data }) => {
+            setDeleteOneDialog(false);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Delete Successfully!',
+                status: 'success',
+            });
+            fetchData();
+        });
     };
 
     const status = [
@@ -91,7 +114,7 @@ export default function ReportCourse() {
         },
         {
             field: 'course_id',
-            minWidth: 200,
+            minWidth: 248,
             sortable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Reported course</span>,
@@ -128,7 +151,7 @@ export default function ReportCourse() {
             renderHeader: (params) => <span className="header-table">Date Created</span>,
             renderCell: (params) => (
                 <div className="normal-font row-center">
-                    {moment(params.row.created_at).format('DD/MM/YYYY HH:mm:ss')}
+                    {moment(params.row.created_at).utc().format('DD/MM/YYYY HH:mm:ss')}
                 </div>
             ),
             editable: false,
@@ -152,8 +175,19 @@ export default function ReportCourse() {
             renderHeader: (params) => <span className="header-table">Actions</span>,
             renderCell: (params) => (
                 <div>
-                    <CustomIconAction label="Detail" arrow handleClick={() => handleOpenEditDialog(params.id)}>
+                    <CustomIconAction
+                        label="Detail"
+                        arrow
+                        handleClick={() => handleOpenEditDialog(params.row.course_id)}
+                    >
                         <RemoveRedEyeRounded className="text-primary icon" />
+                    </CustomIconAction>
+                    <CustomIconAction
+                        label="Remove course"
+                        arrow
+                        handleClick={() => handleRemoveCourse(params.row.course_id)}
+                    >
+                        <DeleteRounded className="text-danger icon" />
                     </CustomIconAction>
                 </div>
             ),
@@ -171,6 +205,13 @@ export default function ReportCourse() {
                     <CustomizationSearch placeholder="Searching report..." handleChangeSearch={handleChangeSearch} />
                 </div>
             </div>
+
+            <CustomConfirmDialog
+                label="course"
+                open={deleteOneDialog}
+                handleSubmit={handleDeleteQuestion}
+                handleClose={() => setDeleteOneDialog(false)}
+            />
 
             <Box sx={{ height: 640, width: '100%', marginTop: '20px' }}>
                 <DataGrid

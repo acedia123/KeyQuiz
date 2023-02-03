@@ -236,7 +236,7 @@ export default function AdminCourses() {
             renderHeader: (params) => <span className="header-table">Date Updated</span>,
             renderCell: (params) => (
                 <div className="normal-font row-center">
-                    {moment(params.row.updateAt).format('DD/MM/yyyy HH:mm:ss')}
+                    {moment(params.row.updateAt).utc().format('DD/MM/yyyy HH:mm:ss')}
                 </div>
             ),
             editable: false,
@@ -249,7 +249,7 @@ export default function AdminCourses() {
             renderHeader: (params) => <span className="header-table">Date Created</span>,
             renderCell: (params) => (
                 <div className="normal-font row-center">
-                    {moment(params.row.createdAt).format('DD/MM/yyyy HH:mm:ss')}
+                    {moment(params.row.createdAt).utc().format('DD/MM/yyyy HH:mm:ss')}
                 </div>
             ),
             editable: false,

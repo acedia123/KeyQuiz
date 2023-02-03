@@ -52,7 +52,7 @@ export default function UserAvatarPopper() {
                     <li className="popper-link popper-link--unselect">
                         <Avatar
                             className="mr-2"
-                            src={data.type_of_login === 'google' ? data.avatar : IMAGE_PATH + '/avatar/' + data.avatar}
+                            src={data.avatar.length > 10 ? data.avatar : IMAGE_PATH + '/avatar/' + data.avatar}
                             alt={data.user_name}
                         />
                         <div className="d-flex justify-content-around flex-column">

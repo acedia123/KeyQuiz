@@ -150,7 +150,13 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
     };
 
     const handleClear = () => {
-        setDataForm({ content: '', answers: [{ id: 1, content: '', isCorrect: false }], hint: '', explain: '' });
+        setDataForm({
+            content: '',
+            answers: [{ id: 1, content: '', isCorrect: false }],
+            hint: '',
+            explain: '',
+            level: 0,
+        });
         setDataError({
             notification: { status: false, error: '' },
             content: { status: false, error: '' },
@@ -177,15 +183,18 @@ export default function AddQuestionDialog({ open, handleSubmit, handleClose, dat
     };
 
     const handleBlurContent = () => {
-        let count = data.reduce(
-            (preValue, item) =>
-                preValue +
-                item.questions.filter(
-                    (ques) => ques.content.trim().toLowerCase() === dataForm.content.trim().toLowerCase(),
-                ).length,
-            0,
-        );
-        setFoundSameContent(count);
+        if (data) {
+            let count = data.reduce(
+                (preValue, item) =>
+                    preValue +
+                    item.questions.filter(
+                        (ques) => ques.content.trim().toLowerCase() === dataForm.content.trim().toLowerCase(),
+                    ).length,
+                0,
+            );
+            setFoundSameContent(count);
+        }
+
         setDataError((preState) => {
             return { ...preState, content: checkContent(dataForm) };
         });

@@ -243,7 +243,13 @@ export default function CourseDetail() {
                             <Grid>
                                 <Link to={routes.authorProfile + '/' + courseDetail.author[0].user_id}>
                                     <Grid container alignItems="center">
-                                        <Avatar src={IMAGE_PATH + '/avatar/' + courseDetail.author[0].avatar} />
+                                        <Avatar
+                                            src={
+                                                courseDetail.author[0].avatar.length > 10
+                                                    ? courseDetail.author[0].avatar
+                                                    : IMAGE_PATH + '/avatar/' + courseDetail.author[0].avatar
+                                            }
+                                        />
                                         <Typography className="ml-3 normal-font font-weight-bold">
                                             {courseDetail.author[0].user_name}
                                         </Typography>
@@ -252,15 +258,6 @@ export default function CourseDetail() {
                             </Grid>
                             <Grid>
                                 <Grid container alignItems="center">
-                                    {/* <CustomIconAction
-                                        label={'Add to my courses'}
-                                        arrow={true}
-                                        className={cx('kq-btn')}
-                                        handleClick={() => {
-                                            console.log('hihi');
-                                        }}
-                                        icon={<AddOutlined fontSize="large" />}
-                                    /> */}
                                     {questions && questions.length > 0 && (
                                         <CustomIconAction
                                             label={'Copy all questions'}
@@ -426,7 +423,11 @@ export default function CourseDetail() {
                         </Tabs>
                     </Box>
                     <TabPanel value={+tab} index={0}>
-                        <TabListCourses data={questions ? questions : []} id={id} />
+                        <TabListCourses
+                            data={questions ? questions : []}
+                            id={id}
+                            authorId={courseDetail.author[0].user_id}
+                        />
                     </TabPanel>
                     <TabPanel value={+tab} index={1}>
                         <TabComments courseId={id} courseDetail={courseDetail} />

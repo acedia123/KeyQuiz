@@ -103,11 +103,11 @@ export default function ReportQuestion() {
         },
         {
             field: 'question_id',
-            minWidth: 200,
+            minWidth: 248,
             sortable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Reported question</span>,
-            renderCell: (params) => <div className="normal-font row-center">{params.row.question_id}</div>,
+            renderCell: (params) => <div className="normal-font row-center">{params.row.question.content}</div>,
             editable: false,
         },
         {
@@ -142,7 +142,7 @@ export default function ReportQuestion() {
             renderHeader: (params) => <span className="header-table">Date Created</span>,
             renderCell: (params) => (
                 <div className="normal-font row-center">
-                    {moment(params.row.created_at).format('DD/MM/YYYY HH:mm:ss')}
+                    {moment(params.row.created_at).utc().format('DD/MM/YYYY HH:mm:ss')}
                 </div>
             ),
             editable: false,
@@ -230,7 +230,7 @@ export default function ReportQuestion() {
                             Reported by: {dataQuestion.author.user_name} - {dataQuestion.author.email}
                         </span>
                         <span className="normal-font font-weight-bold">
-                            Reported at: {moment(dataQuestion.created_at).format('DD-MM-YYYY HH:ss:mm')}
+                            Reported at: {moment(dataQuestion.created_at).utc().format('DD-MM-YYYY HH:ss:mm')}
                         </span>
                     </div>
                     <CardQuestion

@@ -19,6 +19,8 @@ import CustomChipLabel from '../../components/Chip/CustomChipLabel';
 
 import classNames from 'classnames/bind';
 import styles from './Report.module.scss';
+import CustomConfirmDialog from '../../components/Dialog/CustomConfirmDialog';
+import { deleteComment } from '../../services/rate';
 
 const cx = classNames.bind(styles);
 
@@ -32,6 +34,8 @@ export default function ReportRate() {
     const [dialogForm, setDialogForm] = useState(false);
     const [dataSubmit, setDataSubmit] = useState(null);
     const [notification, setNotification] = useState(null);
+    const [deleteOneDialog, setDeleteOneDialog] = useState(false);
+    const [rateId, setRateId] = useState(null);
 
     useEffect(() => {
         document.title = 'List Report Rate | Key Quiz';
@@ -91,6 +95,24 @@ export default function ReportRate() {
         setDialogForm(true);
     };
 
+    const handleDeleteQuestion = () => {
+        deleteComment({ rate_id: rateId }).then(({ data }) => {
+            setDeleteOneDialog(false);
+            context.setDataAlert({
+                ...context.dataAlert,
+                isOpen: true,
+                message: 'Delete Successfully!',
+                status: 'success',
+            });
+            fetchData();
+        });
+    };
+
+    const handleConfirmDelete = (id) => {
+        setRateId(id);
+        setDeleteOneDialog(true);
+    };
+
     const columns = [
         {
             field: 'id',
@@ -114,7 +136,7 @@ export default function ReportRate() {
         },
         {
             field: 'rate_id',
-            minWidth: 200,
+            minWidth: 248,
             sortable: false,
             headerAlign: 'center',
             renderHeader: (params) => <span className="header-table">Reported rate</span>,
@@ -123,7 +145,7 @@ export default function ReportRate() {
         },
         {
             field: 'email',
-            minWidth: 300,
+            minWidth: 350,
             sortable: false,
             editable: false,
             headerAlign: 'center',
@@ -136,7 +158,7 @@ export default function ReportRate() {
         },
         {
             field: 'other',
-            minWidth: 340,
+            minWidth: 390,
             sortable: false,
             editable: false,
             headerAlign: 'center',
@@ -151,7 +173,7 @@ export default function ReportRate() {
             renderHeader: (params) => <span className="header-table">Date Created</span>,
             renderCell: (params) => (
                 <div className="normal-font row-center">
-                    {moment(params.row.created_at).format('DD/MM/YYYY HH:mm:ss')}
+                    {moment(params.row.created_at).utc().format('DD/MM/YYYY HH:mm:ss')}
                 </div>
             ),
             editable: false,
@@ -167,21 +189,21 @@ export default function ReportRate() {
         //     ),
         //     editable: false,
         // },
-        // {
-        //     minWidth: 150,
-        //     sortable: false,
-        //     headerAlign: 'center',
-        //     type: 'actions',
-        //     renderHeader: (params) => <span className="header-table">Actions</span>,
-        //     renderCell: (params) => (
-        //         <div>
-        //             <CustomIconAction label="Detail" arrow handleClick={() => handleOpenEditDialog(params.id)}>
-        //                 <RemoveRedEyeRounded className="text-primary icon" />
-        //             </CustomIconAction>
-        //         </div>
-        //     ),
-        //     editable: false,
-        // },
+        {
+            minWidth: 150,
+            sortable: false,
+            headerAlign: 'center',
+            type: 'actions',
+            renderHeader: (params) => <span className="header-table">Actions</span>,
+            renderCell: (params) => (
+                <div>
+                    <CustomIconAction label="Detail" arrow handleClick={() => handleConfirmDelete(params.row.rate_id)}>
+                        <DeleteRounded className="text-danger icon" />
+                    </CustomIconAction>
+                </div>
+            ),
+            editable: false,
+        },
     ];
 
     return (
@@ -203,7 +225,12 @@ export default function ReportRate() {
                     <CustomizationSearch placeholder="Searching report..." handleChangeSearch={handleChangeSearch} />
                 </div>
             </div>
-
+            <CustomConfirmDialog
+                label="rate"
+                open={deleteOneDialog}
+                handleSubmit={handleDeleteQuestion}
+                handleClose={() => setDeleteOneDialog(false)}
+            />
             <Box sx={{ height: 640, width: '100%', marginTop: '20px' }}>
                 <DataGrid
                     className="quesTable"

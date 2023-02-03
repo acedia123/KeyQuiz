@@ -11,6 +11,7 @@ import {
     getNewQuestion,
     getNotification,
     getOpenOverview,
+    getResetDataLearn,
     getSearchSelected,
     getSearchText,
     getTotalLearn,
@@ -90,6 +91,7 @@ export default function Learn() {
         dispatch(getTerm.getTermRequest({ course_id: courseId }));
         return () => {
             localStorage.removeItem('dataLocal');
+            dispatch(getResetDataLearn.getResetDataLearnSuccess());
         };
     }, []);
 
@@ -167,6 +169,8 @@ export default function Learn() {
             user_id: getUserFromLocalStorage().user_id,
             ...dataSetting,
         }).then(({ data }) => {
+            dispatch(getResetDataLearn.getResetDataLearnSuccess());
+
             setRounds(data);
             dispatch(getIsAnswer.getIsAnswerSuccess(false));
             dispatch(userAnswer.getUserAnswerSuccess([]));

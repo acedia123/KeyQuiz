@@ -48,6 +48,10 @@ export const addRoundProcess = createActions({
     addRoundProcessSuccess: (payload) => payload,
 });
 
+export const getResetDataLearn = createActions({
+    getResetDataLearnSuccess: (payload) => payload,
+});
+
 export const getOpenEndingView = createActions({
     getOpenEndingViewSuccess: (payload) => payload,
     getIndexRoundQuestion: (payload) => payload,

@@ -30,7 +30,7 @@ export default function TabTestResult({}) {
                                 Test Result {index + 1} - {item.questions.length} question
                             </span>
                             <span className={cx('banner-text')}>
-                                {moment(item.created_at).format('DD/MM/YYYY HH:ss:mm')}
+                                {moment(item.created_at).utc('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm:ss')}
                             </span>
                             <span className={cx('banner-text', 'text-success')}>
                                 Correct times: {item.correct_count}

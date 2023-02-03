@@ -288,9 +288,9 @@ export default function Test() {
     };
 
     const handleBlurNumRound = (e) => {
-        if (+e.target.value >= questions.length) {
+        if (+e.target.value >= totalQues) {
             setDataSetting((preState) => {
-                return { ...preState, numberRound: questions.length };
+                return { ...preState, numberRound: totalQues };
             });
         } else {
             setDataSetting((preState) => {

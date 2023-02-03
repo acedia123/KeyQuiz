@@ -10,7 +10,7 @@ import {
     DeleteRounded,
     ExpandLess,
     SaveOutlined,
-    SystemUpdateAltOutlined,
+    CloudUploadOutlined,
     Visibility,
     VisibilityOff,
 } from '@mui/icons-material';
@@ -331,18 +331,55 @@ export default function EditCourse() {
         setOpenImportExcel(true);
     };
 
+    function combineQuestions(data) {
+        const questionMap = {};
+        for (let i = 0; i < data.length; i++) {
+            const termName = data[i].term_name;
+            if (!questionMap[termName]) {
+                questionMap[termName] = { questions: [] };
+            }
+            if (data[i].term_id) {
+                questionMap[data[i].term_name]['term_id'] = data[i].term_id;
+            }
+            for (let j = 0; j < data[i].questions.length; j++) {
+                const question = data[i].questions[j];
+                let isExist = false;
+
+                isExist = questionMap[termName].questions.some(
+                    (ques) =>
+                        ques.content.trim().toLowerCase() === question.content.trim().toLowerCase() &&
+                        ques.answers.toString() === question.answers.toString(),
+                );
+
+                if (!isExist) {
+                    questionMap[termName].questions.push({ ...question });
+                }
+            }
+        }
+        const result = [];
+        for (const key in questionMap) {
+            result.push({
+                term_id: questionMap[key].term_id,
+                term_name: key,
+                questions: questionMap[key].questions,
+                isDelete: false,
+            });
+        }
+        return result;
+    }
+
     const handleImportExcel = (newData) => {
         let newDataError = dataError.terms.slice();
         let newExpand = expand.slice();
-
         let handleData = newData.map((item) => {
             newDataError.push({ status: false, error: '' });
             newExpand.push(false);
             let newArr = [];
             let newQues = item.questions.map((b) => {
-                let check = newArr.filter((a) => a.content === b.content).length > 0;
+                let check =
+                    newArr.filter((a) => a.content.trim().toLowerCase() === b.content.trim().toLowerCase()).length > 0;
                 if (check) {
-                    return { ...b, isExist: check, isDelete: false };
+                    return { ...b, isExist: check };
                 } else {
                     newArr.push(b);
                     return { ...b, isExist: false, isDelete: false };
@@ -350,29 +387,15 @@ export default function EditCourse() {
             });
             return { ...item, questions: newQues, isDelete: false };
         });
-
+        let result = [];
         if (data.data.length === 0) {
-            setData((preState) => {
-                return { ...preState, data: handleData };
-            });
+            result = combineQuestions(handleData);
         } else {
-            let ob = data.data.map((item) => {
-                let h = handleData.find((h) => item.term_name === h.term_name);
-                if (h) {
-                    let idss = new Set(item.questions.map((d) => d.content));
-                    let quess = [...item.questions, ...h.questions.filter((d) => !idss.has(d.content))];
-                    return { ...item, questions: quess };
-                } else {
-                    return { ...item };
-                }
-            });
-            let ids = new Set(ob.map((d) => d.term_name));
-            let merged = [...ob, ...handleData.filter((d) => !ids.has(d.term_name))];
-            setData((preState) => {
-                return { ...preState, data: merged };
-            });
+            result = combineQuestions([...data.data, ...handleData]);
         }
-
+        setData((preState) => {
+            return { ...preState, data: result };
+        });
         setDataError({ ...dataError, terms: newDataError });
         setExpand(newExpand);
         context.setDataAlert({
@@ -495,7 +518,7 @@ export default function EditCourse() {
                         <CustomButton
                             handleClick={handleOpenImport}
                             status="outlined"
-                            icon={SystemUpdateAltOutlined}
+                            icon={CloudUploadOutlined}
                             label="Import"
                         />
                         <CustomButton
